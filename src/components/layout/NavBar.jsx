@@ -18,7 +18,7 @@ import { Link } from "react-router-dom";
 const pages = [
   "Home",
   "Productos",
-  "Clients",
+  "Clientes",
   "Caja",
   "Reportes",
   "Suscripciones",

@@ -1,0 +1,28 @@
+.MaquetaCliente {
+  margin:3%;
+}
+.H2{
+  display: flex;
+  padding-bottom: 1%;
+  align-items: center; /* Alinea verticalmente los elementos */
+  
+}
+.cuadro-central {
+  width: 80%;
+  padding: 15% 1%;
+
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+}
+.info-cliente {
+  margin-top: -17%;
+  display: flex;
+  justify-content: space-between; /* Espacia los elementos de forma equitativa */
+  align-items: center; /* Alinea verticalmente los elementos */
+  
+}
+
+
+.info-cliente p {
+  margin: 0; /* Elimina el margen predeterminado del párrafo */
+}

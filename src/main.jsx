@@ -13,7 +13,7 @@ createRoot(document.getElementById("root")).render(
         <Routes>
           <Route path="/" element={<Home />} /> {/* Ruta raíz */}
           <Route path="/home" element={<Home />} /> {/* Ruta de la página de inicio */}
-          <Route path="/clients" element={<Clients />} /> {/* Ruta de clientes */}
+          <Route path="/clientes" element={<Clients />} /> {/* Ruta de clientes */}
           <Route path="*" element={<PageNotFound />} /> {/* Ruta de página no encontrada */}
         </Routes>
       </Layout>
