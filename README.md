@@ -26,7 +26,7 @@
 4. Asegurarse siempre de trabajar en su rama correspondiente
 5. Para guardar los cambios: **git add .**
 6. Para hacer commit: **git commit -m "lo que hicieron"**
-7. Para subir los cambios **git push** (puede pedir mas cosas a veces)
+7. Para subir los cambios **git push origin dev** (puede pedir mas cosas a veces)
 8. Para hacer merge de los cambios con el main: **git merge main**(desde la rama de cada uno)
 
 ### Links de utilidad
