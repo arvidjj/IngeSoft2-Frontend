@@ -1,12 +1,15 @@
 import React from 'react'
 import { Link, Outlet } from 'react-router-dom'
+import NavBar from './NavBar'
 
-const Layout = () => {
+const Layout = ({children}) => {
   return (
-    <div>
-        <Link to='/home'>Inicio</Link>
-        <Outlet/>
-    </div>
+    <>
+        <NavBar />
+        {children}
+      
+        {/**Footer en caso de ser necesario */}
+    </>
   )
 }
 
