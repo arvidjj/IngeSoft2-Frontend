@@ -1,0 +1,61 @@
+.MaquetaCliente {
+  margin:0%;
+  padding-left: 18%;
+}
+.H2{
+  display: flex;
+  margin-top: 2%;
+  padding-bottom: 1%;
+  align-items: center; /* Alinea verticalmente los elementos */
+  
+}
+.cuadro-central {
+  width: 80%;
+  padding: 20% 1%;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+}
+.header-cliente {
+  margin-top: -24%;
+  display: flex;
+  justify-content: space-between; /* Espacia los elementos de forma equitativa */
+  align-items: center; /* Alinea verticalmente los elementos */
+  
+}
+.header-cliente p {
+  margin: 0; /* Elimina el margen predeterminado del párrafo */
+  font-weight: 400;
+}
+.info-cliente {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3%;
+  padding-bottom: 5%; /* espacio en la linea divisoria*/
+}
+
+.info-cliente > div {
+  flex: 1; /* Ajusta el ancho de los divs internos */
+  margin-right: 40px; /* Agrega margen entre los divs internos */
+}
+
+.info-cliente p {
+  margin: 0; /* Elimina el margen predeterminado del párrafo */
+}
+.datos-extras {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3%;
+  padding-bottom: 5%; /* espacio en la linea divisoria*/
+}
+
+.datos-extras > div {
+  flex: 1; /* Ajusta el ancho de los divs internos */
+  margin-right: 40px; /* Agrega margen entre los divs internos */
+}
+
+.datos-extras p {
+  margin: 0; /* Elimina el margen predeterminado del párrafo */
+}
+.Num-Telefono{
+  margin-left: 33%;
+}
