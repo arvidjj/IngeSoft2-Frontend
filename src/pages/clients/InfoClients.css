@@ -1,61 +1,103 @@
+
 .MaquetaCliente {
-  margin:0%;
-  padding-left: 18%;
+    padding: 3%;
+    padding-left: 18%;
 }
-.H2{
-  display: flex;
-  margin-top: 2%;
-  padding-bottom: 1%;
-  align-items: center; /* Alinea verticalmente los elementos */
-  
-}
+
 .cuadro-central {
-  width: 80%;
-  padding: 20% 1%;
-  background-color: #f0f0f0;
-  border-bottom: 1px solid #ccc;
+    width: 80%;
+    padding: 20% 1%;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ccc;
 }
+
 .header-cliente {
-  margin-top: -24%;
-  display: flex;
-  justify-content: space-between; /* Espacia los elementos de forma equitativa */
-  align-items: center; /* Alinea verticalmente los elementos */
-  
+    margin-top: -24%;
+    display: flex;
+    justify-content: space-between; /* Espacia los elementos de forma equitativa */
+    align-items: center; /* Alinea verticalmente los elementos */
+
 }
+
 .header-cliente p {
-  margin: 0; /* Elimina el margen predeterminado del párrafo */
-  font-weight: 400;
+    margin: 0; /* Elimina el margen predeterminado del párrafo */
+    font-weight: 400;
 }
+
 .info-cliente {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 3%;
-  padding-bottom: 5%; /* espacio en la linea divisoria*/
+    display: flex;
+    margin-left: 10%;
+    justify-content: space-between; /* Distribuir los elementos a lo largo del eje principal */
+    align-items: center; /* Centrar verticalmente los elementos */
 }
 
-.info-cliente > div {
-  flex: 1; /* Ajusta el ancho de los divs internos */
-  margin-right: 40px; /* Agrega margen entre los divs internos */
+
+.info-cliente > div:nth-child(2) {
+    align-items: center; /* Centrar verticalmente los elementos */
+    margin-right: 40%;
 }
 
-.info-cliente p {
-  margin: 0; /* Elimina el margen predeterminado del párrafo */
+/* Estilos para el último div que contiene el botón de "Editar Cliente" */
+.info-cliente > div:last-child {
+    display: flex;
+    justify-content: flex-end; /* Alinear el contenido al final del contenedor */
+    align-items: center; /* Centrar verticalmente los elementos */
+
+
 }
+
+
 .datos-extras {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 3%;
-  padding-bottom: 5%; /* espacio en la linea divisoria*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 3%;
+    padding-bottom: 5%; /* espacio en la linea divisoria*/
 }
 
 .datos-extras > div {
-  flex: 1; /* Ajusta el ancho de los divs internos */
-  margin-right: 40px; /* Agrega margen entre los divs internos */
+    padding-left: 10%;
+    margin-right: 8%;
+
 }
 
 .datos-extras p {
-  margin: 0; /* Elimina el margen predeterminado del párrafo */
+    margin: 0; /* Elimina el margen predeterminado del párrafo */
 }
-.Num-Telefono{
-  margin-left: 33%;
+
+.circle {
+    width: 120%;
+    height: 170%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: purple;
+    font-size: 24px;
 }
+
+.initials {
+    font-weight: bold;
+    background-color: #e9d4f7;
+    font-size: 5rem;
+}
+
+.custom-button{
+    border: none; /* Eliminar el borde */
+    outline: none; /* Eliminar el contorno al hacer clic */
+
+}
+
+.ModalBase {
+    width: 30%;
+}
+.modal-header {
+    /* Estilos para el encabezado del modal */
+}
+
+.modal-body {
+    /* Estilos para el cuerpo del modal */
+}
+
+
+
