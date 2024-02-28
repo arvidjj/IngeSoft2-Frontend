@@ -26,8 +26,8 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 const ButtonBasic = ({ icon, color, text, onClick }) => {
     return (
         <StyledIconButton color={color} onClick={onClick}>
-            <Icon>{icon}</Icon>
-
+            {/*<Icon>{icon}</Icon>*/}
+            {/*Comento porque no me gusta como queda con el icon*/}
             {text}
         </StyledIconButton>
     );
