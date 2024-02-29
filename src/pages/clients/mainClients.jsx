@@ -15,6 +15,7 @@ const MainClients = () => {
     <div className="MaquetaCliente">
       <div className="cuadro-central">
         <h2>Clientes</h2>
+        <p>asjdhas</p>
         <div className="header-cliente">
           <div className="header-Principal">
             <a href="#" className="a">
