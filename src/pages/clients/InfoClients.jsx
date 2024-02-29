@@ -14,6 +14,7 @@ import Pagination from '@mui/material/Pagination';
 import ButtonBasic from "../../components/bottons/ButtonBasic.jsx";
 import ModalBase from "../../components/modals/ModalBase.jsx";
 import LabelBase from "../../components/labels/LabelBase.jsx";
+import {Link} from "react-router-dom";
 
 const InfoClients = () => {
     const [value, setValue] = useState('one');
@@ -60,23 +61,25 @@ const InfoClients = () => {
     return (
         <div className="container-fluid MaquetaCliente">
             <div className="cuadro-central">
-                <div className="header-cliente">
-                    <button className="custom-button"><span className="icon"><IoArrowBackSharp/></span></button>
+                <div>
+                    <Link to="/clientes">
+                        <button className="custom-button"><IoArrowBackSharp/></button>
+                    </Link>
                 </div>
                 <div className="info-cliente">
                     <div>
-                        {/* Botón con las iniciales del nombre y apellido en un círculo */}
                         <ButtonBasic2 initials={getInitials('Drew Cano')}/>
                     </div>
-                    <div>
-                        <h3>Drew Cano</h3>
-                        <Alert variant="outlined" severity="error">
+                    <div style={{marginLeft:"10%"}}>
+                        <h3 style={{color:"#667085"}}>Drew Cano</h3>
+                        <Alert variant="outlined" severity="error"
+                               style={{ borderRadius: "50px", backgroundColor:"#FFCFCF"}}>
                             Este cliente tiene 1 pago atrasado
                         </Alert>
                         {/*https://mui.com/material-ui/react-alert/     Para buscar las otras alertas*/}
                     </div>
                     <div className="d-flex justify-content-center mb-4 float-end">
-                        <ButtonBasic icon={<IoPencilOutline/>} color="secondary" text="Editar Cliente"
+                        <ButtonBasic icon={<IoPencilOutline/>}  color="secondary" text="Editar Cliente"
                                      onClick={handleEditClientClick}/>
                     </div>
                 </div>
