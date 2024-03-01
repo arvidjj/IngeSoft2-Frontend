@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Logo from "../assets/logo.png";
-import Swal from "sweetalert2";
+import Logo from "../assets/Logo.png";
 import "../style.css";
+
 
 const Login = () => {
     const [usuario, setUsuario] = useState({
         email: "",
         password: "",
     });
+    const notify = () => toast('Here is your toast.');
     const [mostrarPassword, setMostrarPassword] = useState(false);
     const [emailFocused, setEmailFocused] = useState(false);
     const [passwordFocused, setPasswordFocused] = useState(false);
@@ -30,18 +31,11 @@ const Login = () => {
             .then((response) => {
                 console.log(response.data);
                 localStorage.setItem("user", JSON.stringify(response.data));
+                notify();
                 navigate("/home");
-                window.location.reload();
             })
             .catch((error) => {
                 console.log(error);
-                Swal.fire({
-                    icon: "error",
-                    title: "Usuario no encontrado",
-                    text: "Revise su nombre de usuario o contraseña",
-                    timer: 2000,
-                    timerProgressBar: true,
-                });
             });
     };
 
@@ -72,7 +66,7 @@ const Login = () => {
     return (
         <div className="login-container">
             <div className="login-card">
-                    <img src={Logo} alt="Logo de la aplicación" className="logo"/>
+                    <center><img src={Logo} alt="Logo de la aplicación" className="logo"/></center>
                 <form onSubmit={handleSubmit}>
                     <div className={`form-group ${emailFocused || usuario.email ? 'focused' : ''}`}>
                         <input
