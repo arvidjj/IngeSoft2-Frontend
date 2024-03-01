@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Logo from "../assets/Logo.png";
+import Logo from "../assets/logo.png";
 import "../style.css";
 
 
@@ -10,7 +10,6 @@ const Login = () => {
         email: "",
         password: "",
     });
-    const notify = () => toast('Here is your toast.');
     const [mostrarPassword, setMostrarPassword] = useState(false);
     const [emailFocused, setEmailFocused] = useState(false);
     const [passwordFocused, setPasswordFocused] = useState(false);
@@ -31,7 +30,6 @@ const Login = () => {
             .then((response) => {
                 console.log(response.data);
                 localStorage.setItem("user", JSON.stringify(response.data));
-                notify();
                 navigate("/home");
             })
             .catch((error) => {
