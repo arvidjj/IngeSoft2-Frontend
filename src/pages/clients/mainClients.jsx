@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./mainClients.css";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -9,8 +9,24 @@ import { PiUserCircleLight } from "react-icons/pi";
 import { TbArrowDown } from "react-icons/tb";
 import { GoQuestion } from "react-icons/go";
 import { Link } from "react-router-dom";
+import api from "../../utils/api"; 
 
 const MainClients = () => {
+  const [clientes, setClientes] = useState([]);
+
+  useEffect(() => {
+    fetchClientes();
+  }, []);
+
+  const fetchClientes = async () => {
+    try {
+      const response = await api.get("/clientes/page/1");
+      setClientes(response.data.items);
+    } catch (error) {
+      console.error("Error al obtener clientes:", error);
+    }
+  };
+
   return (
     <div className="MaquetaCliente">
       <div className="cuadro-central">
@@ -51,88 +67,35 @@ const MainClients = () => {
             </tr>
           </thead>
           <tbody className="table tbody tr:nth-child(odd) ">
-            <tr>
-              <td>
-                <Link to="/clientesInfo">
-                  <PiUserCircleLight
-                    style={{
-                      padding: "0px",
-                      fontSize: "25px",
-                      background: "#eaecf000",
-                    }}
-                  />{" "}
-                  Mark
-                </Link>
-              </td>
-              <td>Otto</td>
-              <td>Otto</td>
-              <td>Otto</td>
-              <td>Otto</td>
-              <td>
-                <a href="#">
-                  <RiDeleteBinLine />
-                </a>
-                <a href="#">
-                  {" "}
-                  <FiEdit2 />
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                {" "}
-                <Link to="/clientesInfo">
-                  <PiUserCircleLight
-                    style={{
-                      padding: "0px",
-                      fontSize: "25px",
-                      background: "#eaecf000",
-                    }}
-                  />{" "}
-                  Mark
-                </Link>
-              </td>
-              <td>Otto</td>
-              <td>Otto</td>
-              <td>Otto</td>
-              <td>Otto</td>
-              <td>
-                <a href="#">
-                  <RiDeleteBinLine />
-                </a>
-                <a href="#">
-                  {" "}
-                  <FiEdit2 />
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <Link to="/clientesInfo">
-                  <PiUserCircleLight
-                    style={{
-                      padding: "0px",
-                      fontSize: "25px",
-                      background: "#eaecf000",
-                    }}
-                  />{" "}
-                  Mark
-                </Link>
-              </td>
-              <td>Otto</td>
-              <td>Otto</td>
-              <td>Otto</td>
-              <td>Otto</td>
-              <td>
-                <a href="#">
-                  <RiDeleteBinLine />
-                </a>
-                <a href="#">
-                  {" "}
-                  <FiEdit2 />
-                </a>
-              </td>
-            </tr>
+            {clientes.map((cliente) => (
+              <tr key={cliente.id}>
+                <td>
+                  <Link to={`/clientesInfo/${cliente.id}`}>
+                    <PiUserCircleLight
+                      style={{
+                        padding: "0px",
+                        fontSize: "25px",
+                        background: "#eaecf000",
+                      }}
+                    />{" "}
+                    {cliente.nombre}
+                  </Link>
+                </td>
+                <td>{cliente.active ? "Activo" : "Inactivo"}</td>
+                <td>Plan</td>
+                <td>{cliente.email}</td>
+                <td>{cliente.telefono}</td>
+                <td>
+                  <a href="#">
+                    <RiDeleteBinLine />
+                  </a>
+                  <a href="#">
+                    {" "}
+                    <FiEdit2 />
+                  </a>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

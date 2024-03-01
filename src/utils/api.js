@@ -8,7 +8,7 @@ api.interceptors.request.use(
   function (config) {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user.accessToken) {
-      config.headers["token"] = user.token;
+      config.headers["Authorization"] = `Bearer ${user.accessToken}`;
     }
     return config;
   },
@@ -26,3 +26,5 @@ export default api;
  * api.post("/clientes", clientes);
  * api.get("/clientes");
  */
+
+
