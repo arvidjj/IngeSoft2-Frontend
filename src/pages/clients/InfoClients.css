@@ -5,12 +5,15 @@
 }
 
 .cuadro-central {
-    width: 80%;
+    width: 100%;
     padding: 20% 1%;
     background-color: #f0f0f0;
     border-bottom: 1px solid #ccc;
 }
-
+.cuadro-medio{
+    width: 80%;
+    margin-left: 10%;
+}
 .header-cliente {
     margin-right: 20%;
 }

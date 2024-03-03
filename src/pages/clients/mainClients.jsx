@@ -70,7 +70,7 @@ const MainClients = () => {
             {clientes.map((cliente) => (
               <tr key={cliente.id}>
                 <td>
-                  <Link to={`/clientesInfo/${cliente.id}`}>
+                <Link to={`/clientesinfo/${cliente.id}`}>
                     <PiUserCircleLight
                       style={{
                         padding: "0px",
