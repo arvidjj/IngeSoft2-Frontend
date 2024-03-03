@@ -3,15 +3,12 @@ import { IconButton, styled } from '@mui/material';
 import Icon from '@mui/material/Icon';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
-    backgroundColor: 'transparent',
     border: `2px solid ${theme.palette.secondary.main}`,
     borderRadius: '0.8em', // Utilizando em para hacerlo relativo
-    padding: '0.6em 1.6em', // Utilizando em para hacerlo relativo
-    display: 'flex',
-    alignItems: 'center',
-    marginRight: '0.5em',
-    color: theme.palette.secondary.main,
     fontSize: '0.9em', // Tamaño de fuente relativo
+    padding: '0.6em 1.6em', // Utilizando em para hacerlo relativo
+    margin:'1em',
+
     '&:hover': {
         backgroundColor: theme.palette.secondary.main,
         color: '#fff',
@@ -22,13 +19,15 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
         fontSize: '0.8em',
     },
 }));
+const ButtonTextContainer = styled('div')({
+    marginLeft: '0.5em', // Agregar espacio entre el ícono y el texto
+});
 
 const ButtonBasic = ({ icon, color, text, onClick }) => {
     return (
         <StyledIconButton color={color} onClick={onClick}>
-            <Icon>{icon}</Icon>
-
-            {text}
+            {icon}
+            <ButtonTextContainer>{text}</ButtonTextContainer>
         </StyledIconButton>
     );
 };

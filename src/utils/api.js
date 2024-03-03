@@ -1,14 +1,14 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "http://localhost:8080",
 });
 
 api.interceptors.request.use(
   function (config) {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user && user.token) {
-      config.headers["token"] = user.token;
+    if (user && user.accessToken) {
+      config.headers["Authorization"] = `Bearer ${user.accessToken}`;
     }
     return config;
   },
@@ -26,3 +26,5 @@ export default api;
  * api.post("/clientes", clientes);
  * api.get("/clientes");
  */
+
+
