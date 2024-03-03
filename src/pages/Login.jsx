@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { ThreeDots } from 'react-loader-spinner'
 import Logo from "../assets/logo.png";
 import { IoPeopleSharp } from "react-icons/io5";
 import { RiLockPasswordFill } from "react-icons/ri";
@@ -15,6 +17,19 @@ const Login = () => {
     const [mostrarPassword, setMostrarPassword] = useState(false);
     const [emailFocused, setEmailFocused] = useState(false);
     const [passwordFocused, setPasswordFocused] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
 
     const navigate = useNavigate();
 
@@ -27,6 +42,7 @@ const Login = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        setLoading(true);
         axios
             .post("http://localhost:8080/auth/login", usuario)
             .then((response) => {
@@ -36,6 +52,16 @@ const Login = () => {
             })
             .catch((error) => {
                 console.log(error);
+                Toast.fire({
+                    icon: "error",
+                    title: "Ha ocurrido un error. Vulva a intentarlo.",
+                    customClass: {
+                        title: "error-title",
+                    },
+                });
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 
@@ -80,8 +106,9 @@ const Login = () => {
                                 onFocus={handleEmailFocus}
                                 onBlur={handleEmailBlur}
                                 autoFocus
+                                required
                             />
-                            <IoPeopleSharp className="input-icon" /> {/* Icono dentro del input */}
+                            <IoPeopleSharp className="input-icon" />
                         </div>
                         <label className="placehold">Usuario</label>
                     </div>
@@ -96,8 +123,9 @@ const Login = () => {
                                 onChange={handleChange}
                                 onFocus={handlePasswordFocus}
                                 onBlur={handlePasswordBlur}
+                                required
                             />
-                            <RiLockPasswordFill className="input-icon" /> {/* Icono dentro del input */}
+                            <RiLockPasswordFill className="input-icon" />
                         </div>
                         <label className="placehold">Contraseña</label>
                     </div>
@@ -112,8 +140,23 @@ const Login = () => {
                         </label>
                     </div>
                     <div className="form-group">
-                        <button type="submit" className="login-button">
-                            Iniciar Sesión
+                        <button type="submit" className="login-button" disabled={loading} style={{ position: 'relative' }}>
+                            {loading ? (
+                                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
+                                    <ThreeDots
+                                        visible={true}
+                                        height="30"
+                                        width="30"
+                                        color="white"
+                                        radius="9"
+                                        ariaLabel="three-dots-loading"
+                                        wrapperStyle={{}}
+                                        wrapperClass=""
+                                    />
+                                </div>
+                            ) : (
+                                "Iniciar Sesión"
+                            )}
                         </button>
                     </div>
                 </form>
