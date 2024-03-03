@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.png";
+import { IoPeopleSharp } from "react-icons/io5";
+import { RiLockPasswordFill } from "react-icons/ri";
 import "../style.css";
 
 
@@ -64,33 +66,39 @@ const Login = () => {
     return (
         <div className="login-container">
             <div className="login-card">
-                    <center><img src={Logo} alt="Logo de la aplicación" className="logo"/></center>
+                <center><img src={Logo} alt="Logo de la aplicación" className="logo" /></center>
                 <form onSubmit={handleSubmit}>
-                    <div className={`form-group ${emailFocused || usuario.email ? 'focused' : ''}`}>
-                        <input
-                            name="email"
-                            value={usuario.email}
-                            className="form-control"
-                            type="text"
-                            placeholder=" "
-                            onChange={handleChange}
-                            onFocus={handleEmailFocus}
-                            onBlur={handleEmailBlur}
-                            autoFocus
-                        />
+                    <div className={`form-email ${emailFocused || usuario.email ? 'focused' : ''}`}>
+                        <div className="input-container">
+                            <input
+                                name="email"
+                                value={usuario.email}
+                                className="form-control"
+                                type="text"
+                                placeholder=" "
+                                onChange={handleChange}
+                                onFocus={handleEmailFocus}
+                                onBlur={handleEmailBlur}
+                                autoFocus
+                            />
+                            <IoPeopleSharp className="input-icon" /> {/* Icono dentro del input */}
+                        </div>
                         <label className="placehold">Usuario</label>
                     </div>
-                    <div className={`form-group ${passwordFocused || usuario.password ? 'focused' : ''}`}>
-                        <input
-                            name="password"
-                            value={usuario.password}
-                            className="form-control"
-                            type={mostrarPassword ? "text" : "password"}
-                            placeholder=" "
-                            onChange={handleChange}
-                            onFocus={handlePasswordFocus}
-                            onBlur={handlePasswordBlur}
-                        />
+                    <div className={`form-password ${passwordFocused || usuario.password ? 'focused' : ''}`}>
+                        <div className="input-container">
+                            <input
+                                name="password"
+                                value={usuario.password}
+                                className="form-control"
+                                type={mostrarPassword ? "text" : "password"}
+                                placeholder=" "
+                                onChange={handleChange}
+                                onFocus={handlePasswordFocus}
+                                onBlur={handlePasswordBlur}
+                            />
+                            <RiLockPasswordFill className="input-icon" /> {/* Icono dentro del input */}
+                        </div>
                         <label className="placehold">Contraseña</label>
                     </div>
                     <div className="form-group">
