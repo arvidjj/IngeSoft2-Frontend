@@ -7,17 +7,11 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
     border: `2px solid ${theme.palette.secondary.main}`,
     borderRadius: '0.8em', // Utilizando em para hacerlo relativo
     padding: '0.6em 1.6em', // Utilizando em para hacerlo relativo
-<<<<<<< Updated upstream
     display: 'flex',
     alignItems: 'center',
     marginRight: '0.5em',
     color: theme.palette.secondary.main,
     fontSize: '0.9em', // Tamaño de fuente relativo
-=======
-    margin:'1em',
-    color:theme.palette.secondary.main,
-
->>>>>>> Stashed changes
     '&:hover': {
         backgroundColor: theme.palette.secondary.main,
         color: '#fff',
