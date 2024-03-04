@@ -5,46 +5,39 @@
 }
 
 .cuadro-central {
-    width: 80%;
+    width: 100%;
     padding: 20% 1%;
     background-color: #f0f0f0;
     border-bottom: 1px solid #ccc;
 }
-
+.cuadro-medio{
+    width: 80%;
+    margin-left: 10%;
+}
 .header-cliente {
-    margin-top: -24%;
-    display: flex;
-    justify-content: space-between; /* Espacia los elementos de forma equitativa */
-    align-items: center; /* Alinea verticalmente los elementos */
-
+    margin-right: 20%;
 }
 
-.header-cliente p {
-    margin: 0; /* Elimina el margen predeterminado del párrafo */
-    font-weight: 400;
-}
-
+/* Estilos base */
 .info-cliente {
     display: flex;
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan en varias líneas */
     margin-left: 10%;
-    justify-content: space-between; /* Distribuir los elementos a lo largo del eje principal */
-    align-items: center; /* Centrar verticalmente los elementos */
-}
 
+    align-items: center;
+}
 
 .info-cliente > div:nth-child(2) {
-    align-items: center; /* Centrar verticalmente los elementos */
-    margin-right: 40%;
+    align-items: center;
+    margin-right: 20%; /* Reducir el margen derecho */
+
 }
 
-/* Estilos para el último div que contiene el botón de "Editar Cliente" */
 .info-cliente > div:last-child {
-    display: flex;
-    justify-content: flex-end; /* Alinear el contenido al final del contenedor */
-    align-items: center; /* Centrar verticalmente los elementos */
 
-
+    flex: 1; /* Permitir que este elemento ocupe todo el espacio disponible */
 }
+
 
 
 .datos-extras {
@@ -67,25 +60,32 @@
 
 .circle {
     width: 120%;
-    height: 170%;
+    height: 180%;
+    margin-left:50%;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: purple;
-    font-size: 24px;
+    color: #7F56D9;
+
+
 }
 
 .initials {
     font-weight: bold;
     background-color: #e9d4f7;
     font-size: 5rem;
+    margin-left:50%;
+    background-color: #F9F5FF;
 }
 
-.custom-button{
-    border: none; /* Eliminar el borde */
-    outline: none; /* Eliminar el contorno al hacer clic */
-
+.custom-button {
+    font-size: 200%;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
 }
 
 .ModalBase {

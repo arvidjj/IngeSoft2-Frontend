@@ -31,7 +31,9 @@
 }
 
 .cuadro-central {
-  width: 80%;
+  width: 100%;
+  height: 105%;
+  margin-left: -10%;
   padding: 20px 10px;
   background-color: #ffffff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
