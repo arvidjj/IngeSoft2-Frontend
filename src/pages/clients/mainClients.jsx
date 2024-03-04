@@ -10,10 +10,16 @@ import { TbArrowDown } from "react-icons/tb";
 import { GoQuestion } from "react-icons/go";
 import { Link } from "react-router-dom";
 import api from "../../utils/api";
+<<<<<<< Updated upstream
 import LabelBase from "../../components/labels/LabelBase";
 import ModalBase from "../../components/modals/ModalBase";
 import ButtonBasic from "../../components/bottons/ButtonBasic";
 import CustomAlert from "../../components/alert/CustomAlert";
+=======
+import ModalBase from "../../components/modals/ModalBase"; // Ajusta la ruta según la ubicación del componente
+import LabelBase from "../../components/labels/LabelBase.jsx";
+import axios from "axios";
+>>>>>>> Stashed changes
 
 const MainClients = () => {
   const [showAlert, setShowAlert] = useState(false); 
@@ -22,6 +28,7 @@ const MainClients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredClientes, setFilteredClientes] = useState([]);
   const [showModal, setShowModal] = useState(false);
+<<<<<<< Updated upstream
   const [loading, setLoading] = useState(false); 
   const [clienteData, setClienteData] = useState({
     nombre: '',
@@ -33,6 +40,15 @@ const MainClients = () => {
   });
   const [clienteDataExtra, setClienteDataExtra] = useState({
    apellido: '',
+=======
+  const [clienteData, setClienteData] = useState({
+    nombre: '',
+    ruc: '5689875-9',
+    cedula:'5689875',
+    telefono: '',
+    email: '',
+    direccion: '', // Nuevo campo para la dirección
+>>>>>>> Stashed changes
   });
 
   useEffect(() => {
@@ -83,6 +99,7 @@ const MainClients = () => {
     setFilteredClientes(filtered);
   };
 
+<<<<<<< Updated upstream
   
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -205,6 +222,34 @@ const handleCancelDelete = () => {
   const handleShowAlert = (client) => {
     setClientToDelete(client);
     setShowAlert(true);
+=======
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await api.post("/clientes", clienteData);
+      console.log("Cliente registrado:", response.data);
+      // Actualizar la lista de clientes después de registrar uno nuevo
+      fetchClientes();
+      // Cerrar el modal después de registrar
+      setShowModal(false);
+      // Limpiar los datos del cliente después del registro
+      setClienteData({
+        nombre: '',
+        ruc: '',
+        cedula:'',
+        telefono: '',
+        email: '',
+        direccion: '', // Limpiar también el campo de dirección
+      });
+    } catch (error) {
+      console.error("Error al registrar cliente:", error);
+    }
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setClienteData({ ...clienteData, [name]: value });
+>>>>>>> Stashed changes
   };
 
   return (
@@ -212,8 +257,12 @@ const handleCancelDelete = () => {
       <div className="cuadro-central">
         <h2>Clientes</h2>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <p>aaaaaa</p>
 =======
+>>>>>>> Stashed changes
+=======
+        <p>asjdhas</p>
 >>>>>>> Stashed changes
         <div className="header-cliente">
           <div className="header-Principal">            
@@ -221,11 +270,20 @@ const handleCancelDelete = () => {
               type="text"
               placeholder="Buscar..."
               className="form-control me-2"
+<<<<<<< Updated upstream
               value={searchTerm}
               onChange={handleSearchChange}
             />
             <ButtonBasic text="Buscar"   onClick={handleSearchChange}/>
             <button className="button" onClick={() => setShowModal(true)}>
+=======
+              style={{ width: "450px", height: "37px" }}
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <button className="button" onClick={() => setShowModal(true)}>
+              {" "}
+>>>>>>> Stashed changes
               <IoAdd />
               Nuevo Cliente
             </button>
@@ -282,6 +340,7 @@ const handleCancelDelete = () => {
       </div>
       {/* Modal para registrar nuevo cliente */}
       <ModalBase
+<<<<<<< Updated upstream
                 open={showModal}
                 closeModal={() => setShowModal(false)}
                 title="Registro de Cliente"
@@ -385,6 +444,87 @@ const handleCancelDelete = () => {
   />
 )}
 
+=======
+        open={showModal}
+        closeModal={() => setShowModal(false)}
+        title="Registro de Cliente"
+      >
+        <div>
+          <div className="modal-body">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <LabelBase label="Nombre:" htmlFor="nombre" />
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  className="form-control"
+                  value={clienteData.nombre}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="mb-3">
+                <LabelBase label="Apellido:" htmlFor="apellido" />
+                <input
+                  type="text"
+                  id="apellido"
+                  name="apellido"
+                  className="form-control"                
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="mb-3">
+                <LabelBase label="CI/RUC:" htmlFor="ci_ruc" />
+                <input
+                  type="text"
+                  id="ci_ruc"
+                  name="ci_ruc"
+                  className="form-control"
+                  value={clienteData.ruc}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="mb-3">
+                <LabelBase label="Telefono:" htmlFor="telefono" />
+                <input
+                  type="text"
+                  id="telefono"
+                  name="telefono"
+                  className="form-control"
+                  value={clienteData.telefono}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="mb-3">
+                <LabelBase label="e-mail:" htmlFor="email" />
+                <input
+                  type="text"
+                  id="email"
+                  name="email"
+                  className="form-control"
+                  value={clienteData.email}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="mb-3">
+                <LabelBase label="Dirección:" htmlFor="direccion" />
+                <input
+                  type="text"
+                  id="direccion"
+                  name="direccion"
+                  className="form-control"
+                  value={clienteData.direccion}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <button type="submit" className="btn btn-primary">
+                Agregar Cliente
+              </button>
+            </form>
+          </div>
+        </div>
+      </ModalBase>
+>>>>>>> Stashed changes
     </div>
   );
 };
