@@ -16,6 +16,14 @@
   text-decoration: none;
   color: inherit;
 }
+.pagination-container {
+  
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  margin-right: 15%; 
+}
+
 
 .MaquetaCliente a:hover {
   text-decoration: none;
