@@ -37,28 +37,63 @@
 .cuadro-central a {
   background-color: #ffffff00;
 }
+
 .header-cliente {
-  padding-left: 100px;
-  margin-top: 7px;
+  margin: 0%;
+}
+.header-cliente p {
+  margin: 0px;
+  font-weight: 400;
+}
+.header-Principal {
+  width: 100%; 
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.header-cliente p {
-  margin: 0;
-  font-weight: 400;
-}
-
-.header-Principal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 0px; 
+  margin-left: 5px;
+  box-sizing: border-box; 
 }
 
 .input {
-  width: 120px;
+  width: 70%; 
+  margin-right: 10px; 
+ 
 }
+
+.button {
+  flex: 1; 
+  height: 38px;
+  border: 1px solid #6941c6;
+  border-radius: 8px;
+  background-color: #6941c6;
+  color: #fff;
+  text-align: center;
+  line-height: 1.5;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 8px;
+  min-width: 120px; 
+  width: calc(30% - 10px); 
+}
+
+@media screen and (max-width: 768px) {
+  .header-Principal {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .input {
+    width: 100%; 
+    margin-bottom: 8px; 
+   
+  }
+
+  .button {
+    width: 100%; 
+  }
+}
+
 
 .custom-table {
   width: 100%;
@@ -89,19 +124,6 @@
   border-bottom: 1px solid #cccccc6a;
 }
 
-.button {
-  width: 136px;
-  height: 38px;
-  border: 1px solid #6941c6;
-  border-radius: 8px;
-  background-color: #6941c6;
-  color: #fff;
-  text-align: center;
-  line-height: 1.5;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 8px;
-}
 
 .button:hover {
   background-color: #5a2f9e;
@@ -109,4 +131,18 @@
 
 .button:active {
   background-color: #4c2682;
+}
+
+
+.modal {
+  display: block;
+  background: rgba(0, 0, 0, 0.5);
+  font-size: 15px;
+}
+
+.modal-dialog {
+  width: auto;
+  max-width: 30%; 
+  margin: 5% auto; 
+  overflow-y: auto; 
 }
