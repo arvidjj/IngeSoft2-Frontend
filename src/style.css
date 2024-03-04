@@ -37,7 +37,12 @@
   margin-bottom: 2.5rem;
 }
 
-.form-group {
+.form-checkbox {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+
+.form-buttom {
   position: relative;
   margin-bottom: 2.5rem;
 }
