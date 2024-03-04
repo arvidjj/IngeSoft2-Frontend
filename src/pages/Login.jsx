@@ -54,7 +54,7 @@ const Login = () => {
                 console.log(error);
                 Toast.fire({
                     icon: "error",
-                    title: "Ha ocurrido un error. Vulva a intentarlo.",
+                    title: "Ha ocurrido un error. Vuelva a intentarlo.",
                     customClass: {
                         title: "error-title",
                     },
