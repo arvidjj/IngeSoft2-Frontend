@@ -15,9 +15,8 @@ import AdbIcon from "@mui/icons-material/Adb";
 import { Link, useLocation } from "react-router-dom";
 
 const pages = [
-    { name: "Home", color: "#667085" },
-    { name: "Productos", color: "#667085" },
     { name: "Clientes", color: "#667085" },
+    { name: "Productos", color: "#667085" },
     { name: "Caja", color: "#667085" },
     { name: "Reportes", color: "#667085" },
 ];

@@ -91,13 +91,9 @@
 .ModalBase {
     width: 30%;
 }
-.modal-header {
-    /* Estilos para el encabezado del modal */
-}
-
-.modal-body {
-    /* Estilos para el cuerpo del modal */
-}
-
+.table td {
+    padding: 15px; /* Ajusta este valor según la altura que desees */
+  }
+  
 
 
