@@ -6,6 +6,7 @@ import { ThreeDots } from 'react-loader-spinner'
 import Logo from "../assets/logo.png";
 import { IoPeopleSharp } from "react-icons/io5";
 import { RiLockPasswordFill } from "react-icons/ri";
+import api from "../utils/api";
 import "../style.css";
 
 
@@ -43,10 +44,8 @@ const Login = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
         setLoading(true);
-        axios
-            .post("http://localhost:8080/auth/login", usuario)
+        api.post("/auth/login", usuario)
             .then((response) => {
-                console.log(response.data);
                 localStorage.setItem("user", JSON.stringify(response.data));
                 navigate("/home");
             })
