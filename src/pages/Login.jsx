@@ -54,7 +54,7 @@ const Login = () => {
                 console.log(error);
                 Toast.fire({
                     icon: "error",
-                    title: "Ha ocurrido un error. Vulva a intentarlo.",
+                    title: "Ha ocurrido un error. Vuelva a intentarlo.",
                     customClass: {
                         title: "error-title",
                     },
@@ -129,7 +129,7 @@ const Login = () => {
                         </div>
                         <label className="placehold">Contraseña</label>
                     </div>
-                    <div className="form-group">
+                    <div className="form-checkbox">
                         <label>
                             <input
                                 type="checkbox"
@@ -139,7 +139,7 @@ const Login = () => {
                             Mostrar contraseña
                         </label>
                     </div>
-                    <div className="form-group">
+                    <div className="form-buttom">
                         <button type="submit" className="login-button" disabled={loading} style={{ position: 'relative' }}>
                             {loading ? (
                                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
