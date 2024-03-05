@@ -8,7 +8,10 @@ api.interceptors.request.use(
   function (config) {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user.accessToken) {
-      config.headers["Authorization"] = `Bearer ${user.accessToken}`;
+      // Ignorar el uso del token para las rutas /auth/register y /auth/login
+      if (config.url !== "/auth/register" && config.url !== "/auth/login") {
+        config.headers["Authorization"] = `Bearer ${user.accessToken}`;
+      }
     }
     return config;
   },
@@ -18,6 +21,7 @@ api.interceptors.request.use(
 );
 
 export default api;
+
 
 /*
  * Ejemplo de utilizacion:
