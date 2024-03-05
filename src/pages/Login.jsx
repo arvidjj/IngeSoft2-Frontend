@@ -72,7 +72,14 @@ const Login = () => {
 
     return (
         <div className="login-container">
-        <Toaster position="top-right" reverseOrder={false} />
+        <Toaster position="top-right" reverseOrder={false} toastOptions={{
+            error:{
+                style: {
+                    background: '#FFDBD9',
+                    color: '#D92D20'
+                }
+            }
+        }} />
             <div className="login-card">
                 <center><img src={Logo} alt="Logo de la aplicación" className="logo" /></center>
                 <form onSubmit={handleSubmit}>
