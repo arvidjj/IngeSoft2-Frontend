@@ -44,10 +44,6 @@ const MainClients = () => {
 
   useEffect(() => {
     // Concatenar el apellido al nombre al cargar el componente
-    setClienteData(prevClienteData => ({
-      ...prevClienteData,
-      nombre: `${prevClienteData.nombre} ${clienteDataExtra.apellido}`
-    }));
   }, [clienteDataExtra.apellido]);
 
   const fetchClientes = async () => {
