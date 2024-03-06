@@ -323,11 +323,11 @@ const MainClients = () => {
                     {cliente.nombre}
                   </Link>
                 </td>
-                <td>{cliente.active ? "Activo" : "Inactivo"}</td>
-                <td>Plan</td>
-                <td>{cliente.email}</td>
-                <td>{cliente.telefono}</td>
-                <td>
+                <td className=".custom-table2">{cliente.active ? "Activo" : "Inactivo"}</td>
+                <td className=".custom-table2">Plan</td>
+                <td className="custom-table2">{cliente.email}</td>
+                <td className="custom-table2">{cliente.telefono}</td>
+                <td className="custom-table2">
                   <a href="#" onClick={() => handleShowAlert(cliente)}>
                     <RiDeleteBinLine />
                   </a>
