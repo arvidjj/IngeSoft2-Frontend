@@ -96,6 +96,35 @@ const MainClients = () => {
       nombre: event.target.value,
     });
   };
+  
+  const handleRucChange = (event) => {
+    setEditingClient({
+      ...editingClient,
+      ruc: event.target.value,
+    });
+  };
+  
+  const handleTelefonoChange = (event) => {
+    setEditingClient({
+      ...editingClient,
+      telefono: event.target.value,
+    });
+  };
+  
+  const handleEmailChange = (event) => {
+    setEditingClient({
+      ...editingClient,
+      email: event.target.value,
+    });
+  };
+  
+  const handleDireccionChange = (event) => {
+    setEditingClient({
+      ...editingClient,
+      direccion: event.target.value,
+    });
+  };
+  
   // Funcion para abrir el modal cuando se hace clic en "Editar Cliente"
   const handleEditClientClick = (client) => {
     setEditingClient(client);
@@ -112,7 +141,9 @@ const MainClients = () => {
     try {
       await api.put(`/clientes/${editingClient.id}`, editingClient); // Actualiza el cliente con los datos editados
       setModalOpen(false); // Cierra el modal 
-      toast.success("Usuario editado satisfactoriamente") 
+      fetchClientes();
+      toast.success("Usuario editado satisfactoriamente");
+
     } catch (error) {
       console.error("Error al actualizar cliente:", error);
       toast.error("Error al actualizar cliente " );
@@ -152,7 +183,7 @@ const MainClients = () => {
     try {
       const response = await api.post(`/clientes`, datosCliente);
       console.log("Cliente agregado:", response.data);
-      toast.success("Usuario guardados satisfactoriamente") 
+      toast.success("Cliente guardado exitosamente") 
       fetchClientes();
       setClienteData({
         nombre: '',
@@ -227,6 +258,7 @@ const MainClients = () => {
     try {
       await api.delete(`/clientes/${id}`);
       // Vuelve a cargar la lista de clientes despues de eliminar uno
+      toast.success("El cliente se elimino con exito");
       fetchClientes();
     } catch (error) {
       console.error("Error al eliminar cliente:", error);
@@ -260,6 +292,7 @@ const MainClients = () => {
           </div>
         </div>
         <hr />
+        <div className="tabla">
         <table className="custom-table">
           <thead>
             <tr>
@@ -306,6 +339,17 @@ const MainClients = () => {
             ))}
           </tbody>
         </table>
+        </div>
+        <div className="d-flex justify-content-center mt-4">
+        <Pagination
+    count={Math.ceil(filteredClientes.length / itemsPerPage)}
+    page={currentPage <= 2 ? currentPage : 1} 
+    onChange={(event, value) => setCurrentPage(value)}
+    shape="rounded"
+    color="secondary"
+  />
+  
+  </div>
       </div>
       {/* Modal para registrar nuevo cliente */}
       <ModalBase
@@ -398,7 +442,9 @@ const MainClients = () => {
                 </ButtonBasic>
               </div>
             </form>
+            
           </div>
+          
         </div>
       </ModalBase>
       {/*modal para editar cliente*/ }
@@ -434,7 +480,7 @@ const MainClients = () => {
                     name="ruc"
                     className="form-control"
                     value={editingClient ? editingClient.ruc : ""}
-                    onChange={handleNameChange}
+                    onChange={handleRucChange}
                   />
                 </div>
                 <div style={{ margin: "5px" }}>
@@ -446,7 +492,7 @@ const MainClients = () => {
                     name="telefono"
                     className="form-control"
                     value={editingClient ? editingClient.telefono : ""}
-                  onChange={handleNameChange}
+                    onChange={handleTelefonoChange}
                   />
                 </div>
               </div>
@@ -459,7 +505,7 @@ const MainClients = () => {
                   name="email"
                   className="form-control"
                   value={editingClient ? editingClient.email : ""}
-                  onChange={handleNameChange}
+                  onChange={handleEmailChange}
                 />
               </div>
               <div>
@@ -471,7 +517,7 @@ const MainClients = () => {
                   name="direccion"
                   className="form-control"
                   value={editingClient ? editingClient.direccion : ""}
-                  onChange={handleNameChange}
+                  onChange={handleDireccionChange}
                 />
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
@@ -509,15 +555,11 @@ const MainClients = () => {
       
   }}
 />
+
       <div className="d-flex justify-content-center mt-4">
+    
       <div className="pagination-container">
-  <Pagination
-    count={Math.ceil(filteredClientes.length / itemsPerPage)}
-    page={currentPage <= 2 ? currentPage : 1} 
-    onChange={(event, value) => setCurrentPage(value)}
-    shape="rounded"
-    color="secondary"
-  />
+  
 </div>
 
       </div>
