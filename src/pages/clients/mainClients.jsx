@@ -18,6 +18,8 @@ import Pagination from "@mui/material/Pagination";
 
 const MainClients = () => {
   const [showAlert, setShowAlert] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState(null);
   const [clientToDelete, setClientToDelete] = useState(null);
   const [clientes, setClientes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -86,6 +88,34 @@ const MainClients = () => {
     setFilteredClientes(filtered);
   };
 
+  const handleNameChange = (event) => {
+    setEditingClient({
+      ...editingClient,
+      nombre: event.target.value,
+    });
+  };
+  // Función para abrir el modal cuando se hace clic en "Editar Cliente"
+  const handleEditClientClick = (client) => {
+    setEditingClient(client);
+    setModalOpen(true);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  // Función para guardar los cambios realizados en el cliente
+  const handleGuardarCambios = async () => {
+    try {
+      await api.put(`/clientes/${editingClient.id}`, editingClient); // Actualiza el cliente con los datos editados
+      setModalOpen(false); // Cierra el modal de edición
+      notify(); // Muestra notificación al actualizar cliente
+    } catch (error) {
+      console.error("Error al actualizar cliente:", error);
+    }
+  };
+    
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -265,9 +295,8 @@ const MainClients = () => {
                   <a href="#" onClick={() => handleShowAlert(cliente)}>
                     <RiDeleteBinLine />
                   </a>
-                  <a href="#">
-                    {" "}
-                    <FiEdit2 />
+                  <a href="#" onClick={() => handleEditClientClick(cliente)}>
+        <FiEdit2 />
                   </a>
                 </td>
               </tr>
@@ -364,6 +393,88 @@ const MainClients = () => {
                 <ButtonBasic text="Guardar" onClick={handleSubmit}>
                   {loading ? "Cargando..." : "Agregar Cliente"}
                 </ButtonBasic>
+              </div>
+            </form>
+          </div>
+        </div>
+      </ModalBase>
+      {/*modal para editar cliente*/ }
+      <ModalBase
+       open={modalOpen}
+       title="Editar Cliente"
+       closeModal={handleCloseModal}
+      >
+        <div>
+          <div className="modal-body" style={{ marginTop: "0px", paddingTop: "0px" }}>
+            <p style={{ fontWeight: "bold", fontSize: "14px" }}>Datos Personales</p>
+
+            <form>
+              <div>
+                <LabelBase label="Nombre:" htmlFor="nombre" />
+                <input
+                  style={{ width: "100%", height: "30px" }}
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  className="form-control"
+                  value={editingClient ? editingClient.nombre : ""}
+                  onChange={handleNameChange}
+                />
+              </div>
+              <div className="d-flex">
+                <div style={{ margin: "5px" }}>
+                  <LabelBase label="CI/RUC:" htmlFor="ruc" />
+                  <input
+                    type="text"
+                    style={{ width: "100%", height: "30px" }}
+                    id="ruc"
+                    name="ruc"
+                    className="form-control"
+                    value={editingClient ? editingClient.ruc : ""}
+                    onChange={handleNameChange}
+                  />
+                </div>
+                <div style={{ margin: "5px" }}>
+                  <LabelBase label="Telefono:" htmlFor="telefono" />
+                  <input
+                    type="text"
+                    style={{ width: "100%", height: "30px" }}
+                    id="telefono"
+                    name="telefono"
+                    className="form-control"
+                    value={editingClient ? editingClient.telefono : ""}
+                  onChange={handleNameChange}
+                  />
+                </div>
+              </div>
+              <div>
+                <LabelBase label="e-mail:" htmlFor="email" />
+                <input
+                  type="text"
+                  style={{ width: "100%", height: "30px" }}
+                  id="email"
+                  name="email"
+                  className="form-control"
+                  value={editingClient ? editingClient.email : ""}
+                  onChange={handleNameChange}
+                />
+              </div>
+              <div>
+                <LabelBase label="Dirección:" htmlFor="direccion" />
+                <input
+                  type="text"
+                  style={{ width: "100%", height: "30px" }}
+                  id="direccion"
+                  name="direccion"
+                  className="form-control"
+                  value={editingClient ? editingClient.direccion : ""}
+                  onChange={handleNameChange}
+                />
+              </div>
+              <div className="d-flex justify-content-center align-items-center float-end">
+              <ButtonBasic text="Guardar" onClick={handleGuardarCambios}>
+              {loading ? "Cargando..." : "Guardar Cambios"}
+            </ButtonBasic>
               </div>
             </form>
           </div>
