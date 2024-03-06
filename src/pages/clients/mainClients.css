@@ -106,8 +106,10 @@
 
 
 .custom-table {
-  width: 100%;
+  width: 95%;
   border-collapse: collapse;
+  margin-left: 2%;
+
 }
 
 .custom-table th {
