@@ -185,6 +185,7 @@ const MainClients = () => {
       console.log("Cliente agregado:", response.data);
       toast.success("Cliente guardado exitosamente") 
       fetchClientes();
+      setClienteDataExtra({ apellido: '' });
       setClienteData({
         nombre: '',
         ruc: '',
