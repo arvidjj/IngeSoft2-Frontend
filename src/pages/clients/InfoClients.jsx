@@ -2,17 +2,14 @@ import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./InfoClients.css";
 import toast, { Toaster } from "react-hot-toast";
-
 import { useParams } from "react-router-dom";
 import { IoArrowBackSharp } from "react-icons/io5";
 import Alert from "@mui/material/Alert";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-
 import { IoPencilOutline } from "react-icons/io5";
 import Pagination from "@mui/material/Pagination";
-
 import ButtonBasic from "../../components/bottons/ButtonBasic.jsx";
 import ModalBase from "../../components/modals/ModalBase.jsx";
 import LabelBase from "../../components/labels/LabelBase.jsx";
@@ -29,17 +26,29 @@ const InfoClients = () => {
   const [value, setValue] = useState("one");
   const [editingClient, setEditingClient] = useState(null);
   const notify = () => toast.success("Cambios guardados satisfactoriamente");
+  const [mediciones, setMediciones] = useState([]);
 
   useEffect(() => {
     fetchCliente();
+    fetchMedicionesDesdeAPI();
   }, [id]);
 
   const fetchCliente = async () => {
     try {
       const response = await api.get(`/clientes/${id}`); // Utiliza el id para obtener los datos del cliente
+      //console.log(response.data);
       setCliente(response.data);
     } catch (error) {
       console.error("Error al obtener cliente:", error);
+    }
+  };
+  const fetchMedicionesDesdeAPI = async () => {
+    try {
+      const medicionesData = await api.get(`/mediciones/searchByClienteId/${id}/page/1`);
+      console.log(medicionesData.data);
+      setMediciones(medicionesData.data.items);
+    } catch (error) {
+      console.error("Error al obtener mediciones desde la API:", error);
     }
   };
 
@@ -72,6 +81,18 @@ const InfoClients = () => {
       nombre: event.target.value,
     });
   };
+  const handleRucChange = (event) => {
+    setEditingClient({
+      ...editingClient,
+      ruc: event.target.value,
+    });
+  };
+  const handleTelefonoChange = (event) => {
+    setEditingClient({
+      ...editingClient,
+      telefono: event.target.value,
+    });
+  };
   // Función para abrir el modal cuando se hace clic en "Editar Cliente"
   const handleEditClientClick = () => {
     setEditingClient(cliente);
@@ -96,7 +117,24 @@ const InfoClients = () => {
 
   return (
     <div className="container-fluid MaquetaCliente">
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          success: {
+            style: {
+              background: "#75B798",
+              color: "#0A3622",
+            },
+          },
+          error: {
+            style: {
+              background: "#FFDBD9",
+              color: "#D92D20",
+            },
+          },
+        }}
+      />
       <div className="cuadro-central">
         <div style={{ marginLeft: "3%" }}>
           <Link to="/clientes">
@@ -106,7 +144,7 @@ const InfoClients = () => {
           </Link>
         </div>
         <div className="cuadro-medio">
-          {cliente && ( // Verifica si cliente no es null antes de intentar acceder a sus propiedades
+          {cliente && (
             <div className="info-cliente">
               <div>
                 <ButtonBasic2 initials={initials} />
@@ -138,6 +176,7 @@ const InfoClients = () => {
             open={modalOpen}
             title="Editar Cliente"
             closeModal={handleCloseModal}
+            
           >
             <form className="mb-3">
               <div className="mb-2 block">
@@ -172,7 +211,7 @@ const InfoClients = () => {
                   name="ruc"
                   className="form-control"
                   value={editingClient ? editingClient.ruc : ""}
-                  onChange={handleNameChange}
+                  onChange={handleRucChange}
                 />
               </div>
               <div className="mb-2 block">
@@ -183,7 +222,7 @@ const InfoClients = () => {
                   name="telefono"
                   className="form-control"
                   value={editingClient ? editingClient.telefono : ""}
-                  onChange={handleNameChange}
+                  onChange={handleTelefonoChange}
                 />
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
@@ -196,103 +235,112 @@ const InfoClients = () => {
           {cliente && (
             <div className="datos-extras">
               <div>
-                <h4>Plan Actual</h4>
-                <p>{cliente.planActual}</p>
+                <h4 style={{fontSize: "30px", color:"#667085"}}>Plan Actual</h4>
+                <p style={{fontSize: "20px", textAlign:"center"}}>Mensual</p>
               </div>
               <div>
-                <h4>RUC</h4>
-                <p>{cliente.ruc}</p>
+                <h4 style={{fontSize: "30px", color:"#667085"}}>RUC</h4>
+                <p style={{fontSize: "20px"}}>{cliente.ruc}</p>
               </div>
               <div>
-                <h4>N° de Telefono</h4>
-                <p>{cliente.telefono}</p>
+                <h4 style={{fontSize: "30px", color:"#667085"}}>N° de Telefono</h4>
+                <p style={{fontSize: "20px", textAlign:"center"}}>{cliente.telefono}</p>
               </div>
             </div>
           )}
-          <Box className="Pago-Mediciones d-flex justify-content-center mb-3">
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              textColor="secondary"
-              indicatorColor="secondary"
-              aria-label="secondary tabs example"
-            >
-              <Tab value="one" label="Pagos" />
-              <Tab value="two" label="Mediciones" />
-            </Tabs>
+          <Box className="Pago-Mediciones d-flex justify-content-between align-items-center mb-3">
+            <div style={{ marginLeft: "40%" }}>
+              <Tabs
+                value={value}
+                onChange={handleChange}
+                textColor="secondary"
+                indicatorColor="secondary"
+                aria-label="secondary tabs example"
+              >
+                <Tab value="one" label="Pagos" />
+                <Tab value="two" label="Mediciones" />
+              </Tabs>
+            </div>
+            {/* 
+            <div style={{marginRight:"6%"}}>
+              <ButtonBasic
+                icon={<IoAdd />}
+                color="secondary"
+                text="Nueva Medicion"
+                onClick={handleEditClientClick}
+              />
+            </div>
+            */}
           </Box>
           {/* Renderiza la tabla de pagos si showPayments es true */}
           {showPayments && (
             <table class="table table-striped">
-              {/* Contenido de la tabla de pagos */}
-                             
-               <thead>
-                  <tr>
-                    <th scope="col">N° Factura</th>
-                    <th scope="col">Pago</th>
-                    <th scope="col">Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">11111</th>
-                    <td>Enero</td>
-                    <td><EstadoPago estado="No pagado" /></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2222</th>
-                    <td>Febrero</td>
-                    <td><EstadoPago estado="Pagado" /></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">33333</th>
-                    <td>Marzo</td>
-                    <td><EstadoPago estado="Pagado" /></td>
-                  </tr>
-                </tbody>
-             </table>
-            
+              <thead>
+                <tr>
+                  <th scope="col">N° Factura</th>
+                  <th scope="col">Pago</th>
+                  <th scope="col">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th style={{color:"#6941C6"}} scope="row">11111</th>
+                  <td>Enero</td>
+                  <td>
+                    <EstadoPago estado="No pagado" />
+                  </td>
+                  {/*<td><button><IoPencilOutline /></button></td>*/}
+                </tr>
+                <tr>
+                  <th style={{color:"#6941C6"}} scope="row">2222</th>
+                  <td>Febrero</td>
+                  <td>
+                    <EstadoPago estado="Pagado" />
+                  </td>
+                  {/*<td><button><IoPencilOutline /></button></td>*/}
+                </tr>
+                <tr>
+                  <th style={{color:"#6941C6"}} scope="row">33333</th>
+                  <td>Marzo</td>
+                  <td>
+                    <EstadoPago estado="Pagado" />
+                  </td>
+                  {/*<td><button><IoPencilOutline /></button></td>*/}
+                </tr>
+              </tbody>
+            </table>
           )}
-
           {/* Renderiza la tabla de mediciones si showMeasurements es true */}
           {showMeasurements && (
-            <table class="table table-striped">              {/* Contenido de la tabla de mediciones */}
-                <thead>
+            <table className="table table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Brazo(cm)</th>
+                  <th scope="col">Piernas(cm)</th>
+                  <th scope="col">Cintura(cm)</th>
+                  <th scope="col">Pecho(cm)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mediciones && mediciones.length > 0 ? (
+                  mediciones.map((medicion, index) => (
+                    <tr key={index}>
+                      <td>{medicion.fecha}</td>
+                      <td>{medicion.cirBrazo}</td>
+                      <td>{medicion.cirPiernas}</td>
+                      <td>{medicion.cirCintura}</td>
+                      <td>{medicion.cirPecho}</td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Brazo</th>
-                    <th scope="col">Piernas</th>
-                    <th scope="col">Cintura</th>
-                    <th scope="col">Cadera</th>
+                    <td colSpan="5">No hay mediciones disponibles</td>
                   </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">21 Enero 2023</th>
-                    <td>32</td>
-                    <td>32</td>
-                    <td>32</td>
-                    <td>32</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">21 Enero 2023</th>
-                    <td>32</td>
-                    <td>32</td>
-                    <td>32</td>
-                    <td>32</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">21 Enero 2023</th>
-                    <td>32</td>
-                    <td>32</td>
-                    <td>32</td>
-                    <td>32</td>
-                  </tr>
-                </tbody>
-              </table>
-            
+                )}
+              </tbody>
+            </table>
           )}
-
           <div className="d-flex justify-content-center mt-4">
             <Pagination count={5} shape="rounded" color="secondary" />
           </div>
