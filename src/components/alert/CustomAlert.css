@@ -24,16 +24,16 @@
     margin-bottom: 0px;
   }
   .confirm-button {
-    background-color: #8e24aa; /* Color púrpura similar al original */
-    color: #fff; /* Texto blanco */
-    border: none; /* Sin borde */
-    border-radius: 0.8em; /* Borde redondeado */
-    padding: 0.6em 1.6em; /* Espaciado interno */
-    cursor: pointer; /* Cursor al pasar sobre el botón */
-    margin: 1em; /* Margen alrededor del botón */
-    font-size: 0.9em; /* Tamaño de fuente */
+    background-color: #8e24aa; 
+    color: #fff; 
+    border: none; 
+    border-radius: 0.8em; 
+    padding: 0.6em 1.6em;
+    cursor: pointer; 
+    margin: 1em;  
+    font-size: 0.9em; 
 }
 
 .confirm-button:hover {
-    background-color: #6a1b9a; /* Cambio de color al pasar el ratón */
+    background-color: #6a1b9a; 
 }
