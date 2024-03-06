@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
 import { ThreeDots } from 'react-loader-spinner'
 import Logo from "../assets/logo.png";
 import { IoPeopleSharp } from "react-icons/io5";
 import { RiLockPasswordFill } from "react-icons/ri";
+import toast, { Toaster } from "react-hot-toast";
 import api from "../utils/api";
 import "../style.css";
 
@@ -19,18 +19,6 @@ const Login = () => {
     const [emailFocused, setEmailFocused] = useState(false);
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-        }
-    });
 
     const navigate = useNavigate();
 
@@ -51,13 +39,7 @@ const Login = () => {
             })
             .catch((error) => {
                 console.log(error);
-                Toast.fire({
-                    icon: "error",
-                    title: "Ha ocurrido un error. Vuelva a intentarlo.",
-                    customClass: {
-                        title: "error-title",
-                    },
-                });
+                toast.error("Ha ocurrido un error. Intentalo de nuevo.")
             })
             .finally(() => {
                 setLoading(false);
@@ -90,6 +72,14 @@ const Login = () => {
 
     return (
         <div className="login-container">
+        <Toaster position="top-right" reverseOrder={false} toastOptions={{
+            error:{
+                style: {
+                    background: '#FFDBD9',
+                    color: '#D92D20'
+                }
+            }
+        }} />
             <div className="login-card">
                 <center><img src={Logo} alt="Logo de la aplicación" className="logo" /></center>
                 <form onSubmit={handleSubmit}>
@@ -98,7 +88,7 @@ const Login = () => {
                             <input
                                 name="email"
                                 value={usuario.email}
-                                className="form-control"
+                                className="form-input"
                                 type="text"
                                 placeholder=" "
                                 onChange={handleChange}
@@ -116,7 +106,7 @@ const Login = () => {
                             <input
                                 name="password"
                                 value={usuario.password}
-                                className="form-control"
+                                className="form-input"
                                 type={mostrarPassword ? "text" : "password"}
                                 placeholder=" "
                                 onChange={handleChange}
