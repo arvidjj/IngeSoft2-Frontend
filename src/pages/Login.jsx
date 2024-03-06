@@ -39,12 +39,19 @@ const Login = () => {
             })
             .catch((error) => {
                 console.log(error);
-                toast.error("Ha ocurrido un error. Intentalo de nuevo.")
+                if (error.response && error.response.status === 400) {
+                    toast.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
+                } else if (error.response && error.response.status === 404) {
+                    toast.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
+                } else {
+                    toast.error("Ha ocurrido un error. Inténtalo de nuevo.");
+                }
             })
             .finally(() => {
                 setLoading(false);
             });
     };
+    
 
     const toggleMostrarPassword = () => {
         setMostrarPassword(!mostrarPassword);
@@ -76,7 +83,7 @@ const Login = () => {
             error:{
                 style: {
                     background: '#FFDBD9',
-                    color: '#D92D20'
+                    color: '#D92D20',
                 }
             }
         }} />
