@@ -15,6 +15,7 @@ import ModalBase from "../../components/modals/ModalBase";
 import ButtonBasic from "../../components/bottons/ButtonBasic";
 import CustomAlert from "../../components/alert/CustomAlert";
 import Pagination from "@mui/material/Pagination";
+import toast, { Toaster } from "react-hot-toast";
 
 const MainClients = () => {
   const [showAlert, setShowAlert] = useState(false);
@@ -57,6 +58,7 @@ const MainClients = () => {
       setFilteredClientes(response.data.items);
     } catch (error) {
       console.error("Error al obtener clientes:", error);
+      toast.error("Error al actualizar cliente " );
     }
   };
 
@@ -94,25 +96,26 @@ const MainClients = () => {
       nombre: event.target.value,
     });
   };
-  // Función para abrir el modal cuando se hace clic en "Editar Cliente"
+  // Funcion para abrir el modal cuando se hace clic en "Editar Cliente"
   const handleEditClientClick = (client) => {
     setEditingClient(client);
     setModalOpen(true);
   };
 
-  // Función para cerrar el modal
+  // Funcion para cerrar el modal
   const handleCloseModal = () => {
     setModalOpen(false);
   };
 
-  // Función para guardar los cambios realizados en el cliente
+  // Funcion para guardar los cambios realizados en el cliente
   const handleGuardarCambios = async () => {
     try {
       await api.put(`/clientes/${editingClient.id}`, editingClient); // Actualiza el cliente con los datos editados
-      setModalOpen(false); // Cierra el modal de edición
-      notify(); // Muestra notificación al actualizar cliente
+      setModalOpen(false); // Cierra el modal 
+      toast.success("Usuario editado satisfactoriamente") 
     } catch (error) {
       console.error("Error al actualizar cliente:", error);
+      toast.error("Error al actualizar cliente " );
     }
   };
     
@@ -122,7 +125,7 @@ const MainClients = () => {
     // Verificar si algún campo esta vacio
     for (const key in clienteData) {
       if (clienteData[key] === "") {
-        alert(`El campo ${key} no puede estar vacío`);
+        toast.error(`El campo ${key} no puede estar vacío`);
         return;
       }
     }
@@ -130,13 +133,13 @@ const MainClients = () => {
     // Verificar la validez del correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(clienteData.email)) {
-      alert("Correo electrónico inválido");
+      toast.error("Correo electrónico inválido");
       return;
     }
 
     // Verificar la longitud del numero de teléfono
     if (clienteData.telefono.length < 8) {
-      alert("El número de teléfono debe tener al menos 8 dígitos");
+      toast.error("El número de teléfono debe tener al menos 8 dígitos");
       return;
     }
 
@@ -149,7 +152,7 @@ const MainClients = () => {
     try {
       const response = await api.post(`/clientes`, datosCliente);
       console.log("Cliente agregado:", response.data);
-      alert('Cliente creado correctamente');
+      toast.success("Usuario guardados satisfactoriamente") 
       fetchClientes();
       setClienteData({
         nombre: '',
@@ -162,7 +165,7 @@ const MainClients = () => {
       setShowModal(false);
     } catch (error) {
       console.error("Error al registrar cliente:", error);
-      alert('Error al crear cliente');
+      toast.error('Error al registrar cliente');
     } finally {
       setLoading(false);
     }
@@ -209,7 +212,7 @@ const MainClients = () => {
         setShowAlert(false);
       } catch (error) {
         console.error("Error al eliminar cliente:", error);
-        alert("Error al eliminar cliente");
+        toast.error("Error al eliminar cliente" + error);
       }
     }
   };
@@ -227,7 +230,7 @@ const MainClients = () => {
       fetchClientes();
     } catch (error) {
       console.error("Error al eliminar cliente:", error);
-      alert("Error al eliminar cliente");
+      toast.error("Error al eliminar cliente");
     }
   };
 
@@ -489,6 +492,23 @@ const MainClients = () => {
           cancelAction={handleCancelDelete}
         />
       )}
+      <Toaster position="top-right" reverseOrder={false}
+  toastOptions={{
+    success: {
+      style: {
+        background: '#75B798',
+        color: '#0A3622'
+      },
+    },
+    error: {
+      style: {
+        background: '#FFDBD9',
+        color: '#D92D20'
+      },
+    },
+      
+  }}
+/>
       <div className="d-flex justify-content-center mt-4">
       <div className="pagination-container">
   <Pagination
