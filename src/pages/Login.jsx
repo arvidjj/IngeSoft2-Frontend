@@ -40,9 +40,9 @@ const Login = () => {
             .catch((error) => {
                 console.log(error);
                 if (error.response && error.response.status === 400) {
-                    toast.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
+                    toast.error("Datos incorrectos. Por favor, inténtalo de nuevo.");
                 } else if (error.response && error.response.status === 404) {
-                    toast.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
+                    toast.error("Usuario no encontrado. Por favor, revisa tus datos.");
                 } else {
                     toast.error("Ha ocurrido un error. Inténtalo de nuevo.");
                 }
