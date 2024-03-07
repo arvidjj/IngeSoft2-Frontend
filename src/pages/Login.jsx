@@ -35,7 +35,7 @@ const Login = () => {
         api.post("/auth/login", usuario)
             .then((response) => {
                 localStorage.setItem("user", JSON.stringify(response.data));
-                navigate("/home");
+                navigate("/clientes");
             })
             .catch((error) => {
                 console.log(error);
