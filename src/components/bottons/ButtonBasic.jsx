@@ -17,6 +17,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
         borderRadius: '0.5em',
         padding: '1.4em 0.8em',
         fontSize: '0.8em',
+        
     },
 }));
 const ButtonTextContainer = styled('div')({
