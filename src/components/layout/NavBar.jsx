@@ -12,16 +12,17 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const pages = [
-    { name: "Clientes", color: "#667085" },
+    { name: "Home", color: "#667085" },
     { name: "Productos", color: "#667085" },
+    { name: "Clientes", color: "#667085" },
     { name: "Caja", color: "#667085" },
     { name: "Reportes", color: "#667085" },
 ];
 
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = ["Cerrar Sesion"];
 
 function NavBar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -41,8 +42,15 @@ function NavBar() {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+    const logOut = () => {
+        localStorage.removeItem("user");
+        navigate("/");
+    };
+
+
 
     const location = useLocation();
+    const navigate = useNavigate();
 
     return (
         <Box sx={{ position: 'relative' }}>
@@ -164,7 +172,7 @@ function NavBar() {
                                 onClose={handleCloseUserMenu}
                             >
                                 {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                    <MenuItem key={setting} onClick={logOut}>
                                         <Typography textAlign="center">{setting}</Typography>
                                     </MenuItem>
                                 ))}

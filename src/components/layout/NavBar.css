@@ -1,0 +1,35 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: self-start;
+    padding: 10px 20px;
+    background-color: white;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .navbar__logo img {
+    width: 50px;
+    height: auto;
+  }
+  
+  .navbar__links {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+  }
+  
+  .navbar__links li a {
+    color: #667085;
+    text-decoration: none;
+  }
+  
+  .navbar__user {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar__user span {
+    margin-right: 10px;
+  }
+  
