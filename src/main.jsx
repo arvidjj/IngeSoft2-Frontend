@@ -15,6 +15,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/" element={<Login />} />
           <Route path="/clientes" element={<Layout><MainClients /></Layout>} />
           <Route path="/clientesinfo/:id" element={<Layout><InfoClients /></Layout>} />
+          <Route path="/productos" element={<Layout><MainProductos /></Layout>} />
           <Route path="*" element={<Layout><PageNotFound /></Layout>} />
         </Routes>
       </Router>
