@@ -1,7 +1,9 @@
-import axios from "axios";
+import axios from "/node_modules/.vite/deps/axios.js?v=e9a41200";
+
+const baseURL = import.meta.env.VITE_API; // Acceso a variables de entorno en Vite
 
 const api = axios.create({
-  baseURL: process.env.VITE_API,
+  baseURL: baseURL,
 });
 
 api.interceptors.request.use(
@@ -21,14 +23,3 @@ api.interceptors.request.use(
 );
 
 export default api;
-
-
-/*
- * Ejemplo de utilizacion:
- * import api from "./services/api.js"
- * api.[peticion]("/ruta sin localhost");
- * api.post("/clientes", clientes);
- * api.get("/clientes");
- */
-
-

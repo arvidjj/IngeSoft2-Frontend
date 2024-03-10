@@ -7,7 +7,7 @@ import PageNotFound from "./pages/PageNotFound";
 import Layout from "./components/layout/Layout";
 import MainClients from "./pages/clients/mainClients";
 import Login from "./pages/Login";
-
+import MainProductos  from './pages/productos/MainProductos';
 createRoot(document.getElementById("root")).render(
     <React.StrictMode>
       <Router>
@@ -15,6 +15,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/" element={<Login />} />
           <Route path="/clientes" element={<Layout><MainClients /></Layout>} />
           <Route path="/clientesinfo/:id" element={<Layout><InfoClients /></Layout>} />
+          <Route path="/productos" element={<Layout><MainProductos /></Layout>} />
           <Route path="*" element={<Layout><PageNotFound /></Layout>} />
         </Routes>
       </Router>
