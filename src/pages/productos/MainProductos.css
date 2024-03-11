@@ -1,0 +1,32 @@
+
+  .custom-input {
+    width: 75%;
+    height: 40px;
+  }
+  
+  .dropdown {
+    margin-right: 10%;
+    
+  }
+  
+  .button-t {
+    margin-right: 5%;
+    border: 8px solid #6941c6;
+    border-radius: 8px;
+    background-color: #6941c6;
+    color: #fff;
+    text-align: center;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .btn-filtrar{
+    width: 130%;
+    color: #6941c6;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #6941c6;
+  }
+  .btn-filtrar:hover{
+    background-color: #6941c6;
+  }
+  

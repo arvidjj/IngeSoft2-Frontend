@@ -1,7 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Home from "./pages/Home";
 import InfoClients from "./pages/clients/InfoClients";
 import PageNotFound from "./pages/PageNotFound";
 import Layout from "./components/layout/Layout";
