@@ -1,5 +1,6 @@
 
   .custom-input {
+    margin-left: 3%;
     width: 75%;
     height: 40px;
   }
@@ -28,5 +29,26 @@
   }
   .btn-filtrar:hover{
     background-color: #6941c6;
+  }
+  .card-1{
+    border: none;
+  }
+  .card-2{
+    border: none;
+  }
+  .custom-table tbody tr {
+    height: 5em; /* Ajusta el valor según sea necesario */
+  }
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    position: fixed; 
+    bottom: 5em; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    z-index: 999; 
+  }
+  .custom-table-icons{
+    margin: 2%;
   }
   
