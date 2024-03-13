@@ -1,7 +1,11 @@
 import axios from "axios";
 
+
+
+const baseURL = import.meta.env.VITE_API; // Acceso a variables de entorno en Vite
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API,
+  baseURL: baseURL,
 });
 
 api.interceptors.request.use(
@@ -30,4 +34,5 @@ export default api;
  * api.post("/clientes", clientes);
  * api.get("/clientes");
  */
+
 
