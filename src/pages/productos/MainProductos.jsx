@@ -22,9 +22,11 @@ const MainProductos = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [productoToDelete, setProductoToDelete] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [modalMode, setModalMode] = useState("create");
+  const [sortBy, setSortBy] = useState(""); // Estado para controlar el ordenamiento de los productos
+  const [sortType, setSortType] = useState(""); // Estado para controlar el tipo de orden (ascendente o descendente)
 
   const notifyProducto = () =>
     toast.success("Producto creado satisfactoriamente");
@@ -47,8 +49,8 @@ const MainProductos = () => {
     try {
       const response = await api.get(`/productos/page/${page}`);
       setProductos(response.data.items);
-      
       setFilteredProductos(response.data.items);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error al obtener los productos:", error);
     }
@@ -71,7 +73,7 @@ const MainProductos = () => {
   const handleEditarProducto = (producto) => {
     setModalMode("edit"); // Establece el modo como editar
     setProductosData(producto); // Establece los datos del producto a editar en el estado
-    setShowModal(true);
+    setShowEditModal(true);
   };
 
   // Función para cerrar el modal
@@ -112,29 +114,29 @@ const MainProductos = () => {
     handleInputChange(event);
   };
 
-  
-
- const handleAceptar = async () => {
-  try {
-    if (modalMode === "create") {
-      // Lógica para crear un nuevo producto
-      const response = await api.post("/productos", productosData);
-      console.log("Producto creado:", response.data);
-      notifyProducto();
-    } else if (modalMode === "edit") {
-      // Lógica para editar un producto existente
-      const response = await api.put(`/productos/${productosData.id}`, productosData);
-      console.log("Producto editado:", response.data);
-      notifyProductoActualizado();
+  const handleAceptar = async () => {
+    try {
+      if (modalMode === "create") {
+        // Lógica para crear un nuevo producto
+        const response = await api.post("/productos", productosData);
+        console.log("Producto creado:", response.data);
+        notifyProducto();
+      } else if (modalMode === "edit") {
+        // Lógica para editar un producto existente
+        const response = await api.put(
+          `/productos/${productosData.id}`,
+          productosData
+        );
+        console.log("Producto editado:", response.data);
+        notifyProductoActualizado();
+      }
+      setShowModal(false);
+      fetchProductos(currentPage);
+    } catch (error) {
+      console.error("Error al procesar la solicitud:", error);
+      toast.error("Error al procesar la solicitud");
     }
-    setShowModal(false);
-    fetchProductos(currentPage);
-  } catch (error) {
-    console.error("Error al procesar la solicitud:", error);
-    toast.error("Error al procesar la solicitud");
-  }
-};
-
+  };
 
   const handleEliminarProducto = async () => {
     if (productoToDelete) {
@@ -149,6 +151,7 @@ const MainProductos = () => {
       }
     }
   };
+
   const handleConfirmDelete = async () => {
     if (productoToDelete) {
       try {
@@ -173,22 +176,25 @@ const MainProductos = () => {
   const handleSearchChange = (event) => {
     const term = event.target.value;
     setSearchTerm(term);
-  
-    if (term.length >= 3) { // Solo realiza la búsqueda si el término tiene al menos 3 letras
+
+    if (term.length >= 4) {
+      // Solo realiza la búsqueda si el término tiene al menos 3 letras
       searchProductos(term);
+      setCurrentPage(1);
+      setSortBy(""); // Restablecer el ordenamiento al iniciar una nueva búsqueda
+      setSortType("");
     } else {
       // Restablece la lista de productos original si el término tiene menos de 3 letras
       setFilteredProductos(productos);
       // Siempre vuelve a la primera página cuando se borra el término de búsqueda
-      setCurrentPage(1);
     }
   };
-  
+
   const searchProductos = (term) => {
     const filtered = productos.filter((producto) => {
       const nombre = producto.nombre.toLowerCase();
       const codigo = producto.codigo.toLowerCase();
-  
+
       return (
         nombre.includes(term.toLowerCase()) ||
         codigo.includes(term.toLowerCase())
@@ -196,7 +202,42 @@ const MainProductos = () => {
     });
     setFilteredProductos(filtered);
   };
+
+  const handleSortBy = (sortBy) => {
+    if (sortBy === "nombre") {
+      setFilteredProductos(sortProductos(filteredProductos.slice(), sortBy));
+      setSortBy("nombre");
+    }
+  };
+
+  const sortProductos = (productos, sortBy) => {
+    return productos.sort((a, b) => {
+      if (sortBy === "precio" || sortBy === "cantidad") {
+        return a[sortBy] - b[sortBy];
+      } else {
+        // Ordenamiento por otros tipos de datos
+        if (a[sortBy] < b[sortBy]) {
+          return -1;
+        }
+        if (a[sortBy] > b[sortBy]) {
+          return 1;
+        }
+        return 0;
+      }
+    });
+  };
   
+  const handleSortByPrice = () => {
+    setFilteredProductos(sortProductos(filteredProductos.slice(), "precio"));
+    setSortBy("precio");
+  };
+  
+  const handleSortByCantidad = () => {
+    setFilteredProductos(sortProductos(filteredProductos.slice(), "cantidad"));
+    setSortBy("cantidad");
+  };
+  
+
   return (
     <div className="MaquetaCliente">
       <Toaster
@@ -217,7 +258,7 @@ const MainProductos = () => {
           },
         }}
       />
-      <div className="cuadro-central">
+      <div class="card">
         <div className="container">
           <div className="card-1">
             <h2>Tienda</h2>
@@ -244,17 +285,17 @@ const MainProductos = () => {
                 </button>
                 <ul className="dropdown-menu">
                   <li>
-                    <a className="dropdown-item" href="#">
+                    <a className="dropdown-item" href="#" onClick={handleSortByPrice}>
                       Precio
                     </a>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#">
+                    <a className="dropdown-item" href="#" onClick={handleSortByCantidad}>
                       Stock
                     </a>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#">
+                    <a className="dropdown-item" href="#" onClick={() => handleSortBy("nombre")}>
                       Nombre
                     </a>
                   </li>
@@ -376,13 +417,14 @@ const MainProductos = () => {
                     <td>{producto.codigo}</td>
                     <td>{producto.descripcion}</td>
                     <td>{producto.precio}</td>
-                    <td class = "text-center">
+                    <td class="text-center">
                       <a href="#" onClick={() => handleShowAlert(producto)}>
                         <RiDeleteBinLine />
                       </a>
                       <a
                         href="#"
-                        onClick={() => handleEditarProducto(producto)} style={{ marginLeft: '2em' }}
+                        onClick={() => handleEditarProducto(producto)}
+                        style={{ marginLeft: "2em" }}
                       >
                         <FiEdit2 />
                       </a>

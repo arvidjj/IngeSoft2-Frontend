@@ -1,4 +1,10 @@
-
+.card {
+    width: 100%; /* Porcentaje del ancho del contenedor padre */
+    height: 100%; /* Altura ajustada automáticamente según el contenido */
+    max-width: 90rem; /* Ancho máximo en píxeles para evitar que la tarjeta se expanda demasiado en pantallas grandes */
+    margin-left: -8%;
+  }
+  
   .custom-input {
     margin-left: 3%;
     width: 75%;
@@ -52,3 +58,39 @@
     margin: 2%;
   }
   
+  /* Media Queries para pantallas más pequeñas */
+
+@media screen and (max-width: 600px) {
+  .card {
+    margin-left: 0;
+    
+    max-width: 100%;
+  }
+
+  .custom-input {
+    width: 60%;
+  }
+
+  .dropdown {
+    margin-right: 5%;
+  }
+
+  .button-t {
+    margin-right: 3%;
+    font-size: 11px;
+  }
+
+  .btn-filtrar {
+    width: 110%;
+  }
+
+  .custom-table{
+    width: 50%;
+    font-size: 5px;
+  }
+
+  /* Ajustes para la paginación */
+  .pagination-container {
+    bottom: 2rem; /* Mover la paginación hacia arriba */
+  }
+}
