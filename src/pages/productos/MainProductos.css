@@ -3,6 +3,7 @@
     height: 100%; /* Altura ajustada automáticamente según el contenido */
     max-width: 90rem; /* Ancho máximo en píxeles para evitar que la tarjeta se expanda demasiado en pantallas grandes */
     margin-left: -8%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   }
   
   .custom-input {
@@ -91,6 +92,53 @@
 
   /* Ajustes para la paginación */
   .pagination-container {
-    bottom: 2rem; /* Mover la paginación hacia arriba */
+    margin-top: 50rem;
+    bottom: 1rem; /* Mover la paginación hacia arriba */
   }
+}
+.container {
+  
+  display: flex;
+  flex-direction: column; /* Para alinear el card y la tabla verticalmente */
+
+}
+
+.table-container {
+  flex: 1; /* Para que la tabla ocupe todo el espacio restante */
+  overflow: auto; /* Si la tabla es demasiado grande, permite desplazamiento vertical */
+}
+
+.custom-table {
+  width: 98%; /* La tabla ocupará todo el ancho disponible */
+  /* Otros estilos que tengas para la tabla */
+}
+
+.mb-2.block {
+  display: flex;
+  flex-direction: column; /* Para que los elementos estén en columna */
+}
+
+.label-container {
+  display: flex;
+  align-items: center;
+}
+
+.required {
+  color: red;
+  margin-left: 0.5rem;
+  font-size: 0.8rem; /* Ajusta el tamaño del asterisco según sea necesario */
+}
+
+.campo-obligatorio {
+  display: flex;
+  align-items: center;
+  color: red;
+  font-size: 0.8rem;
+}
+
+
+
+.required-info {
+  color: red; /* Color rojo */
+  text-align: center; /* Alineación al centro */
 }

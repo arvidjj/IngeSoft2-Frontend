@@ -90,30 +90,9 @@ const MainProductos = () => {
     }));
   };
 
-  const handleNameChange = (event) => {
+  const handleCampoChange = (event) => {
     handleInputChange(event);
   };
-
-  const handleDescripcionChange = (event) => {
-    handleInputChange(event);
-  };
-
-  const handleCodigoChange = (event) => {
-    handleInputChange(event);
-  };
-
-  const handleCostoChange = (event) => {
-    handleInputChange(event);
-  };
-
-  const handleCantidadChange = (event) => {
-    handleInputChange(event);
-  };
-
-  const handlePrecioChange = (event) => {
-    handleInputChange(event);
-  };
-
   const handleAceptar = async () => {
     try {
       if (modalMode === "create") {
@@ -131,6 +110,7 @@ const MainProductos = () => {
         notifyProductoActualizado();
       }
       setShowModal(false);
+      setShowEditModal(false);
       fetchProductos(currentPage);
     } catch (error) {
       console.error("Error al procesar la solicitud:", error);
@@ -226,17 +206,16 @@ const MainProductos = () => {
       }
     });
   };
-  
+
   const handleSortByPrice = () => {
     setFilteredProductos(sortProductos(filteredProductos.slice(), "precio"));
     setSortBy("precio");
   };
-  
+
   const handleSortByCantidad = () => {
     setFilteredProductos(sortProductos(filteredProductos.slice(), "cantidad"));
     setSortBy("cantidad");
   };
-  
 
   return (
     <div className="MaquetaCliente">
@@ -258,8 +237,9 @@ const MainProductos = () => {
           },
         }}
       />
+
       <div class="card">
-        <div className="container">
+        <div class="container">
           <div className="card-1">
             <h2>Tienda</h2>
             <div className="card-body d-flex align-items-center justify-content-between">
@@ -285,17 +265,29 @@ const MainProductos = () => {
                 </button>
                 <ul className="dropdown-menu">
                   <li>
-                    <a className="dropdown-item" href="#" onClick={handleSortByPrice}>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={handleSortByPrice}
+                    >
                       Precio
                     </a>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#" onClick={handleSortByCantidad}>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={handleSortByCantidad}
+                    >
                       Stock
                     </a>
                   </li>
                   <li>
-                    <a className="dropdown-item" href="#" onClick={() => handleSortBy("nombre")}>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={() => handleSortBy("nombre")}
+                    >
                       Nombre
                     </a>
                   </li>
@@ -310,80 +302,112 @@ const MainProductos = () => {
           </div>
 
           <ModalBase
-            open={showModal || showEditModal} // Abre el modal tanto para crear como para editar
-            closeModal={handleCloseModal}
-            title={showModal ? "Crear Nuevo Producto" : "Editar Producto"} // Título dinámico según si es crear o editar
-          >
-            <form className="mb-3">
-              <div className="mb-2 block">
-                <LabelBase label="Nombre:" htmlFor="nombre" />
-                <input
-                  type="text"
-                  id="nombre"
-                  name="nombre"
-                  className="form-control"
-                  value={productosData.nombre}
-                  onChange={handleNameChange}
-                />
-              </div>
+  open={showModal || showEditModal}
+  closeModal={handleCloseModal}
+  title={showModal ? "Crear Nuevo Producto" : "Editar Producto"}
+>
+  <form className="mb-3">
+    <div className="mb-2 block">
+      <div className="label-container">
+        <LabelBase label="Nombre:" htmlFor="nombre" />
+        <span className="required">*</span>
+      </div>
+      <input
+        type="text"
+        id="nombre"
+        name="nombre"
+        className="form-control"
+        value={productosData.nombre}
+        onChange={handleCampoChange}
+        required
+      />
+    </div>
+    <div className="mb-2 block">
+      <div className="label-container">
+        <LabelBase label="Descripcion:" htmlFor="descripcion" />
+        {/* No se requiere asterisco para campos opcionales */}
+      </div>
+      <input
+        id="descripcion"
+        name="descripcion"
+        className="form-control"
+        value={productosData.descripcion}
+        onChange={handleCampoChange}
+      ></input>
+    </div>
+    <div className="d-flex justify-content-between">
+      <div className="d-flex flex-column mr-2">
+        <div className="mb-2 block">
+          <div className="label-container">
+            <LabelBase label="Codigo:" htmlFor="codigo" />
+            <span className="required">*</span>
+          </div>
+          <input
+            type="text"
+            id="codigo"
+            name="codigo"
+            className="form-control"
+            value={productosData.codigo}
+            onChange={handleCampoChange}
+            required
+          />
+        </div>
+        <div className="mb-2 block">
+          <div className="label-container">
+            <LabelBase label="Cantidad:" htmlFor="cantidad" />
+            <span className="required">*</span>
+          </div>
+          <input
+            id="cantidad"
+            name="cantidad"
+            className="form-control"
+            value={productosData.cantidad}
+            onChange={handleCampoChange}
+            required
+          />
+        </div>
+      </div>
+      <div className="d-flex flex-column">
+      <div className="mb-2 block">
+          <div className="label-container">
+            <LabelBase label="Costo:" htmlFor="costo" />
+            <span className="required">*</span>
+          </div>
+          <input
+            id="costo"
+            name="costo"
+            className="form-control"
+            value={productosData.costo}
+            onChange={handleCampoChange}
+            required
+          />
+        </div>
+        <div className="mb-2 block">
+          <div className="label-container">
+            <LabelBase label="Precio:" htmlFor="precio" />
+            <span className="required">*</span>
+          </div>
+          <input
+            id="precio"
+            name="precio"
+            className="form-control"
+            value={productosData.precio}
+            onChange={handleCampoChange}
+            required
+          />
+        </div>
+      </div>
+    </div>
+    <div className="campo-obligatorio">
+      <span className="required">*</span>
+      <span className="message">Campo obligatorio</span>
+    </div>
+    <div className="d-flex justify-content-center align-items-center float-end">
+      <ButtonBasic text="Aceptar" onClick={handleAceptar} />
+    </div>
+  </form>
+</ModalBase>
 
-              <div className="mb-2 block">
-                <LabelBase label="Descripcion:" htmlFor="descripcion" />
-                <input
-                  id="descripcion"
-                  name="descripcion"
-                  className="form-control"
-                  value={productosData.descripcion}
-                  onChange={handleDescripcionChange}
-                ></input>
-              </div>
-              <div className="mb-2 block">
-                <LabelBase label="Codigo:" htmlFor="codigo" />
-                <input
-                  type="text"
-                  id="codigo"
-                  name="codigo"
-                  className="form-control"
-                  value={productosData.codigo}
-                  onChange={handleCodigoChange}
-                />
-              </div>
-              <div className="mb-2 block">
-                <LabelBase label="Costo:" htmlFor="costo" />
-                <input
-                  id="costo"
-                  name="costo"
-                  className="form-control"
-                  value={productosData.costo}
-                  onChange={handleCostoChange}
-                />
-              </div>
-              <div className="mb-2 block">
-                <LabelBase label="Cantidad:" htmlFor="cantidad" />
-                <input
-                  id="cantidad"
-                  name="cantidad"
-                  className="form-control"
-                  value={productosData.cantidad}
-                  onChange={handleCantidadChange}
-                />
-              </div>
-              <div className="mb-2 block">
-                <LabelBase label="Precio:" htmlFor="precio" />
-                <input
-                  id="precio"
-                  name="precio"
-                  className="form-control"
-                  value={productosData.precio}
-                  onChange={handlePrecioChange}
-                />
-              </div>
-
-              <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Aceptar" onClick={handleAceptar} />
-              </div>
-            </form>
-          </ModalBase>
           {showAlert && productoToDelete && (
             <CustomAlert
               message={`¿Estás seguro de eliminar el producto ${productoToDelete.nombre}?`}
@@ -393,7 +417,7 @@ const MainProductos = () => {
               cancelAction={handleCancelDelete}
             />
           )}
-          <div className="card-2">
+          <div class="table-container">
             <table className="custom-table">
               <thead>
                 <tr>
