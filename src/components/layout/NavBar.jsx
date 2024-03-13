@@ -30,6 +30,7 @@ const NavBar = () => {
                 <Link to="/productos" ><button className="nav-btn">Productos</button></Link>
                 <Link to="/caja" ><button className="nav-btn">Caja</button></Link>
                 <Link to="/reportes" ><button className="nav-btn">Reportes</button></Link>
+                <Link to="/users" ><button className="nav-btn">Usuarios</button></Link>
             </div>
             <div className="navbar-right">
                 {userData && (
