@@ -58,14 +58,14 @@ const MainClients = () => {
       setFilteredClientes(response.data.items);
     } catch (error) {
       console.error("Error al obtener clientes:", error);
-      toast.error("Error al actualizar cliente " );
+      toast.error("Error al actualizar cliente ");
     }
   };
 
   const handleSearchChange = (event) => {
     const term = event.target.value;
     setSearchTerm(term);
-  
+
     if (term.length >= 4) {
       searchClientes(term);
     } else {
@@ -96,35 +96,35 @@ const MainClients = () => {
       nombre: event.target.value,
     });
   };
-  
+
   const handleRucChange = (event) => {
     setEditingClient({
       ...editingClient,
       ruc: event.target.value,
     });
   };
-  
+
   const handleTelefonoChange = (event) => {
     setEditingClient({
       ...editingClient,
       telefono: event.target.value,
     });
   };
-  
+
   const handleEmailChange = (event) => {
     setEditingClient({
       ...editingClient,
       email: event.target.value,
     });
   };
-  
+
   const handleDireccionChange = (event) => {
     setEditingClient({
       ...editingClient,
       direccion: event.target.value,
     });
   };
-  
+
   // Funcion para abrir el modal cuando se hace clic en "Editar Cliente"
   const handleEditClientClick = (client) => {
     setEditingClient(client);
@@ -140,16 +140,15 @@ const MainClients = () => {
   const handleGuardarCambios = async () => {
     try {
       await api.put(`/clientes/${editingClient.id}`, editingClient); // Actualiza el cliente con los datos editados
-      setModalOpen(false); // Cierra el modal 
+      setModalOpen(false); // Cierra el modal
       fetchClientes();
       toast.success("Usuario editado satisfactoriamente");
-
     } catch (error) {
       console.error("Error al actualizar cliente:", error);
-      toast.error("Error al actualizar cliente " );
+      toast.error("Error al actualizar cliente ");
     }
   };
-    
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -183,30 +182,30 @@ const MainClients = () => {
     try {
       const response = await api.post(`/clientes`, datosCliente);
       console.log("Cliente agregado:", response.data);
-      toast.success("Cliente guardado exitosamente") 
+      toast.success("Cliente guardado exitosamente");
       fetchClientes();
-      setClienteDataExtra({ apellido: '' });
+      setClienteDataExtra({ apellido: "" });
       setClienteData({
-        nombre: '',
-        ruc: '',
-        cedula: '',
-        telefono: '',
-        email: '',
-        direccion: '',
+        nombre: "",
+        ruc: "",
+        cedula: "",
+        telefono: "",
+        email: "",
+        direccion: "",
       });
       setShowModal(false);
     } catch (error) {
       console.error("Error al registrar cliente:", error);
-      toast.error('Error al registrar cliente');
+      toast.error("Error al registrar cliente");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     // Verificar si el campo es 'telefono' y si el valor contiene solo numeros
-    if (name === "telefono" && !(/^\d+$/.test(value))) {
+    if (name === "telefono" && !/^\d+$/.test(value)) {
       return;
     }
 
@@ -294,63 +293,64 @@ const MainClients = () => {
         </div>
         <hr />
         <div className="tabla">
-        <table className="custom-table">
-          <thead>
-            <tr>
-              <th scope="col">Nombre</th>
-              <th scope="col">
-                Estado <TbArrowDown />
-              </th>
-              <th scope="col">
-                Plan <GoQuestion />
-              </th>
-              <th scope="col">Email</th>
-              <th scope="col">Numero de telefono</th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody className="table tbody tr:nth-child(odd) ">
-            {filteredClientes.map((cliente) => (
-              <tr key={cliente.id}>
-                <td>
-                <Link to={`/clientesinfo/${cliente.id}`}>
-                    <PiUserCircleLight
-                      style={{
-                        padding: "0px",
-                        fontSize: "25px",
-                        background: "#eaecf000",
-                      }}
-                    />{" "}
-                    {cliente.nombre}
-                  </Link>
-                </td>
-                <td className=".custom-table2">{cliente.active ? "Activo" : "Inactivo"}</td>
-                <td className=".custom-table2">Plan</td>
-                <td className="custom-table2">{cliente.email}</td>
-                <td className="custom-table2">{cliente.telefono}</td>
-                <td className="custom-table2">
-                  <a href="#" onClick={() => handleShowAlert(cliente)}>
-                    <RiDeleteBinLine />
-                  </a>
-                  <a href="#" onClick={() => handleEditClientClick(cliente)}>
-        <FiEdit2 />
-                  </a>
-                </td>
+          <table className="custom-table">
+            <thead>
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">
+                  Estado <TbArrowDown />
+                </th>
+                <th scope="col">
+                  Plan <GoQuestion />
+                </th>
+                <th scope="col">Email</th>
+                <th scope="col">Numero de telefono</th>
+                <th scope="col"></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="table tbody tr:nth-child(odd) ">
+              {filteredClientes.map((cliente) => (
+                <tr key={cliente.id}>
+                  <td>
+                    <Link to={`/clientesinfo/${cliente.id}`}>
+                      <PiUserCircleLight
+                        style={{
+                          padding: "0px",
+                          fontSize: "25px",
+                          background: "#eaecf000",
+                        }}
+                      />{" "}
+                      {cliente.nombre}
+                    </Link>
+                  </td>
+                  <td className=".custom-table2">
+                    {cliente.active ? "Activo" : "Inactivo"}
+                  </td>
+                  <td className=".custom-table2">Plan</td>
+                  <td className="custom-table2">{cliente.email}</td>
+                  <td className="custom-table2">{cliente.telefono}</td>
+                  <td className="custom-table2">
+                    <a href="#" onClick={() => handleShowAlert(cliente)}>
+                      <RiDeleteBinLine />
+                    </a>
+                    <a href="#" onClick={() => handleEditClientClick(cliente)}>
+                      <FiEdit2 />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         <div className="d-flex justify-content-center mt-4">
-        <Pagination
-    count={Math.ceil(filteredClientes.length / itemsPerPage)}
-    page={currentPage <= 2 ? currentPage : 1} 
-    onChange={(event, value) => setCurrentPage(value)}
-    shape="rounded"
-    color="secondary"
-  />
-  
-  </div>
+          <Pagination
+            count={Math.ceil(filteredClientes.length / itemsPerPage)}
+            page={currentPage <= 2 ? currentPage : 1}
+            onChange={(event, value) => setCurrentPage(value)}
+            shape="rounded"
+            color="secondary"
+          />
+        </div>
       </div>
       {/* Modal para registrar nuevo cliente */}
       <ModalBase
@@ -359,8 +359,13 @@ const MainClients = () => {
         title="Registro de Cliente"
       >
         <div>
-          <div className="modal-body" style={{ marginTop: "0px", paddingTop: "0px" }}>
-            <p style={{ fontWeight: "bold", fontSize: "14px" }}>Datos Personales</p>
+          <div
+            className="modal-body"
+            style={{ marginTop: "0px", paddingTop: "0px" }}
+          >
+            <p style={{ fontWeight: "bold", fontSize: "14px" }}>
+              Datos Personales
+            </p>
 
             <form>
               <div>
@@ -443,20 +448,23 @@ const MainClients = () => {
                 </ButtonBasic>
               </div>
             </form>
-            
           </div>
-          
         </div>
       </ModalBase>
-      {/*modal para editar cliente*/ }
+      {/*modal para editar cliente*/}
       <ModalBase
-       open={modalOpen}
-       title="Editar Cliente"
-       closeModal={handleCloseModal}
+        open={modalOpen}
+        title="Editar Cliente"
+        closeModal={handleCloseModal}
       >
         <div>
-          <div className="modal-body" style={{ marginTop: "0px", paddingTop: "0px" }}>
-            <p style={{ fontWeight: "bold", fontSize: "14px" }}>Datos Personales</p>
+          <div
+            className="modal-body"
+            style={{ marginTop: "0px", paddingTop: "0px" }}
+          >
+            <p style={{ fontWeight: "bold", fontSize: "14px" }}>
+              Datos Personales
+            </p>
 
             <form>
               <div>
@@ -522,9 +530,9 @@ const MainClients = () => {
                 />
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-              <ButtonBasic text="Guardar" onClick={handleGuardarCambios}>
-              {loading ? "Cargando..." : "Guardar Cambios"}
-            </ButtonBasic>
+                <ButtonBasic text="Guardar" onClick={handleGuardarCambios}>
+                  {loading ? "Cargando..." : "Guardar Cambios"}
+                </ButtonBasic>
               </div>
             </form>
           </div>
@@ -539,30 +547,27 @@ const MainClients = () => {
           cancelAction={handleCancelDelete}
         />
       )}
-      <Toaster position="top-right" reverseOrder={false}
-  toastOptions={{
-    success: {
-      style: {
-        background: '#75B798',
-        color: '#0A3622'
-      },
-    },
-    error: {
-      style: {
-        background: '#FFDBD9',
-        color: '#D92D20'
-      },
-    },
-      
-  }}
-/>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          success: {
+            style: {
+              background: "#75B798",
+              color: "#0A3622",
+            },
+          },
+          error: {
+            style: {
+              background: "#FFDBD9",
+              color: "#D92D20",
+            },
+          },
+        }}
+      />
 
       <div className="d-flex justify-content-center mt-4">
-    
-      <div className="pagination-container">
-  
-</div>
-
+        <div className="pagination-container"></div>
       </div>
     </div>
   );
