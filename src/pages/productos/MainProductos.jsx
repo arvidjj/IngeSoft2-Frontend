@@ -10,6 +10,7 @@ import ButtonBasic from "../../components/bottons/ButtonBasic";
 import ModalBase from "../../components/modals/ModalBase";
 import LabelBase from "../../components/labels/LabelBase";
 import CustomAlert from "../../components/alert/CustomAlert";
+import StockIndicator from "../../components/ManejoStock/StockIndicator";
 import { IoCheckmark } from "react-icons/io5";
 import api from "../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
@@ -25,13 +26,6 @@ const MainProductos = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [modalMode, setModalMode] = useState("create");
-  const [sortBy, setSortBy] = useState(""); // Estado para controlar el ordenamiento de los productos
-  const [sortType, setSortType] = useState(""); // Estado para controlar el tipo de orden (ascendente o descendente)
-
-  const notifyProducto = () =>
-    toast.success("Producto creado satisfactoriamente");
-  const notifyProductoActualizado = () =>
-    toast.success("Producto actualizado satisfactoriamente");
   const [productosData, setProductosData] = useState({
     nombre: "",
     descripcion: "",
@@ -81,34 +75,94 @@ const MainProductos = () => {
     setShowModal(false);
     setShowEditModal(false);
   };
-  // Antes de la declaración del componente, dentro de la función de componentes:
-  const handleInputChange = (event) => {
+
+  const handleCampoChange = (event) => {
     const { name, value } = event.target;
+    // Verificar si el valor es negativo y no permitirlo
+    if (
+      name === "cantidad" ||
+      name === "costo" ||
+      name === "precio" ||
+      name === "codigo"
+    ) {
+      if (parseFloat(value) < 0) {
+        toast.error("No se admiten valores negativos en ningun campo");
+        return; 
+      }
+    }
     setProductosData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
 
-  const handleCampoChange = (event) => {
-    handleInputChange(event);
-  };
   const handleAceptar = async () => {
     try {
       if (modalMode === "create") {
-        // Lógica para crear un nuevo producto
-        const response = await api.post("/productos", productosData);
+        // Validación de Nombre
+        const nombreExists = productos.some(
+          (producto) =>
+            producto.nombre.toLowerCase() === productosData.nombre.toLowerCase()
+        );
+        if (nombreExists) {
+          toast.error("El nombre del producto ya existe.");
+          return;
+        }
+
+        // Validación de Código
+        if (productosData.codigo.length < 4) {
+          toast.error("El código debe tener al menos 4 caracteres.");
+          return;
+        }
+        const codigoExists = productos.some(
+          (producto) =>
+            producto.codigo.toLowerCase() === productosData.codigo.toLowerCase()
+        );
+        if (codigoExists) {
+          toast.error("El código del producto ya está en uso.");
+          return;
+        }
+      }
+
+      // Validación de Precio vs. Costo
+      if (parseFloat(productosData.precio) < parseFloat(productosData.costo)) {
+        toast.error("El precio no puede ser menor que el costo.");
+        return;
+      }
+
+      let response;
+      if (modalMode === "create") {
+        response = await api.post("/productos", productosData);
         console.log("Producto creado:", response.data);
-        notifyProducto();
+        toast.success("Producto creado satisfactoriamente");
       } else if (modalMode === "edit") {
-        // Lógica para editar un producto existente
-        const response = await api.put(
+        // Verificar si se realizaron cambios
+        const editedProducto = productos.find(
+          (producto) => producto.id === productosData.id
+        );
+        if (
+          editedProducto.nombre === productosData.nombre &&
+          editedProducto.descripcion === productosData.descripcion &&
+          editedProducto.codigo === productosData.codigo &&
+          editedProducto.costo === productosData.costo &&
+          editedProducto.cantidad === productosData.cantidad &&
+          editedProducto.precio === productosData.precio
+        ) {
+          toast.promise(new Promise((resolve) => resolve()), {
+            loading: "Guardando...",
+            success: "No se realizo ningun cambio en el producto.",
+            error: "Hubo un error al guardar los cambios.",
+          });
+          return;
+        }
+        response = await api.put(
           `/productos/${productosData.id}`,
           productosData
         );
         console.log("Producto editado:", response.data);
-        notifyProductoActualizado();
+        toast.success("Producto actualizado satisfactoriamente");
       }
+
       setShowModal(false);
       setShowEditModal(false);
       fetchProductos(currentPage);
@@ -251,7 +305,7 @@ const MainProductos = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                 />
-                <ButtonBasic text="Buscar" />
+                <ButtonBasic text="Buscar"/>
               </form>
 
               <div className="dropdown">
@@ -302,111 +356,115 @@ const MainProductos = () => {
           </div>
 
           <ModalBase
-  open={showModal || showEditModal}
-  closeModal={handleCloseModal}
-  title={showModal ? "Crear Nuevo Producto" : "Editar Producto"}
->
-  <form className="mb-3">
-    <div className="mb-2 block">
-      <div className="label-container">
-        <LabelBase label="Nombre:" htmlFor="nombre" />
-        <span className="required">*</span>
-      </div>
-      <input
-        type="text"
-        id="nombre"
-        name="nombre"
-        className="form-control"
-        value={productosData.nombre}
-        onChange={handleCampoChange}
-        required
-      />
-    </div>
-    <div className="mb-2 block">
-      <div className="label-container">
-        <LabelBase label="Descripcion:" htmlFor="descripcion" />
-        {/* No se requiere asterisco para campos opcionales */}
-      </div>
-      <input
-        id="descripcion"
-        name="descripcion"
-        className="form-control"
-        value={productosData.descripcion}
-        onChange={handleCampoChange}
-      ></input>
-    </div>
-    <div className="d-flex justify-content-between">
-      <div className="d-flex flex-column mr-2">
-        <div className="mb-2 block">
-          <div className="label-container">
-            <LabelBase label="Codigo:" htmlFor="codigo" />
-            <span className="required">*</span>
-          </div>
-          <input
-            type="text"
-            id="codigo"
-            name="codigo"
-            className="form-control"
-            value={productosData.codigo}
-            onChange={handleCampoChange}
-            required
-          />
-        </div>
-        <div className="mb-2 block">
-          <div className="label-container">
-            <LabelBase label="Cantidad:" htmlFor="cantidad" />
-            <span className="required">*</span>
-          </div>
-          <input
-            id="cantidad"
-            name="cantidad"
-            className="form-control"
-            value={productosData.cantidad}
-            onChange={handleCampoChange}
-            required
-          />
-        </div>
-      </div>
-      <div className="d-flex flex-column">
-      <div className="mb-2 block">
-          <div className="label-container">
-            <LabelBase label="Costo:" htmlFor="costo" />
-            <span className="required">*</span>
-          </div>
-          <input
-            id="costo"
-            name="costo"
-            className="form-control"
-            value={productosData.costo}
-            onChange={handleCampoChange}
-            required
-          />
-        </div>
-        <div className="mb-2 block">
-          <div className="label-container">
-            <LabelBase label="Precio:" htmlFor="precio" />
-            <span className="required">*</span>
-          </div>
-          <input
-            id="precio"
-            name="precio"
-            className="form-control"
-            value={productosData.precio}
-            onChange={handleCampoChange}
-            required
-          />
-        </div>
-      </div>
-    </div>
-    <div className="campo-obligatorio">
-      <span className="required">*</span>
-      <span className="message">Campo obligatorio</span>
-    </div>
-    <div className="d-flex justify-content-center align-items-center float-end">
-      <ButtonBasic text="Aceptar" onClick={handleAceptar} />
-    </div>
-  </form>
-</ModalBase>
+            open={showModal || showEditModal}
+            closeModal={handleCloseModal}
+            title={showModal ? "Crear Nuevo Producto" : "Editar Producto"}
+          >
+            <form className="mb-3">
+              <div className="mb-2 block">
+                <div className="label-container">
+                  <LabelBase label="Nombre:" htmlFor="nombre" />
+                  <span className="required">*</span>
+                </div>
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  className="form-control"
+                  value={productosData.nombre}
+                  onChange={handleCampoChange}
+                  required
+                />
+              </div>
+              <div className="mb-2 block">
+                <div className="label-container">
+                  <LabelBase label="Descripcion:" htmlFor="descripcion" />
+                  {/* No se requiere asterisco para campos opcionales */}
+                </div>
+                <input
+                  type="text"
+                  id="descripcion"
+                  name="descripcion"
+                  className="form-control"
+                  value={productosData.descripcion}
+                  onChange={handleCampoChange}
+                ></input>
+              </div>
+              <div className="d-flex justify-content-between">
+                <div className="d-flex flex-column mr-2">
+                  <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="Codigo:" htmlFor="codigo" />
+                      <span className="required">*</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="codigo"
+                      name="codigo"
+                      className="form-control"
+                      value={productosData.codigo}
+                      onChange={handleCampoChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="Cantidad:" htmlFor="cantidad" />
+                      <span className="required">*</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="cantidad"
+                      name="cantidad"
+                      className="form-control"
+                      value={productosData.cantidad}
+                      onChange={handleCampoChange}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="d-flex flex-column">
+                  <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="Costo:" htmlFor="costo" />
+                      <span className="required">*</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="costo"
+                      name="costo"
+                      className="form-control"
+                      value={productosData.costo}
+                      onChange={handleCampoChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="Precio:" htmlFor="precio" />
+                      <span className="required">*</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="precio"
+                      name="precio"
+                      className="form-control"
+                      value={productosData.precio}
+                      onChange={handleCampoChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="campo-obligatorio">
+                <span className="required">*</span>
+                <span className="message">Campo obligatorio</span>
+              </div>
+              <div className="d-flex justify-content-center align-items-center float-end">
+                <ButtonBasic text="Aceptar" onClick={handleAceptar} />
+              </div>
+            </form>
+          </ModalBase>
 
           {showAlert && productoToDelete && (
             <CustomAlert
@@ -437,18 +495,19 @@ const MainProductos = () => {
                 {filteredProductos.map((producto) => (
                   <tr key={producto.id}>
                     <td>{producto.nombre}</td>
-                    <td>{producto.cantidad}</td>
+                    <td><StockIndicator stock={producto.cantidad} /></td>
                     <td>{producto.codigo}</td>
                     <td>{producto.descripcion}</td>
                     <td>{producto.precio}</td>
                     <td class="text-center">
-                      <a href="#" onClick={() => handleShowAlert(producto)}>
+                      <a href="#" onClick={() => handleShowAlert(producto)}
+                      style={{ fontSize:"1.2rem"}}>
                         <RiDeleteBinLine />
                       </a>
                       <a
                         href="#"
                         onClick={() => handleEditarProducto(producto)}
-                        style={{ marginLeft: "2em" }}
+                        style={{ marginLeft: "1.5em", fontSize:"1.2rem"}}
                       >
                         <FiEdit2 />
                       </a>
