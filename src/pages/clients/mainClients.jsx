@@ -16,6 +16,8 @@ import ButtonBasic from "../../components/bottons/ButtonBasic";
 import CustomAlert from "../../components/alert/CustomAlert";
 import Pagination from "@mui/material/Pagination";
 import toast, { Toaster } from "react-hot-toast";
+import { Button } from "flowbite-react";
+import { IoAddOutline } from "react-icons/io5";
 
 const MainClients = () => {
   const [showAlert, setShowAlert] = useState(false);
@@ -27,6 +29,15 @@ const MainClients = () => {
   const [filteredClientes, setFilteredClientes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [modalidad, setModalidad] = useState("");
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [actividades, setActividades] = useState([]);
+  const [selectedActividadId, setSelectedActividadId] = useState("");
+  const [selectedClienteId, setSelectedClienteId] = useState("");
+  const [suscripcionModalOpen, setSuscripcionModalOpen] = useState(false); 
+
+
   const [clienteData, setClienteData] = useState({
     nombre: "",
     ruc: "",
@@ -136,6 +147,8 @@ const MainClients = () => {
     setModalOpen(false);
   };
 
+
+  
   // Funcion para guardar los cambios realizados en el cliente
   const handleGuardarCambios = async () => {
     try {
@@ -272,6 +285,67 @@ const MainClients = () => {
     setShowAlert(true);
   };
 
+//suscripcion
+useEffect(() => {
+  fetchActividades();
+}, []);
+const handleSuscripcionModalOpen = () => {
+  setSuscripcionModalOpen(true);
+};
+
+const handleSuscripcionModalClose = () => {
+  setSuscripcionModalOpen(false);
+};
+
+const fetchActividades = async () => {
+  try {
+    const response = await api.get("http://localhost:8080/actividades/page/1");
+    const actividadesData = response.data.items.map((actividad) => ({
+      id: actividad.id,
+      nombre: actividad.nombre,
+    }));
+    setActividades(actividadesData);
+  } catch (error) {
+    console.error("Error al obtener actividades:", error);
+    toast.error("Error al obtener actividades");
+  }
+};
+
+
+const handleSubmitSuscripcion = async (event) => {
+  event.preventDefault();
+
+  const suscripcionData = {
+    suscripcionDto: {
+      clienteID: selectedClienteId,
+      total: 100.0,
+    },
+    suscripcionDetalleDtoList: [
+      {
+        subscripcionId: null,
+        actividadId: selectedActividadId,
+        estado: "PAGADO",
+        fechaInicio: fechaInicio,
+        fechaFin: "",
+        modalidad: modalidad,
+      },
+    ],
+  };
+
+  try {
+    const response = await api.post(
+      "http://localhost:8080/suscripciones/con-detalles",
+      suscripcionData
+    );
+    console.log("Suscripción agregada:", response.data);
+    toast.success("Suscripción agregada exitosamente");
+    setSuscripcionModalOpen(false);
+  } catch (error) {
+    console.error("Error al agregar suscripción:", error);
+    toast.error("Error al agregar suscripción");
+  }
+};
+
   return (
     <div className="MaquetaCliente">
       <div className="cuadro-central">
@@ -286,6 +360,7 @@ const MainClients = () => {
               onChange={handleSearchChange}
             />
             <ButtonBasic text="Buscar" onClick={handleSearchChange} />
+            <Button   text="Filtar por" onClick={handleSearchChange} />
             <button className="button" onClick={() => setShowModal(true)}>
               <IoAdd />
               Nuevo Cliente
@@ -334,6 +409,9 @@ const MainClients = () => {
                   </a>
                   <a href="#" onClick={() => handleEditClientClick(cliente)}>
         <FiEdit2 />
+                  </a>
+                  <a href="#" onClick={() => handleSuscripcionModalOpen()}>
+                  <IoAddOutline />
                   </a>
                 </td>
               </tr>
@@ -530,6 +608,83 @@ const MainClients = () => {
           </div>
         </div>
       </ModalBase>
+      
+
+      {/*modal de suscripciones */}
+      <ModalBase
+        open={suscripcionModalOpen}
+        closeModal={handleSuscripcionModalClose}
+        title="Agregar Suscripción"
+      >
+        <form onSubmit={handleSubmitSuscripcion}>
+          <div>
+            <LabelBase label="Cliente:" htmlFor="cliente">
+            <LabelBase label="Nombre:" htmlFor="nombre" />
+                <p 
+                  style={{ width: "100%", height: "30px" }}/>
+              <select
+                id="cliente"
+                name="cliente"
+                value={selectedClienteId}
+                onChange={(e) => setSelectedClienteId(e.target.value)}
+              >
+                <option value="">Selecciona un cliente</option>
+                {clientes.map((cliente) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nombre}
+                  </option>
+                ))}
+              </select>
+            </LabelBase>
+          </div>
+          <div>
+            <LabelBase label="Modalidad:" htmlFor="modalidad" />
+            <select
+            style={{ width: "100%", height: "30px" }}
+              id="modalidad"
+              name="modalidad"
+              value={modalidad}
+              onChange={(e) => setModalidad(e.target.value)}
+            >
+              <option value="">Selecciona una modalidad</option>
+              <option value="SEMANAL">Semanal</option>
+              <option value="MENSUAL">Mensual</option>
+            </select>
+          </div>
+          <div>
+            <LabelBase label="Fecha de inicio:" htmlFor="fechaInicio" />
+            <input
+            style={{ width: "25%", height: "30px" }}
+              type="date"
+              id="fechaInicio"
+              name="fechaInicio"
+              value={fechaInicio}
+              onChange={(e) => setFechaInicio(e.target.value)}
+            />
+          </div>
+          <div>
+            <LabelBase label="Actividad:" htmlFor="actividad"/>
+              <select
+              style={{ width: "100%", height: "30px" }}
+                id="actividad"
+                name="actividad"
+                value={selectedActividadId}
+                onChange={(e) => setSelectedActividadId(e.target.value)}
+              >
+                <option value="">Selecciona una actividad</option>
+                {actividades.map((actividad) => (
+                  <option key={actividad.id} value={actividad.id}>
+                    {actividad.nombre}
+                  </option>
+                ))}
+              </select>
+          </div>   
+          <ButtonBasic text="Guardar" onClick={handleSubmitSuscripcion}>
+              {loading ? "Cargando..." : "Guardar Cambios"}
+            </ButtonBasic>
+        </form>
+      </ModalBase>
+
       {showAlert && clientToDelete && (
         <CustomAlert
           message={`¿Estás seguro de eliminar a ${clientToDelete.nombre}?`}
