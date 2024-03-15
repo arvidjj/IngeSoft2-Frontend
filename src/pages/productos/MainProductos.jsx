@@ -5,8 +5,9 @@ import { FiEdit2 } from "react-icons/fi";
 import { IoAdd } from "react-icons/io5";
 import { TbArrowDown } from "react-icons/tb";
 import { GoQuestion } from "react-icons/go";
-import Pagination from "@mui/material/Pagination";
+
 import ButtonBasic from "../../components/bottons/ButtonBasic";
+import ButtonCrear from "../../components/bottons/ButtonCrear";
 import ModalBase from "../../components/modals/ModalBase";
 import LabelBase from "../../components/labels/LabelBase";
 import CustomAlert from "../../components/alert/CustomAlert";
@@ -14,6 +15,8 @@ import StockIndicator from "../../components/ManejoStock/StockIndicator";
 import { IoCheckmark } from "react-icons/io5";
 import api from "../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
+import ErrorPagina from "../../components/errores/ErrorPagina";
+import Pagination from "../../components/pagination/PaginationContainer";
 
 const MainProductos = () => {
   const [productos, setProductos] = useState([]);
@@ -26,6 +29,24 @@ const MainProductos = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [modalMode, setModalMode] = useState("create");
+  const [error, setError] = useState(false); // Estado para manejar el error
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+
+  // Función para filtrar productos por rango de precio
+  const handleFilterByPriceRange = (minPrice, maxPrice) => {
+    // Filtrar los productos dentro del rango de precios
+    const filtered = productos.filter((producto) => {
+      const precio = parseFloat(producto.precio);
+      return precio >= minPrice && precio <= maxPrice;
+    });
+    // Actualizar el estado de los productos filtrados
+    setFilteredProductos(filtered);
+  };
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    // Aquí podrías realizar otras acciones relacionadas con el cambio de página, como cargar datos adicionales, etc.
+  };
   const [productosData, setProductosData] = useState({
     nombre: "",
     descripcion: "",
@@ -45,7 +66,9 @@ const MainProductos = () => {
       setProductos(response.data.items);
       setFilteredProductos(response.data.items);
       setTotalPages(response.data.totalPages);
+      setError(false);
     } catch (error) {
+      setError(true);
       console.error("Error al obtener los productos:", error);
     }
   };
@@ -87,7 +110,7 @@ const MainProductos = () => {
     ) {
       if (parseFloat(value) < 0) {
         toast.error("No se admiten valores negativos en ningun campo");
-        return; 
+        return;
       }
     }
     setProductosData((prevData) => ({
@@ -261,16 +284,6 @@ const MainProductos = () => {
     });
   };
 
-  const handleSortByPrice = () => {
-    setFilteredProductos(sortProductos(filteredProductos.slice(), "precio"));
-    setSortBy("precio");
-  };
-
-  const handleSortByCantidad = () => {
-    setFilteredProductos(sortProductos(filteredProductos.slice(), "cantidad"));
-    setSortBy("cantidad");
-  };
-
   return (
     <div className="MaquetaCliente">
       <Toaster
@@ -296,7 +309,7 @@ const MainProductos = () => {
         <div class="container">
           <div className="card-1">
             <h2>Tienda</h2>
-            <div className="card-body d-flex align-items-center justify-content-between">
+            <div className="card-body d-flex align-items-center ">
               <form className="d-flex flex-grow-1">
                 <input
                   className="form-control mt-3 custom-input"
@@ -305,53 +318,64 @@ const MainProductos = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                 />
-                <ButtonBasic text="Buscar"/>
+                <ButtonBasic text="Buscar" />
               </form>
-
               <div className="dropdown">
                 <button
                   type="button"
-                  className="btn btn-primary dropdown-toggle btn-filtrar"
+                  className="btn btn-secundary dropdown-toggle btn-filtrar"
                   data-bs-toggle="dropdown"
+                  style={{ fontSize: "1.02rem" }}
                 >
                   <IoCheckmark />
-                  Filtrar por...
+                  Filtrar por Precio
                 </button>
                 <ul className="dropdown-menu">
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={handleSortByPrice}
-                    >
-                      Precio
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={handleSortByCantidad}
-                    >
-                      Stock
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={() => handleSortBy("nombre")}
-                    >
-                      Nombre
-                    </a>
-                  </li>
+                  <form className=" px-2 ">
+                    <div className="mb-3">
+                      <label htmlFor="minPrice" className="form-label">
+                        Precio mínimo
+                      </label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        id="minPrice"
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(e.target.value)}
+                      />
+                    </div>
+
+                    <label htmlFor="maxPrice" className="form-label">
+                      Precio máximo
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      id="maxPrice"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                    />
+                    <div className="d-grid">
+                      <ButtonCrear
+                        text="Aplicar"
+                        onClick={() =>
+                          handleFilterByPriceRange(
+                            parseFloat(minPrice),
+                            parseFloat(maxPrice)
+                          )
+                        }
+                      />
+                    </div>
+                  </form>
                 </ul>
               </div>
 
-              <button className="button-t" onClick={handleNuevoProducto}>
-                <IoAdd />
-                Nuevo Producto
-              </button>
+              <ButtonCrear
+                text="Nuevo Producto"
+                onClick={handleNuevoProducto}
+                icon={<IoAdd />}
+                color="secondary"
+              />
             </div>
           </div>
 
@@ -388,6 +412,7 @@ const MainProductos = () => {
                   className="form-control"
                   value={productosData.descripcion}
                   onChange={handleCampoChange}
+                  maxLength={40}
                 ></input>
               </div>
               <div className="d-flex justify-content-between">
@@ -461,7 +486,7 @@ const MainProductos = () => {
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Aceptar" onClick={handleAceptar} />
+                <ButtonCrear text="Aceptar" onClick={() => handleAceptar()} />
               </div>
             </form>
           </ModalBase>
@@ -476,53 +501,61 @@ const MainProductos = () => {
             />
           )}
           <div class="table-container">
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th scope="col">Nombre del Producto</th>
-                  <th scope="col">
-                    Stock <TbArrowDown />
-                  </th>
-                  <th scope="col">
-                    Codigo <GoQuestion />
-                  </th>
-                  <th scope="col">Descripcion</th>
-                  <th scope="col">Precio</th>
-                  <th scope="col"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProductos.map((producto) => (
-                  <tr key={producto.id}>
-                    <td>{producto.nombre}</td>
-                    <td><StockIndicator stock={producto.cantidad} /></td>
-                    <td>{producto.codigo}</td>
-                    <td>{producto.descripcion}</td>
-                    <td>{producto.precio}</td>
-                    <td class="text-center">
-                      <a href="#" onClick={() => handleShowAlert(producto)}
-                      style={{ fontSize:"1.2rem"}}>
-                        <RiDeleteBinLine />
-                      </a>
-                      <a
-                        href="#"
-                        onClick={() => handleEditarProducto(producto)}
-                        style={{ marginLeft: "1.5em", fontSize:"1.2rem"}}
-                      >
-                        <FiEdit2 />
-                      </a>
-                    </td>
+            {error ? (
+              <ErrorPagina /> // Muestra el componente de error si hay un error
+            ) : (
+              <table className="custom-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Nombre del Producto</th>
+                    <th scope="col">
+                      Stock <TbArrowDown />
+                    </th>
+                    <th scope="col">
+                      Codigo <GoQuestion />
+                    </th>
+                    <th scope="col">Descripcion</th>
+                    <th scope="col">Precio(Gs)</th>
+                    <th scope="col"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredProductos.map((producto) => (
+                    <tr key={producto.id}>
+                      <td>{producto.nombre}</td>
+                      <td>
+                        <StockIndicator stock={producto.cantidad} />
+                      </td>
+                      <td>{producto.codigo}</td>
+                      <td>{producto.descripcion}</td>
+                      <td>{producto.precio}</td>
+                      <td class="text-center">
+                        <a
+                          href="#"
+                          onClick={() => handleShowAlert(producto)}
+                          style={{ fontSize: "1.2rem" }}
+                        >
+                          <RiDeleteBinLine />
+                        </a>
+                        <a
+                          href="#"
+                          onClick={() => handleEditarProducto(producto)}
+                          style={{ marginLeft: "1.5em", fontSize: "1.2rem" }}
+                        >
+                          <FiEdit2 />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
           <div className="pagination-container">
             <Pagination
-              count={totalPages}
-              shape="rounded"
-              color="secondary"
-              onChange={(event, page) => setCurrentPage(page)}
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
             />
           </div>
         </div>
