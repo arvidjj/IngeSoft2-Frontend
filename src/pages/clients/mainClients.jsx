@@ -4,7 +4,7 @@ import "./mainClients.css";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FiEdit2 } from "react-icons/fi";
 import { BsSearch } from "react-icons/bs";
-import { IoAdd } from "react-icons/io5";
+import { IoAdd, IoClose } from "react-icons/io5";
 import { PiUserCircleLight } from "react-icons/pi";
 import { TbArrowDown } from "react-icons/tb";
 import { GoQuestion } from "react-icons/go";
@@ -16,6 +16,9 @@ import ButtonBasic from "../../components/bottons/ButtonBasic";
 import CustomAlert from "../../components/alert/CustomAlert";
 import Pagination from "@mui/material/Pagination";
 import toast, { Toaster } from "react-hot-toast";
+import { Button } from "flowbite-react";
+import { IoAddOutline } from "react-icons/io5";
+import { IoCheckmark } from "react-icons/io5";
 
 const MainClients = () => {
   const [showAlert, setShowAlert] = useState(false);
@@ -27,6 +30,18 @@ const MainClients = () => {
   const [filteredClientes, setFilteredClientes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [selectedActivities, setSelectedActivities] = useState([]);
+  const [modalidad, setModalidad] = useState("MENSUAL");
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [selectedClienteId, setSelectedClienteId] = useState(null);
+  const [suscripcionModalOpen, setSuscripcionModalOpen] = useState(false);
+
+  const [actividades, setActividades] = useState([]);
+  const [suscripcionSuccess, setSuscripcionSuccess] = useState(false);
+  const [suscripcionError, setSuscripcionError] = useState(false);
+  const [total, setTotal] = useState(0);
+
   const [clienteData, setClienteData] = useState({
     nombre: "",
     ruc: "",
@@ -46,8 +61,29 @@ const MainClients = () => {
   }, [currentPage]);
 
   useEffect(() => {
+    fetchActividades();
+  }, []);
+
+  useEffect(() => {
     // Concatenar el apellido al nombre al cargar el componente
   }, [clienteDataExtra.apellido]);
+
+  useEffect(() => {
+  // Calcula el total cuando hay cambios en selectedActivities o modalidad
+  let newTotal = 0;
+  if (modalidad === "MENSUAL") {
+    newTotal = selectedActivities.reduce((acc, actividad) => {
+      acc += actividad.costoMensual || 0;
+      return acc;
+    }, 0);
+  } else if (modalidad === "SEMANAL") {
+    newTotal = selectedActivities.reduce((acc, actividad) => {
+      acc += actividad.costoSemanal || 0;
+      return acc;
+    }, 0);
+  }
+  setTotal(newTotal);
+}, [selectedActivities, modalidad]);
 
   const fetchClientes = async () => {
     try {
@@ -271,6 +307,129 @@ const MainClients = () => {
     setShowAlert(true);
   };
 
+  //suscripcion
+
+  const fetchActividades = async () => {
+    try {
+      const response = await api.get(
+        "http://localhost:8080/actividades/page/1"
+      );
+      const actividadesData = response.data.items.map((actividad) => ({
+        id: actividad.id,
+        nombre: actividad.nombre,
+        costoMensual: actividad.costoMensual,
+        costoSemanal: actividad.costoSemanal,
+      }));
+      setActividades(actividadesData);
+    } catch (error) {
+      console.error("Error al obtener actividades:", error);
+      toast.error("Error al obtener actividades");
+    }
+  };
+
+  const handleSuscripcionModalOpen = (client) => {
+    setSelectedClienteId(client);
+    setSuscripcionModalOpen(true);
+  };
+
+  const handleSuscripcionModalClose = () => {
+    setSuscripcionModalOpen(false);
+    setModalidad("");
+    setFechaInicio("");
+    setSelectedActivities([]);
+  };
+
+  const handleAddSelectedActivity = (activityId) => {
+    const activityToAdd = actividades.find(
+      (actividad) => actividad.id === parseInt(activityId)
+    );
+    setSelectedActivities([...selectedActivities, activityToAdd]);
+  };
+
+  const handleRemoveSelectedActivity = (activityToRemove) => {
+    const updatedSelectedActivities = selectedActivities.filter(
+      (activity) => activity.id !== activityToRemove.id
+    );
+    setSelectedActivities(updatedSelectedActivities);
+  };
+
+  const handleSubmitSuscripcion = async (event) => {
+    event.preventDefault();
+
+    // Validación de campos faltantes
+    if (selectedActivities.length === 0) {
+      toast.error("Falta llenar campos. Selecciona al menos una actividad.");
+      return;
+    }
+
+    if (!fechaInicio) {
+      toast.error("Falta llenar campos. Ingresa una fecha de inicio.");
+      return;
+    }
+
+    let total = 0;
+    let daysToAdd = 0;
+
+    if (modalidad === "MENSUAL") {
+      daysToAdd = 30;
+    } else if (modalidad === "SEMANAL") {
+      daysToAdd = 7;
+    }
+
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + daysToAdd);
+
+    
+    try {
+      const suscripcionesData = selectedActivities.map((activity) => ({
+        clienteId: selectedClienteId.id,
+        actividadId: activity.id,
+        modalidad: modalidad,
+        estado: "PENDIENTE",
+        fechaInicio: fechaInicio,
+      }));
+
+      const response = await api.post("/suscripciones", suscripcionesData);
+      console.log("Suscripciones agregadas:", response.data);
+      toast.success("Suscripciones agregadas exitosamente");
+      setSuscripcionModalOpen(false);
+      setSuscripcionSuccess(true);
+      setSuscripcionError(false);
+      // Restablecer los valores
+      setModalidad("");
+      setFechaInicio("");
+      setSelectedActivities([]);
+    } catch (error) {
+      if (error.response) {
+        // El servidor ha respondido con un estado de error
+        if (error.response.status === 500) {
+          toast.error("El cliente ya posee esa actividad.");
+        } else {
+          console.error(
+            "Error en la respuesta del servidor:",
+            error.response.data
+          );
+          toast.error(
+            "Error en la respuesta del servidor. Consulta la consola para más detalles."
+          );
+        }
+      } else if (error.request) {
+        console.error("No se recibió respuesta del servidor:", error.request);
+        toast.error(
+          "No se recibió respuesta del servidor. Verifica tu conexión a internet."
+        );
+      } else {
+        console.error("Error al configurar la solicitud:", error.message);
+        toast.error(
+          "Error al configurar la solicitud. Consulta la consola para más detalles."
+        );
+      }
+
+      setSuscripcionSuccess(false);
+      setSuscripcionError(true);
+    }
+  };
+
   return (
     <div className="MaquetaCliente">
       <div className="cuadro-central">
@@ -285,6 +444,28 @@ const MainClients = () => {
               onChange={handleSearchChange}
             />
             <ButtonBasic text="Buscar" onClick={handleSearchChange} />
+            <div className="dropdown">
+              <button
+                type="button"
+                className="btn btn-primary dropdown-toggle btn-filtrar"
+                data-bs-toggle="dropdown"
+              >
+                <IoCheckmark />
+                Filtrar por...
+              </button>
+              <ul className="dropdown-menu">
+                <li>
+                  <a className="dropdown-item" href="#">
+                    Pagado
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href="#">
+                    Pendiente
+                  </a>
+                </li>
+              </ul>
+            </div>
             <button className="button" onClick={() => setShowModal(true)}>
               <IoAdd />
               Nuevo Cliente
@@ -336,6 +517,12 @@ const MainClients = () => {
                     <a href="#" onClick={() => handleEditClientClick(cliente)}>
                       <FiEdit2 />
                     </a>
+                    <a
+                      href="#"
+                      onClick={() => handleSuscripcionModalOpen(cliente)}
+                    >
+                      <IoAdd />
+                    </a>
                   </td>
                 </tr>
               ))}
@@ -369,7 +556,10 @@ const MainClients = () => {
 
             <form>
               <div>
-                <LabelBase label="Nombre:" htmlFor="nombre" />
+                <div className="label-container">
+                  <LabelBase label="Nombre:" htmlFor="nombre" />
+                  <span className="required">*</span>
+                </div>
                 <input
                   style={{ width: "100%", height: "30px" }}
                   type="text"
@@ -381,7 +571,11 @@ const MainClients = () => {
                 />
               </div>
               <div>
-                <LabelBase label="Apellido:" htmlFor="apellido" />
+                <div className="label-container">
+                  <LabelBase label="Apellido:" htmlFor="apellido" />
+                  <span className="required">*</span>
+                </div>
+
                 <input
                   type="text"
                   style={{ width: "100%", height: "30px" }}
@@ -394,7 +588,11 @@ const MainClients = () => {
               </div>
               <div className="d-flex">
                 <div style={{ margin: "5px" }}>
-                  <LabelBase label="CI/RUC:" htmlFor="ruc" />
+                  <div className="label-container">
+                    <LabelBase label="CI/RUC:" htmlFor="ruc" />
+                    <span className="required">*</span>
+                  </div>
+
                   <input
                     type="text"
                     style={{ width: "100%", height: "30px" }}
@@ -441,6 +639,10 @@ const MainClients = () => {
                   value={clienteData.direccion}
                   onChange={handleInputChange}
                 />
+              </div>
+              <div className="campo-obligatorio">
+                <span className="required">*</span>
+                <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
                 <ButtonBasic text="Guardar" onClick={handleSubmit}>
@@ -538,6 +740,104 @@ const MainClients = () => {
           </div>
         </div>
       </ModalBase>
+
+      {/* Modal de suscripciones */}
+      <ModalBase
+        open={suscripcionModalOpen}
+        closeModal={handleSuscripcionModalClose}
+        title={
+          selectedClienteId
+            ? `Agregar Suscripción a ${selectedClienteId.nombre}`
+            : "Agregar Suscripción"
+        }
+        total={total}
+      >
+        <form onSubmit={handleSubmitSuscripcion}>
+          <div>
+            <div className="label-container">
+              <LabelBase label="Modalidad de membresia:" htmlFor="modalidad" />
+
+              <span className="required">*</span>
+            </div>
+            <select
+              className="select"
+              value={modalidad}
+              onChange={(e) => setModalidad(e.target.value)}
+            >
+              <option value="MENSUAL">Mensual</option>
+              <option value="SEMANAL">Semanal</option>
+            </select>
+          </div>
+          <div>
+            <div className="label-container">
+              <LabelBase label="Fecha de inicio:" htmlFor="modalidad" />
+              <span className="required">*</span>
+            </div>
+
+            <input
+              className="select-activity"
+              type="date"
+              value={fechaInicio}
+              onChange={(e) => setFechaInicio(e.target.value)}
+            />
+          </div>
+          <div>
+            <div className="label-container">
+              <LabelBase label="Actividades" htmlFor="actividades" />
+              <span className="required">*</span>
+            </div>
+            <select
+              className="select"
+              value=""
+              onChange={(e) => handleAddSelectedActivity(e.target.value)}
+            >
+              <option value="" disabled hidden>
+                Selecciona una actividad
+              </option>
+              {actividades.map((actividad) => (
+                <option key={actividad.id} value={actividad.id}>
+                  {actividad.nombre}
+                </option>
+              ))}
+            </select>
+            <p>
+              {selectedActivities.map((activity) => (
+                <div key={activity.id} className="select-activity">
+                  {activity.nombre}{" "}
+                  <button
+                    className="button-activity"
+                    onClick={() => handleRemoveSelectedActivity(activity)}
+                  >
+                    <IoClose />
+                  </button>
+                  <br />
+                </div>
+              ))}
+            </p>
+          </div>
+          
+          <div className="d-flex">
+  <LabelBase label={`Costo: ${total}`} htmlFor="costo" />
+</div>
+
+   
+          <div className="campo-obligatorio">
+            <span className="required">*</span>
+            <span className="message">Campo obligatorio</span>
+          </div>
+          {/* Botón para guardar */}
+          <div className="d-flex justify-content-center align-items-center float-end">
+            <ButtonBasic
+              text="Guardar"
+              type="submit"
+              onClick={handleSubmitSuscripcion}
+            >
+              {loading ? "Cargando..." : "Guardar Cambios"}
+            </ButtonBasic>
+          </div>
+        </form>
+      </ModalBase>
+
       {showAlert && clientToDelete && (
         <CustomAlert
           message={`¿Estás seguro de eliminar a ${clientToDelete.nombre}?`}
