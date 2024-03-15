@@ -296,6 +296,7 @@ const MainUsers = () => {
               <form>
                 <div>
                   <LabelBase label="Nombre:" htmlFor="nombre" />
+                  <span className="required">*</span>
                   <input
                     style={{ width: "100%", height: "30px" }}
                     type="text"
@@ -304,6 +305,7 @@ const MainUsers = () => {
                     className="form-control"
                     value={userData.nombre}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
                 <div>
