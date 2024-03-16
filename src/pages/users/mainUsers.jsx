@@ -40,20 +40,20 @@ const MainUsers = () => {
       rol_id: null
     });
     const roles = [
-//        {label:"rol", value: null},
+        {label:"rol", value: null},
         {label:"admin", value: 1},
         {label:"cajero", value: 3},
         {label:"entrenador", value: 4}
     ]
      useEffect(() => {
-         fetchUsers();
+         fetchUsers(currentPage);
      }, [currentPage]);
     
     const fetchUsers = async (page) => {
       try {
         const response = await api.get(`/empleados/page/${page}`);
-        setProductos(response.data.items);
-        setFilteredProductos(response.data.items);
+        setUserData(response.data.items);
+        setFilteredUsers(response.data.items);
         setTotalPages(response.data.totalPages);
       } catch (error) {
         console.error("Error al obtener los empleado:", error);
@@ -116,7 +116,20 @@ const MainUsers = () => {
         setEditingUser(user);
         setModalOpen(true);
     };
-
+    const rolByID = (id) => {
+      if(id === 1){
+        return "ADMIN"
+      }
+      else if(id === 3){
+        return "CAJERO"
+      }
+      else if(id === 4){
+        return "ENTRENADOR"
+      }
+      else {
+        return "ROL INVALIDO"
+      }
+  };
     // Funcion para cerrar el modal
     const handleCloseModal = () => {
         setModalOpen(false);
@@ -157,17 +170,16 @@ const MainUsers = () => {
         setLoading(true);
     
         try {
-          if (userData.rol_id === null){
-            console.log("Este es el error")
-          }
-          const response = await api.post(`/auth/register`, userData); //esperando API
+          const response = await api.post(`/empleados`, userData); //esperando API
           console.log("Usuario agregado:", response.data);
           toast.success("Usuario guardado exitosamente") 
           setUserData({
-            nombre: '',
-            email: '',
-            password:'',
-            rol_id: null,
+            nombre: "",
+            cedula:"",
+            telefono:"",
+            direccion:"",
+            email: "",
+            rol_id: null
           });
           setShowModal(false);
         } catch (error) {
@@ -484,6 +496,47 @@ const MainUsers = () => {
             cancelAction={handleCancelDelete}
           />
         )}
+          <div class="table-container">
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th scope="col">Nombre del Usuario</th>
+                  <th scope="col">
+                    Rol <TbArrowDown />
+                  </th>
+                  <th scope="col">
+                    email <GoQuestion />
+                  </th>
+                  <th scope="col">Telefono</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.nombre}</td>
+                    <td>{rolByID(user.rol_id)}</td>
+                    <td>{user.email}</td>
+                    <td>{user.telefono}</td>
+                    <td class="text-center">
+                      <a href="#" onClick={() => handleShowAlert(user)}
+                      style={{ fontSize:"1.2rem"}}>
+                        <RiDeleteBinLine />
+                      </a>
+                      <a
+                        href="#"
+                        onClick={() => handleEditarProducto(user)}
+                        style={{ marginLeft: "1.5em", fontSize:"1.2rem"}}
+                      >
+                        <FiEdit2 />
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
         <Toaster position="top-right" reverseOrder={false}
     toastOptions={{
       success: {
