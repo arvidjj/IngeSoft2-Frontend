@@ -104,8 +104,6 @@
   .button {
     width: 100%; 
   }
-  
-
 }
 
 
@@ -174,3 +172,60 @@
  
   height: 60%;
 }
+
+
+
+.dropdown {
+  margin-right: 10%;
+  
+}
+
+
+.button-activity {
+  position: absolute;
+  background: none;
+  border: none;
+  padding: 1px;
+  top: 2px;
+  right: 2px;
+  cursor: pointer;
+  color: #0a080899;
+  vertical-align: middle;
+}
+
+.select{
+border: 0.5px solid rgba(0, 0, 0, 0.537);
+border-radius: 3px;
+padding: 3px;
+margin: 4px;
+position: relative;
+height: 30px;
+width: 100%;
+
+}
+
+.select-activity{
+  border: 0.5px solid rgba(43, 38, 38, 0.434);
+  border-radius: 3px;
+  padding: 3px;
+  margin: 4px;
+  position: relative;
+  height: 30px;
+  width: 100%;
+  color: #1a181dbb;
+  
+  }
+
+  .required {
+    color: red;
+    margin-left: 0.5rem;
+    font-size: 0.8rem; 
+  }
+  
+  .campo-obligatorio {
+    display: flex;
+    align-items: center;
+    color: red;
+    font-size: 0.8rem;
+  }
+  
