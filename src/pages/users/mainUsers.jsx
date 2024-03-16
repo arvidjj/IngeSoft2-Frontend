@@ -4,7 +4,7 @@ import "./mainUsers.css";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FiEdit2 } from "react-icons/fi";
 import { BsSearch } from "react-icons/bs";
-import { IoAdd } from "react-icons/io5";
+import { IoAdd, IoCheckmark } from "react-icons/io5";
 import { PiUserCircleLight } from "react-icons/pi";
 import { TbArrowDown } from "react-icons/tb";
 import { GoQuestion } from "react-icons/go";
@@ -22,15 +22,21 @@ const MainUsers = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [showModal, setShowModal] = useState(false);
+//    const [modalMode, setModalMode] = useState("create");s
+    const [showEditModal, setShowEditModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [userData, setUserData] = useState({
       nombre: "",
+      cedula:"",
+      telefono:"",
+      direccion:"",
       email: "",
-      password:"",
       rol_id: null
     });
     const roles = [
@@ -39,24 +45,31 @@ const MainUsers = () => {
         {label:"cajero", value: 3},
         {label:"entrenador", value: 4}
     ]
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 4; // Define la cantidad de elementos por página
-    // useEffect(() => {
-    //     fetchUsers();
-    // }, [currentPage]);
+     useEffect(() => {
+         fetchUsers();
+     }, [currentPage]);
     
-    const fetchUsers = async () => {
-        try {
-          const response = await api.get(
-           // `/clientes/page/${currentPage}?perPage=${itemsPerPage}` // Pendiente a la api de usuarios
-          );
-          setUsers(response.data.items);
-          setFilteredUsers(response.data.items);
-        } catch (error) {
-        //   console.error("Error al obtener clientes:", error);
-        //   toast.error("Error al actualizar cliente " );
-        }
+    const fetchUsers = async (page) => {
+      try {
+        const response = await api.get(`/empleados/page/${page}`);
+        setProductos(response.data.items);
+        setFilteredProductos(response.data.items);
+        setTotalPages(response.data.totalPages);
+      } catch (error) {
+        console.error("Error al obtener los empleado:", error);
+        toast.error("No se pudo obtener empleados")
+      }
     };
+    // const handleNuevoUsuario = () => {
+    //   setModalMode("create");
+    //   setUserData({
+    //     nombre: "",
+    //     email: "",
+    //     password:"",
+    //     rol_id: null
+    //   })
+    //   setShowModal(true)
+    // }
     const handleSearchChange = (event) => {
         const term = event.target.value;
         setSearchTerm(term);
@@ -142,9 +155,6 @@ const MainUsers = () => {
         }
     
         setLoading(true);
-    
-        // Concatenar el apellido al nombre completo antes de enviar los datos
-        //const datosCliente = { ...userData, nombre: nombreCompleto };
     
         try {
           if (userData.rol_id === null){
@@ -234,131 +244,193 @@ const MainUsers = () => {
     
     return(
         <div className="MaquetaCliente">
-        <div className="cuadro-central">
-          <h2>Usuarios</h2>
-          <div className="header-cliente">
-            <div className="header-Principal">
-              <input
-                type="text"
-                placeholder="Buscar..."
-                className="form-control me-2"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-              <ButtonBasic text="Buscar" onClick={handleSearchChange} />
-              <button className="button" onClick={() => setShowModal(true)}>
-                <IoAdd />
-                Nuevo Usuario
-              </button>
-            </div>
-          </div>
-          <hr />
-          <div className="tabla">
-          <table className="custom-table">
-            <thead>
-              <tr>
-                <th scope="col">Nombre</th>
-                {/* <th scope="col">
-                  Estado <TbArrowDown />
-                </th>
-                <th scope="col">
-                  Plan <GoQuestion />
-                </th> */}
-                <th scope="col">Email</th>
-                <th scope="col">Numero de telefono</th>
-                <th scope="col"></th>
-              </tr>
-            </thead>
-            
-          </table>
-          </div>
-          <div className="d-flex justify-content-center mt-4">
-          <Pagination
-      count={Math.ceil(filteredUsers.length / itemsPerPage)}
-      page={currentPage <= 2 ? currentPage : 1} 
-      onChange={(event, value) => setCurrentPage(value)}
-      shape="rounded"
-      color="secondary"
-    />
-    
-    </div>
-        </div>
-        {/* Modal para registrar nuevo usuario */}
-        <ModalBase
-          open={showModal}
-          closeModal={() => setShowModal(false)}
-          title="Registro de Usuario"
-        >
-          <div>
-            <div className="modal-body" style={{ marginTop: "0px", paddingTop: "0px" }}>
-              <p style={{ fontWeight: "bold", fontSize: "14px" }}>Datos Personales</p>
-  
-              <form>
-                <div>
-                  <LabelBase label="Nombre:" htmlFor="nombre" />
-                  <span className="required">*</span>
-                  <input
-                    style={{ width: "100%", height: "30px" }}
-                    type="text"
-                    id="nombre"
-                    name="nombre"
-                    className="form-control"
-                    value={userData.nombre}
-                    onChange={handleInputChange}
-                    required
-                  />
+          <Toaster
+            position="top-right"
+            reverseOrder={false}
+            toastOptions={{
+              success: {
+                style:{
+                  background: "#FFDBD9",
+                  color:"#D92D20"
+                },
+              },
+              error:{
+                style: {
+                  background: "#FFDBD9",
+                  color: "#D92D20"
+                },
+              },
+            }}
+          />
+
+          <div class="card">
+            <div class="container">
+              <div className="card-1">
+                <h2>Usuarios</h2>
+                <div className="card-body d-flex align-items-center justify-content-between">
+                  <form className="d-flex flex-grow-1">
+                    <input
+                      className="form-control mt-3 custom-input"
+                      type="text"
+                      placeholder="Buscar usuario"
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                    />
+                    <ButtonBasic text="Buscar"/>
+                  </form>
+                  <div className="dropdown">
+                  <button
+                    type="button"
+                    className="btn btn-primary dropdown-toggle btn-filtrar"
+                    data-bs-toggle="dropdown"
+                  >
+                    <IoCheckmark />
+                    Filtrar por...
+                  </button>
+                  <ul className="dropdown-menu">
+                    <li>
+                      <a className="dropdown-item">Rol</a>
+                    </li>
+                  </ul>
+                  </div>
+
+                  { /* onClick={handleNuevoUsuario} */}
+                  <button className="button-t" onClick={() => setShowModal(true)}> 
+                    Nuevo Usuario
+                  </button>
                 </div>
-                <div>
-                  <LabelBase label="e-mail:" htmlFor="email" />
-                  <input
-                    type="text"
-                    style={{ width: "100%", height: "30px" }}
-                    id="email"
-                    name="email"
-                    className="form-control"
-                    value={userData.email}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <LabelBase label="Contraseña:" htmlFor="contraseña" />
-                  <input
-                    type="text"
-                    style={{ width: "100%", height: "30px" }}
-                    id="password"
-                    name="password"
-                    className="form-control"
-                    value={userData.password}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <LabelBase label="Rol:" htmlFor="rol" />
+              </div>
+
+              <ModalBase
+                //Implementacion de Cesar.
+                // open={showModal || showEditModal}
+                // closeModal={handleCloseModal}
+                // title={showModal ? "Crear Nuevo Usuario" : "Editar Usuario"}
+                open={showModal}
+                closeModal={() => setShowModal(false)}
+                title="Registro de Usuario"
+              >
+                <form className="mb-3">
+                {/* nombre: "",
+                cedula:"",
+                telefono:"",
+                direccion:"",
+                email: "",
+                rol_id: null */}
+                 <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="Nombre:" htmlFor="nombre" />
+                      <span className="required">*</span>
+                    </div>
+                    <input
+                      style={{ width: "100%", height: "30px" }}
+                      type="text"
+                      id="nombre"
+                      name="nombre"
+                      className="form-control"
+                      value={userData.nombre}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="Cedula:" htmlFor="cedula" />
+                      <span className="required">*</span>
+                    </div>
+                    <input
+                      style={{ width: "100%", height: "30px" }}
+                      type="text"
+                      id="cedula"
+                      name="cedula"
+                      className="form-control"
+                      value={userData.cedula}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="Telefono:" htmlFor="telefono" />
+                      <span className="required">*</span>
+                    </div>
+                    <input
+                      style={{ width: "100%", height: "30px" }}
+                      type="text"
+                      id="telefono"
+                      name="telefono"
+                      className="form-control"
+                      value={userData.telefono}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="Direccion:" htmlFor="direccion" />
+                      <span className="required">*</span>
+                    </div>
+                    <input
+                      style={{ width: "100%", height: "30px" }}
+                      type="text"
+                      id="direccion"
+                      name="direccion"
+                      className="form-control"
+                      value={userData.direccion}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="e-mail:" htmlFor="e-mail" />
+                      <span className="required">*</span>
+                    </div>
+                      <input
+                        type="text"
+                        style={{ width: "100%", height: "30px" }}
+                        id="email"
+                        name="email"
+                        className="form-control"
+                        value={userData.email}
+                        onChange={handleInputChange}
+                      />
+                  </div>
+                  <div className="mb-2 block">
+                    <div className="label-container">
+                      <LabelBase label="Rol:" htmlFor="rol" />
+                      <span className="required">*</span>
+                    </div>
                     <select
-                    style={{ width: "100%", height: "30px" }}
-                    id="rol_id"
-                    name="rol_id"
-                    className="form-control form-select"
-                    value={userData.rol_id}
-                    onChange={handleInputChange}>
-                        {roles.map((opcion)=>(
-                            <option key={opcion.value} value={opcion.value}>
-                                {opcion.label}
-                            </option>
-                        ))}
+                      style={{ width: "100%", height: "40px" }}
+                      id="rol_id"
+                      name="rol_id"
+                      className="form-control form-select"
+                      value={userData.rol_id}
+                      onChange={handleInputChange}>
+                          {roles.map((opcion)=>(
+                              <option key={opcion.value} value={opcion.value}>
+                                  {opcion.label}
+                              </option>
+                          ))}
                     </select>
-                </div>
-                <div className="d-flex justify-content-center align-items-center float-end">
-                  <ButtonBasic text="Guardar" onClick={handleSubmit}>
-                    {loading ? "Cargando..." : "Agregar Usuario"}
-                  </ButtonBasic>
-                </div>
-              </form>
-              
+                  </div>
+                  <div className="campo-obligatorio">
+                    <span className="required">*</span>
+                    <span className="message">Campo obligatorio</span>
+                  </div>
+
+                  <div className="d-flex justify-content-center align-items-center float-end">
+                    <ButtonBasic text="Guardar" onClick={handleSubmit}>
+                      {loading ? "Cargando..." : "Agregar Usuario"}
+                    </ButtonBasic>
+                    {/* <ButtonBasic text="Aceptar" onClick={handleAceptar} /> */}
+                  </div>
+                </form> 
+              </ModalBase>              
             </div>
-            
           </div>
-        </ModalBase>
+        
         {/*modal para editar Usuario*/ }
         <ModalBase
          open={modalOpen}
