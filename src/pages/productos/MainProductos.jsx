@@ -41,12 +41,12 @@ const MainProductos = () => {
     costo: "",
     cantidad: "",
     precio: "",
-    iva: 0,
+    iva: "",
   });
   const tipo_iva = [
-    { label: "0%", value: 1 },
-    { label: "5%", value: 2 },
-    { label: "10%", value: 3 },
+    { label: "0%", value: 0 },
+    { label: "5%", value: 0.05 },
+    { label: "10%", value: 0.10 },
   ];
   useEffect(() => {
     fetchProductos(currentPage);
@@ -159,7 +159,7 @@ const MainProductos = () => {
 
   const handleCampoChange = (event) => {
     const { name, value } = event.target;
-
+  
     // Verificar si el campo es cantidad, costo, precio o código
     if (name === "cantidad" || name === "costo" || name === "precio") {
       let formattedValue = value.replace(/\D/g, ""); // Eliminar todos los caracteres que no sean dígitos
@@ -180,14 +180,21 @@ const MainProductos = () => {
         ...prevData,
         [name]: formattedValue, // Usar el valor formateado en lugar del valor original
       }));
+    } else if (name === "iva") {
+      // Manejar el cambio en el campo de IVA
+      setProductosData((prevData) => ({
+        ...prevData,
+        [name]: parseFloat(value), // Convertir el valor a número y guardar en el estado
+      }));
     } else {
-      // Si el campo no es cantidad, costo, precio o código, simplemente actualiza el estado con el valor ingresado
+      // Si el campo no es cantidad, costo, precio, código o IVA, simplemente actualizar el estado con el valor ingresado
       setProductosData((prevData) => ({
         ...prevData,
         [name]: value,
       }));
     }
   };
+  
 
   const formatNumber = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
