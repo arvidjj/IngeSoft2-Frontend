@@ -219,8 +219,12 @@ const MainServicios = () => {
           <ModalBase
             open={showModal || showEditModal}
             closeModal={handleCloseModal}
-            title={showModal ? "Crear Nuevo Servicio" : "Editar Servicio"}
+            title={showModal ? "Registrar Actividad" : "Editar Actividad"}
+            
           >
+            <p style={{ fontWeight: "bold", fontSize: "14px" }}>
+              Datos de Actividad
+            </p>
             <form className="mb-3">
               <div className="mb-2 block">
                 <div className="label-container">
@@ -250,7 +254,7 @@ const MainServicios = () => {
                 ></textarea>
               </div>
               <div className="d-flex justify-content-between">
-                <div className="d-flex flex-column mr-2">
+                <div className="d-flex flex-column mr-2" style={{ width: '100%' }}>
                   <div className="mb-2 block">
                     <div className="label-container">
                       <LabelBase label="Costo Mensual:" htmlFor="costoMensual" />
@@ -261,6 +265,7 @@ const MainServicios = () => {
                       id="costoMensual"
                       name="costoMensual"
                       className="form-control"
+                      style={{ width: '100%' }}
                       value={servicioData.costoMensual}
                       onChange={handleCampoChange}
                       required
@@ -288,7 +293,7 @@ const MainServicios = () => {
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Aceptar" onClick={handleAceptar}  />
+                <ButtonBasic text="Guardar" onClick={handleAceptar}  />
               </div>
             </form>
           </ModalBase>
