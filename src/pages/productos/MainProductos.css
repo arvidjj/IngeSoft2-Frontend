@@ -1,152 +1,55 @@
+/* Estilos base */
 .card {
-    width: 100%; /* Porcentaje del ancho del contenedor padre */
-    height: 100%; /* Altura ajustada automáticamente según el contenido */
-    max-width: 90rem; /* Ancho máximo en píxeles para evitar que la tarjeta se expanda demasiado en pantallas grandes */
-    margin-left: -8%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  }
-  
-  .custom-input {
-    margin-left: 3%;
-    width: 75%;
-    height: 40px;
-  }
-  
-  .dropdown {
-    margin-right: 10%;
-  }
-  .dropdown-menu {
-    width: 130%;
-  }
-  .button-t {
-    margin-right: 5%;
-    border: 8px solid #6941c6;
-    border-radius: 8px;
-    background-color: #6941c6;
-    color: #fff;
-    text-align: center;
-    font-size: 13px;
-    cursor: pointer;
-  }
-  .btn-filtrar{
-    width: 130%;
-    color: #6941c6;
-    background-color: transparent;
-    border: none;
-    border-bottom: 1px solid #6941c6;
-  }
-  .btn-filtrar:hover{
-    background-color: #6941c6;
-  }
-  .card-1{
-    border: none;
-  }
-  .card-2{
-    border: none;
-  }
-  .custom-table {
-    width: 100%; /* Ajusta el ancho de la tabla según sea necesario */
-    text-align: center; /* Centra el contenido de las celdas horizontalmente */
-  }
-  .custom-table td {
-    padding: 1.5rem; /* Ajusta el espaciado interno de las celdas según sea necesario */
-  }
-  
-  .custom-table th {
-    background-color: #f2f2f2; /* Cambia el color de fondo de las celdas de encabezado si es necesario */
-  }
- 
-  .pagination-container {
-    display: flex;
-    justify-content: center;
-    position: fixed; 
-    bottom: 5em; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    z-index: 999; 
-  }
-  .custom-table-icons{
-    margin: 2%;
-  }
-  .error-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    padding: 20px;
-    border: 2px solid #ff6347;
-    border-radius: 8px;
-    background-color: #ffe4e1;
-  }
-  
-  .error-icon {
-    font-size: 2rem;
-    color: #ff6347;
-  }
-  
-  .error-message {
-    font-size: 1.2rem;
-    color: #ff6347;
-    text-align: center;
-  }
-  
-  /* Media Queries para pantallas más pequeñas */
-
-@media screen and (max-width: 600px) {
-  .card {
-    margin-left: 0;
-    
-    max-width: 100%;
-  }
-
-  .custom-input {
-    width: 60%;
-  }
-
-  .dropdown {
-    margin-right: 5%;
-  }
-
-  .button-t {
-    margin-right: 3%;
-    font-size: 11px;
-  }
-
-  .btn-filtrar {
-    width: 110%;
-  }
-
-  .custom-table{
-    width: 50%;
-    font-size: 5px;
-  }
-
-  /* Ajustes para la paginación */
-  .pagination-container {
-    margin-top: 50rem;
-    bottom: 1rem; /* Mover la paginación hacia arriba */
-  }
-}
-.container {
-  
-  display: flex;
-  flex-direction: column; /* Para alinear el card y la tabla verticalmente */
-
+  width: 100%;
+  height: 100%;
+  max-width: 90rem;
+  margin-left: -8%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  overflow-x: auto; /* Añade scroll horizontal cuando sea necesario */
+  overflow-y: hidden; /* Oculta el scroll vertical */
 }
 
-.table-container {
-  flex: 1; /* Para que la tabla ocupe todo el espacio restante */
-  overflow: auto; /* Si la tabla es demasiado grande, permite desplazamiento vertical */
+.custom-input {
+
+  width: 100%;
+  height: 40px;
+}
+
+.dropdown {
+  margin-right: 5%;
+}
+
+.dropdown-menu {
+  width: 130%;
+}
+
+.btn-filtrar {
+  width: 130%;
+  color: #6941c6;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #6941c6;
+}
+
+.btn-filtrar:hover {
+  background-color: #6941c6;
 }
 
 .custom-table {
-  width: 98%; /* La tabla ocupará todo el ancho disponible */
-  /* Otros estilos que tengas para la tabla */
+  width: 98%;
+  text-align: center;
+}
+
+.custom-table td {
+  padding: 25px;
+  padding-left: 30px;
+  color: #667085;
+  font-size: 14px;
 }
 
 .mb-2.block {
   display: flex;
-  flex-direction: column; /* Para que los elementos estén en columna */
+  flex-direction: column;
 }
 
 .label-container {
@@ -154,22 +57,64 @@
   align-items: center;
 }
 
-.required {
-  color: red;
-  margin-left: 0.5rem;
-  font-size: 0.8rem; /* Ajusta el tamaño del asterisco según sea necesario */
-}
-
+.required,
 .campo-obligatorio {
-  display: flex;
-  align-items: center;
   color: red;
   font-size: 0.8rem;
 }
 
-
-
 .required-info {
-  color: red; /* Color rojo */
-  text-align: center; /* Alineación al centro */
+  color: red;
+  text-align: center;
+}
+
+.pagination-container {
+  position: absolute; /* Cambiar a posición absoluta */
+  bottom: 1.5rem; /* Fijar en la parte inferior */
+  left: 0; /* Fijar a la izquierda */
+  width: 100%; /* Ocupar todo el ancho disponible */
+ 
+}
+
+
+/* Media queries para pantallas más pequeñas */
+@media screen and (max-width: 900px) {
+ 
+  #Btn-Crear{
+    width: 80%;
+  }
+  #Btn-Buscar{
+    width: 50%;
+  }
+  .card {
+    max-width: 80%; /* Reducir el ancho del card */
+    margin: 0 auto; /* Centrar el card */
+  }
+
+  .custom-input {
+    width: 50%; /* Reducir el ancho del input */
+  }
+
+  .dropdown {
+    margin-right: 2%; /* Reducir el margen derecho del dropdown */
+  }
+
+  .btn-filtrar {
+    width: 80%; /* Reducir el ancho del botón filtrar */
+  }
+
+  .custom-table td {
+      padding: 15px;
+   
+      font-size: 11px;
+  }
+  .custom-table a {
+ 
+    margin: -1rem;
+    font-size: 8px;
+}
+
+  .pagination-container {
+      bottom: 0;
+  }
 }

@@ -2,18 +2,18 @@ import PropTypes from 'prop-types';
 import { IconButton, styled } from '@mui/material';
 
 const FixedColorStyledIconButton = styled(IconButton)(({ theme }) => ({
-    border: `2px solid ${theme.palette.secondary.main}`,
+    border: `2px solid `,
     borderRadius: '0.8em', // Utilizando em para hacerlo relativo
     fontSize: '0.9em', // Tamaño de fuente relativo
     padding: '0.6em 1.6em', // Utilizando em para hacerlo relativo
     margin: '1em',
-    backgroundColor: theme.palette.secondary.main, // Color de fondo fijo
+    backgroundColor: '#6941C6', // Color de fondo fijo
     color: '#fff', // Color del texto fijo
 
     '&:hover': {
         backgroundColor: theme.palette.secondary.dark, // Cambio de color más oscuro en estado hover
         color: '#FFFFFF',
-        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)', // Efecto de sombra en estado hover
+         // Efecto de sombra en estado hover
     },
 }));
 

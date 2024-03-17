@@ -17,6 +17,7 @@ import api from "../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
 import ErrorPagina from "../../components/errores/ErrorPagina";
 import Pagination from "../../components/pagination/PaginationContainer";
+import ElementoNoEncontrado from "../../components/errores/ElementoNoEncontrado";
 
 const MainProductos = () => {
   const [productos, setProductos] = useState([]);
@@ -26,27 +27,13 @@ const MainProductos = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [productoToDelete, setProductoToDelete] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [modalMode, setModalMode] = useState("create");
   const [error, setError] = useState(false); // Estado para manejar el error
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-
-  // Función para filtrar productos por rango de precio
-  const handleFilterByPriceRange = (minPrice, maxPrice) => {
-    // Filtrar los productos dentro del rango de precios
-    const filtered = productos.filter((producto) => {
-      const precio = parseFloat(producto.precio);
-      return precio >= minPrice && precio <= maxPrice;
-    });
-    // Actualizar el estado de los productos filtrados
-    setFilteredProductos(filtered);
-  };
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    // Aquí podrías realizar otras acciones relacionadas con el cambio de página, como cargar datos adicionales, etc.
-  };
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResultsFound, setSearchResultsFound] = useState(true);
   const [productosData, setProductosData] = useState({
     nombre: "",
     descripcion: "",
@@ -54,8 +41,13 @@ const MainProductos = () => {
     costo: "",
     cantidad: "",
     precio: "",
+    iva: 0,
   });
-
+  const tipo_iva = [
+    { label: "0%", value: 1 },
+    { label: "5%", value: 2 },
+    { label: "10%", value: 3 },
+  ];
   useEffect(() => {
     fetchProductos(currentPage);
   }, [currentPage]);
@@ -72,7 +64,73 @@ const MainProductos = () => {
       console.error("Error al obtener los productos:", error);
     }
   };
+  //Seccion donde esta la logica de la busqueda
+  const searchProductos = async (term) => {
+    try {
+      const response = await api.get(
+        `/productos/search/${term}/page/${currentPage}`
+      );
+      const filtered = response.data.items;
+      setFilteredProductos(filtered);
+      setSearchResultsFound(filtered.length > 0); // Si la longitud de 'filtered' es cero, establece 'searchResultsFound' en true
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // Mostrar un mensaje de "Producto no encontrado" cuando el servidor devuelve un 404
+        setFilteredProductos([]); // Establecer los productos filtrados como vacíos
+        setSearchResultsFound(false); // Indicar que no se encontraron resultados
+      } else {
+        // Manejar otros errores de manera similar a como lo haces actualmente
+        setSearchResultsFound(true);
+        console.error("Error al buscar productos por nombre:", error);
+      }
+    }
+  };
 
+  const handleFilterByPriceRange = async (minPrice, maxPrice) => {
+    try {
+      // Realizar búsqueda por rango de precios
+      const response = await api.get(
+        `/productos/search/${minPrice}/${maxPrice}/page/${currentPage}`
+      );
+      const filtered = response.data.items;
+      setFilteredProductos(filtered);
+      setSearchResultsFound(filtered.length > 0);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // Mostrar un mensaje de "Producto no encontrado" cuando el servidor devuelve un 404
+        setFilteredProductos([]); // Establecer los productos filtrados como vacíos
+        setSearchResultsFound(false); // Indicar que no se encontraron resultados
+      } else {
+        // Manejar otros errores de manera similar a como lo haces actualmente
+        setSearchResultsFound(true);
+        console.error("Error al buscar productos por precio:", error);
+      }
+    }
+  };
+
+  const handleSearchClick = () => {
+    if (searchQuery.length >= 4) {
+      searchProductos(searchQuery);
+    } else {
+      setFilteredProductos(productos);
+    }
+  };
+
+  const handleInputChange = (event) => {
+    const newSearchQuery = event.target.value;
+    setSearchQuery(newSearchQuery);
+
+    if (newSearchQuery === "") {
+      // Si el input de búsqueda está vacío, vuelve a la primera página
+      setCurrentPage(1);
+      setFilteredProductos(productos);
+    }
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    // Aquí podrías realizar otras acciones relacionadas con el cambio de página, como cargar datos adicionales, etc.
+  };
   const handleNuevoProducto = () => {
     setModalMode("create"); // Establece el modo como crear
     setProductosData({
@@ -101,40 +159,60 @@ const MainProductos = () => {
 
   const handleCampoChange = (event) => {
     const { name, value } = event.target;
-    // Verificar si el valor es negativo y no permitirlo
-    if (
-      name === "cantidad" ||
-      name === "costo" ||
-      name === "precio" ||
-      name === "codigo"
-    ) {
+
+    // Verificar si el campo es cantidad, costo, precio o código
+    if (name === "cantidad" || name === "costo" || name === "precio") {
+      let formattedValue = value.replace(/\D/g, ""); // Eliminar todos los caracteres que no sean dígitos
+      formattedValue = formattedValue.replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Agregar puntos para separar los miles
+      // Verificar si el valor es negativo y no permitirlo
       if (parseFloat(value) < 0) {
-        toast.error("No se admiten valores negativos en ningun campo");
+        toast.error("No se admiten valores negativos en ningún campo");
         return;
       }
+      setProductosData((prevData) => ({
+        ...prevData,
+        [name]: formattedValue, // Usar el valor formateado en lugar del valor original
+      }));
+    } else if (name === "codigo") {
+      // Verificar el campo de código para asegurarse de que solo contiene números enteros
+      const formattedValue = value.replace(/\D/g, ""); // Eliminar todos los caracteres que no sean dígitos
+      setProductosData((prevData) => ({
+        ...prevData,
+        [name]: formattedValue, // Usar el valor formateado en lugar del valor original
+      }));
+    } else {
+      // Si el campo no es cantidad, costo, precio o código, simplemente actualiza el estado con el valor ingresado
+      setProductosData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     }
-    setProductosData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  };
+
+  const formatNumber = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
   const handleAceptar = async () => {
     try {
+      // Eliminar los puntos de los valores formateados antes de enviarlos al servidor
+      const dataToSend = {
+        ...productosData,
+        cantidad: parseFloat(productosData.cantidad.replace(/\./g, "")),
+        costo: parseFloat(productosData.costo.replace(/\./g, "")),
+        precio: parseFloat(productosData.precio.replace(/\./g, "")),
+      };
+
+      // Validar el campo código para asegurarse de que tenga al menos 6 caracteres y solo números enteros
       if (modalMode === "create") {
-        // Validación de Nombre
-        const nombreExists = productos.some(
-          (producto) =>
-            producto.nombre.toLowerCase() === productosData.nombre.toLowerCase()
-        );
-        if (nombreExists) {
-          toast.error("El nombre del producto ya existe.");
+        // Validar la longitud del código
+        if (productosData.codigo.length != 6) {
+          toast.error("El código solo puede tener 6 caracteres.");
           return;
         }
-
-        // Validación de Código
-        if (productosData.codigo.length < 4) {
-          toast.error("El código debe tener al menos 4 caracteres.");
+        // Validar que el código contenga solo números enteros
+        if (!/^\d+$/.test(productosData.codigo)) {
+          toast.error("El código debe contener solo números enteros.");
           return;
         }
         const codigoExists = productos.some(
@@ -147,15 +225,15 @@ const MainProductos = () => {
         }
       }
 
-      // Validación de Precio vs. Costo
-      if (parseFloat(productosData.precio) < parseFloat(productosData.costo)) {
+      // Validar que el precio no sea menor que el costo
+      if (parseFloat(dataToSend.precio) < parseFloat(dataToSend.costo)) {
         toast.error("El precio no puede ser menor que el costo.");
         return;
       }
 
       let response;
       if (modalMode === "create") {
-        response = await api.post("/productos", productosData);
+        response = await api.post("/productos", dataToSend);
         console.log("Producto creado:", response.data);
         toast.success("Producto creado satisfactoriamente");
       } else if (modalMode === "edit") {
@@ -167,21 +245,19 @@ const MainProductos = () => {
           editedProducto.nombre === productosData.nombre &&
           editedProducto.descripcion === productosData.descripcion &&
           editedProducto.codigo === productosData.codigo &&
-          editedProducto.costo === productosData.costo &&
-          editedProducto.cantidad === productosData.cantidad &&
-          editedProducto.precio === productosData.precio
+          editedProducto.costo === dataToSend.costo &&
+          editedProducto.cantidad === dataToSend.cantidad &&
+          editedProducto.precio === dataToSend.precio &&
+          editedProducto.iva === dataToSend.iva
         ) {
           toast.promise(new Promise((resolve) => resolve()), {
             loading: "Guardando...",
-            success: "No se realizo ningun cambio en el producto.",
+            success: "No se realizó ningún cambio en el producto.",
             error: "Hubo un error al guardar los cambios.",
           });
           return;
         }
-        response = await api.put(
-          `/productos/${productosData.id}`,
-          productosData
-        );
+        response = await api.put(`/productos/${productosData.id}`, dataToSend);
         console.log("Producto editado:", response.data);
         toast.success("Producto actualizado satisfactoriamente");
       }
@@ -194,7 +270,6 @@ const MainProductos = () => {
       toast.error("Error al procesar la solicitud");
     }
   };
-
   const handleEliminarProducto = async () => {
     if (productoToDelete) {
       try {
@@ -230,60 +305,6 @@ const MainProductos = () => {
     setShowAlert(false); // Oculta la alerta
   };
 
-  const handleSearchChange = (event) => {
-    const term = event.target.value;
-    setSearchTerm(term);
-
-    if (term.length >= 4) {
-      // Solo realiza la búsqueda si el término tiene al menos 3 letras
-      searchProductos(term);
-      setCurrentPage(1);
-      setSortBy(""); // Restablecer el ordenamiento al iniciar una nueva búsqueda
-      setSortType("");
-    } else {
-      // Restablece la lista de productos original si el término tiene menos de 3 letras
-      setFilteredProductos(productos);
-      // Siempre vuelve a la primera página cuando se borra el término de búsqueda
-    }
-  };
-
-  const searchProductos = (term) => {
-    const filtered = productos.filter((producto) => {
-      const nombre = producto.nombre.toLowerCase();
-      const codigo = producto.codigo.toLowerCase();
-
-      return (
-        nombre.includes(term.toLowerCase()) ||
-        codigo.includes(term.toLowerCase())
-      );
-    });
-    setFilteredProductos(filtered);
-  };
-
-  const handleSortBy = (sortBy) => {
-    if (sortBy === "nombre") {
-      setFilteredProductos(sortProductos(filteredProductos.slice(), sortBy));
-      setSortBy("nombre");
-    }
-  };
-
-  const sortProductos = (productos, sortBy) => {
-    return productos.sort((a, b) => {
-      if (sortBy === "precio" || sortBy === "cantidad") {
-        return a[sortBy] - b[sortBy];
-      } else {
-        // Ordenamiento por otros tipos de datos
-        if (a[sortBy] < b[sortBy]) {
-          return -1;
-        }
-        if (a[sortBy] > b[sortBy]) {
-          return 1;
-        }
-        return 0;
-      }
-    });
-  };
-
   return (
     <div className="MaquetaCliente">
       <Toaster
@@ -312,16 +333,22 @@ const MainProductos = () => {
             <div className="card-body d-flex align-items-center ">
               <form className="d-flex flex-grow-1">
                 <input
+                  id="Btn-Buscar"
                   className="form-control mt-3 custom-input"
                   type="text"
                   placeholder="Search"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
+                  value={searchQuery}
+                  onChange={handleInputChange}
                 />
-                <ButtonBasic text="Buscar" />
+                <ButtonBasic
+                  id="Btn-Buscar"
+                  text="Buscar"
+                  onClick={handleSearchClick}
+                />
               </form>
               <div className="dropdown">
                 <button
+                  id="Btn-Filtrar"
                   type="button"
                   className="btn btn-secundary dropdown-toggle btn-filtrar"
                   data-bs-toggle="dropdown"
@@ -357,6 +384,7 @@ const MainProductos = () => {
                     />
                     <div className="d-grid">
                       <ButtonCrear
+                        id="Btn-Crear"
                         text="Aplicar"
                         onClick={() =>
                           handleFilterByPriceRange(
@@ -371,6 +399,7 @@ const MainProductos = () => {
               </div>
 
               <ButtonCrear
+                id="Btn-Crear"
                 text="Nuevo Producto"
                 onClick={handleNuevoProducto}
                 icon={<IoAdd />}
@@ -416,8 +445,10 @@ const MainProductos = () => {
                 ></input>
               </div>
               <div className="d-flex justify-content-between">
-                <div className="d-flex flex-column mr-2">
-                  <div className="mb-2 block">
+                <div className="d-flex flex-column">
+                  <div className="mb-3 block">
+                    {" "}
+                    {/* Incrementé el margen inferior */}
                     <div className="label-container">
                       <LabelBase label="Codigo:" htmlFor="codigo" />
                       <span className="required">*</span>
@@ -426,13 +457,13 @@ const MainProductos = () => {
                       type="number"
                       id="codigo"
                       name="codigo"
-                      className="form-control"
+                      className="form-control custom-input"
                       value={productosData.codigo}
                       onChange={handleCampoChange}
                       required
                     />
                   </div>
-                  <div className="mb-2 block">
+                  <div className="mb-3 block">
                     <div className="label-container">
                       <LabelBase label="Cantidad:" htmlFor="cantidad" />
                       <span className="required">*</span>
@@ -441,7 +472,7 @@ const MainProductos = () => {
                       type="number"
                       id="cantidad"
                       name="cantidad"
-                      className="form-control"
+                      className="form-control custom-input"
                       value={productosData.cantidad}
                       onChange={handleCampoChange}
                       required
@@ -449,7 +480,7 @@ const MainProductos = () => {
                   </div>
                 </div>
                 <div className="d-flex flex-column">
-                  <div className="mb-2 block">
+                  <div className="mb-3 block">
                     <div className="label-container">
                       <LabelBase label="Costo:" htmlFor="costo" />
                       <span className="required">*</span>
@@ -458,13 +489,13 @@ const MainProductos = () => {
                       type="number"
                       id="costo"
                       name="costo"
-                      className="form-control"
+                      className="form-control custom-input"
                       value={productosData.costo}
                       onChange={handleCampoChange}
                       required
                     />
                   </div>
-                  <div className="mb-2 block">
+                  <div className="mb-3 block">
                     <div className="label-container">
                       <LabelBase label="Precio:" htmlFor="precio" />
                       <span className="required">*</span>
@@ -473,7 +504,7 @@ const MainProductos = () => {
                       type="number"
                       id="precio"
                       name="precio"
-                      className="form-control"
+                      className="form-control custom-input"
                       value={productosData.precio}
                       onChange={handleCampoChange}
                       required
@@ -481,12 +512,36 @@ const MainProductos = () => {
                   </div>
                 </div>
               </div>
+
+              <div className="mb-2 block">
+                <div className="label-container">
+                  <LabelBase label="Iva:" htmlFor="iva" />
+                  <span className="required">*</span>
+                </div>
+                <select
+                  id="iva_id"
+                  name="iva_id"
+                  className="form-control form-select"
+                  value={productosData.iva}
+                  onChange={handleCampoChange}
+                >
+                  {tipo_iva.map((opcion) => (
+                    <option key={opcion.value} value={opcion.value}>
+                      {opcion.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="campo-obligatorio">
                 <span className="required">*</span>
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonCrear text="Aceptar" onClick={() => handleAceptar()} />
+                <ButtonCrear
+                  id="Btn-Crear"
+                  text="Aceptar"
+                  onClick={() => handleAceptar()}
+                />
               </div>
             </form>
           </ModalBase>
@@ -501,9 +556,14 @@ const MainProductos = () => {
             />
           )}
           <div class="table-container">
-            {error ? (
-              <ErrorPagina /> // Muestra el componente de error si hay un error
-            ) : (
+            {error && <ErrorPagina />}{" "}
+            {/* Muestra el componente de error si hay un error */}
+            {!error &&
+              filteredProductos.length === 0 &&
+              !searchResultsFound && (
+                <ElementoNoEncontrado mensaje="¡Producto no encontrado!" />
+              )}
+            {!error && filteredProductos.length > 0 && (
               <table className="custom-table">
                 <thead>
                   <tr>
@@ -528,7 +588,7 @@ const MainProductos = () => {
                       </td>
                       <td>{producto.codigo}</td>
                       <td>{producto.descripcion}</td>
-                      <td>{producto.precio}</td>
+                      <td>{formatNumber(producto.precio)}</td>
                       <td class="text-center">
                         <a
                           href="#"
@@ -551,13 +611,13 @@ const MainProductos = () => {
               </table>
             )}
           </div>
-          <div className="pagination-container">
-            <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-            />
-          </div>
+        </div>
+        <div className="pagination-container">
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
     </div>
