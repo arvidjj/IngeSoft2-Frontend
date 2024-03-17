@@ -1,3 +1,4 @@
+/** */
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./mainClients.css";
@@ -19,6 +20,8 @@ import toast, { Toaster } from "react-hot-toast";
 import { Button } from "flowbite-react";
 import { IoAddOutline } from "react-icons/io5";
 import { IoCheckmark } from "react-icons/io5";
+import EstadoIndicador from "../../components/estado_pago/EstadoIndicador";
+
 
 const MainClients = () => {
   const [showAlert, setShowAlert] = useState(false);
@@ -41,6 +44,9 @@ const MainClients = () => {
   const [suscripcionSuccess, setSuscripcionSuccess] = useState(false);
   const [suscripcionError, setSuscripcionError] = useState(false);
   const [total, setTotal] = useState(0);
+
+  //estado 
+  const [estado, setEstado] = useState([]);
 
   const [clienteData, setClienteData] = useState({
     nombre: "",
@@ -430,6 +436,53 @@ const MainClients = () => {
     }
   };
 
+  //estado de pagos 
+
+  useEffect(() => {
+    // Llama a la función para obtener las suscripciones del cliente al montar el componente
+    handleGetSuscripciones();
+  }, []); 
+
+const [id,setid]= useState(null);
+
+  const handleGetSuscripciones = async () => {
+    try {
+      const response = await api.get(`/suscripciones/cliente/7/pendientes/page/1`);
+      setEstado(response.data);
+      if (Array.isArray(estado) > 0) {
+    // Filtra las suscripciones del estado 'estado' para el cliente especificado
+    const clienteSuscripciones = estado.filter(suscripcion => suscripcion.clienteId === clienteId);
+    // Retorna "PENDIENTE" si hay suscripciones para el cliente, de lo contrario, retorna "PAGADO"
+    return "PENDIENTE";
+  }
+  // Retorna "PAGADO" si no hay suscripciones o si estado no es un array
+  return "PAGADO";
+
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        console.error('La solicitud devuelve un error 404: Recurso no encontrado');
+        
+        setEstado([]);
+      } else {
+        console.error('Error al obtener suscripciones:', error);
+        toast.error('Error al obtener suscripciones');
+        setEstado([]);
+      }
+    }
+  };
+  
+ // Función para determinar el estado del cliente
+const determinarEstadoCliente = (clienteId) => {
+  // Verifica si estado es un array y tiene elementos
+  if (Array.isArray(estado) > 0) {
+    // Filtra las suscripciones del estado 'estado' para el cliente especificado
+    const clienteSuscripciones = estado.filter(suscripcion => suscripcion.clienteId === clienteId);
+    // Retorna "PENDIENTE" si hay suscripciones para el cliente, de lo contrario, retorna "PAGADO"
+    return "Pendiente";
+  }
+  // Retorna "PAGADO" si no hay suscripciones o si estado no es un array
+  return "Pagado";
+};
   return (
     <div className="MaquetaCliente">
       <div className="cuadro-central">
@@ -507,7 +560,8 @@ const MainClients = () => {
                   <td className=".custom-table2">
                     {cliente.active ? "Activo" : "Inactivo"}
                   </td>
-                  <td className=".custom-table2">Plan</td>
+                  <td className=".custom-table2"><EstadoIndicador estado={determinarEstadoCliente(cliente.id)} />
+                  </td>
                   <td className="custom-table2">{cliente.email}</td>
                   <td className="custom-table2">{cliente.telefono}</td>
                   <td className="custom-table2">
