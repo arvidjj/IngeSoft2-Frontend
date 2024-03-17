@@ -167,8 +167,14 @@
     margin: 5% auto; 
     overflow-y: auto; 
   }
-  
   .tabla{
    
     height: 60%;
   }
+.estadoIDUser{
+  width: 70%;
+  background-color: #E5D0FF;
+  color: #6941c6;
+  border-radius: 5px;
+  text-align: center;
+}

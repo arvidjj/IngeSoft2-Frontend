@@ -13,6 +13,7 @@ import api from "../../utils/api";
 import LabelBase from "../../components/labels/LabelBase";
 import ModalBase from "../../components/modals/ModalBase";
 import ButtonBasic from "../../components/bottons/ButtonBasic";
+import EstadoRol from "../../components/estadoRol/estadoRol";
 import CustomAlert from "../../components/alert/CustomAlert";
 import Pagination from "@mui/material/Pagination";
 import toast, { Toaster } from "react-hot-toast";
@@ -28,7 +29,7 @@ const MainUsers = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [showModal, setShowModal] = useState(false);
-//    const [modalMode, setModalMode] = useState("create");s
+    const [modalMode, setModalMode] = useState("create");
     const [showEditModal, setShowEditModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [userData, setUserData] = useState({
@@ -52,7 +53,7 @@ const MainUsers = () => {
     const fetchUsers = async (page) => {
       try {
         const response = await api.get(`/empleados/page/${page}`);
-        setUserData(response.data.items);
+        setUsers(response.data.items);
         setFilteredUsers(response.data.items);
         setTotalPages(response.data.totalPages);
       } catch (error) {
@@ -96,99 +97,99 @@ const MainUsers = () => {
     };
 
     //Buscar una mejor implementacion
-    const handleNameChange = (event) => {
-        setEditingUser({
-          ...editingUser,
-          nombre: event.target.value,
-        });
-    };
-      
-    const handleEmailChange = (event) => {
-        setEditingUser({
-          ...editingUser,
-          email: event.target.value,
-        });
-    };
-      
-
-    // Funcion para abrir el modal cuando se hace clic en "Editar Cliente"
-    const handleEditUserClick = (user) => {
-        setEditingUser(user);
-        setModalOpen(true);
-    };
     const rolByID = (id) => {
       if(id === 1){
-        return "ADMIN"
+        return "Admin"
       }
       else if(id === 3){
-        return "CAJERO"
+        return "Cajero"
       }
       else if(id === 4){
-        return "ENTRENADOR"
+        return "Entrenador"
       }
       else {
-        return "ROL INVALIDO"
+        return "Rol Invalido"
       }
-  };
-    // Funcion para cerrar el modal
-    const handleCloseModal = () => {
-        setModalOpen(false);
     };
       // Funcion para guardar los cambios realizados en el cliente
       // Pendiente a la API
-    const handleGuardarCambios = async () => {
-        try {
-        await api.put(`/clientes/${editingClient.id}`, editingClient); // Actualiza el cliente con los datos editados
-        setModalOpen(false); // Cierra el modal 
-        fetchClientes();
-        toast.success("Usuario editado satisfactoriamente");
 
-        } catch (error) {
-        console.error("Error al actualizar usuario:", error);
-        toast.error("Error al actualizar usuario " );
-        }
+    const handleEditarUsuario = (usuario) => {
+      setModalMode("edit"); // Establece el modo como editar
+      setUserData(usuario); // Establece los datos del user a editar en el estado
+      setShowEditModal(true);
     };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-    
-        // Verificar si algún campo esta vacio
-        for (const key in userData) {
-          if (userData[key] === "") {
-            toast.error(`El campo ${key} no puede estar vacío`);
+  
+    // Función para cerrar el modal
+    const handleCloseModal = () => {
+      setShowModal(false);
+      setShowEditModal(false);
+    };
+    const handleAceptar = async () => {
+      try {
+        if (modalMode === "create") {
+          // Validación de Nombre
+          const nombreExists = users.some(
+            (user) =>
+              user.nombre.toLowerCase() === userData.nombre.toLowerCase()
+          );
+          if (nombreExists) {
+            toast.error("El nombre del usuario ya existe.");
+            return;
+          }
+  
+          // Validación de Código
+          if (userData.cedula.length < 4) {
+            toast.error("El código debe tener al menos 4 caracteres.");
+            return;
+          }
+          const cedulaExists = users.some(
+            (user) =>
+              user.cedula.toLowerCase() === userData.cedula.toLowerCase()
+          );
+          if (cedulaExists) {
+            toast.error("La cedula del user ya está en uso.");
             return;
           }
         }
-    
-        // Verificar la validez del correo
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(userData.email)) {
-          toast.error("Correo electrónico inválido");
-          return;
+  
+        let response;
+        if (modalMode === "create") {
+          response = await api.post("/empleados", userData);
+          console.log("Usuario creado:", response.data);
+          toast.success("Usuario creado satisfactoriamente");
+        } else if (modalMode === "edit") {
+          // Verificar si se realizaron cambios
+          const editedUsuarios = users.find(
+            (user) => user.id === userData.id
+          );
+          if (
+            editedUsuarios.nombre === userData.nombre &&
+            editedUsuarios.cedula === userData.cedula
+          ) {
+            toast.promise(new Promise((resolve) => resolve()), {
+              loading: "Guardando...",
+              success: "No se realizo ningun cambio en el user.",
+              error: "Hubo un error al guardar los cambios.",
+            });
+            return;
+          }
+          response = await api.put(
+            `/empleados/${userData.id}`,
+            userData
+          );
+          console.log("Usuario editado:", response.data);
+          toast.success("Usuario actualizado satisfactoriamente");
         }
-    
-        setLoading(true);
-    
-        try {
-          const response = await api.post(`/empleados`, userData); //esperando API
-          console.log("Usuario agregado:", response.data);
-          toast.success("Usuario guardado exitosamente") 
-          setUserData({
-            nombre: "",
-            cedula:"",
-            telefono:"",
-            direccion:"",
-            email: "",
-            rol_id: null
-          });
-          setShowModal(false);
-        } catch (error) {
-          console.error("Error al registrar usuario:", error);
-          toast.error('Error al registrar usuario');
-        } finally {
-          setLoading(false);
-        }
-    }
+  
+        setShowModal(false);
+        setShowEditModal(false);
+        fetchUsers(currentPage);
+      } catch (error) {
+        console.error("Error al procesar la solicitud:", error);
+        toast.error("Error al procesar la solicitud");
+      }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -240,10 +241,10 @@ const MainUsers = () => {
     const handelDeleteUser = async (id) => {
         setShowAlert(false);
         try {
-        await api.delete(`/clientes/${id}`);
+        await api.delete(`/empleados/${id}`);
         // Vuelve a cargar la lista de clientes despues de eliminar uno
         toast.success("El usuario se elimino con exito");
-        fetchUsers();
+        fetchUsers(currentPage);
         } catch (error) {
         console.error("Error al eliminar usuario:", error);
         toast.error("Error al eliminar usuario");
@@ -254,114 +255,94 @@ const MainUsers = () => {
         setShowAlert(true);
     };
     
-    return(
-        <div className="MaquetaCliente">
-          <Toaster
-            position="top-right"
-            reverseOrder={false}
-            toastOptions={{
-              success: {
-                style:{
-                  background: "#FFDBD9",
-                  color:"#D92D20"
-                },
-              },
-              error:{
-                style: {
-                  background: "#FFDBD9",
-                  color: "#D92D20"
-                },
-              },
-            }}
-          />
+  return(
+    <div className="MaquetaCliente">
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          success: {
+            style:{
+              background: "#75B798",
+              color:"#0A3622"
+            },
+          },
+          error:{
+            style: {
+              background: "#FFDBD9",
+              color: "#D92D20"
+            },
+          },
+        }}
+      />
 
-          <div class="card">
-            <div class="container">
-              <div className="card-1">
-                <h2>Usuarios</h2>
-                <div className="card-body d-flex align-items-center justify-content-between">
-                  <form className="d-flex flex-grow-1">
-                    <input
-                      className="form-control mt-3 custom-input"
-                      type="text"
-                      placeholder="Buscar usuario"
-                      value={searchTerm}
-                      onChange={handleSearchChange}
-                    />
-                    <ButtonBasic text="Buscar"/>
-                  </form>
-                  <div className="dropdown">
-                  <button
-                    type="button"
-                    className="btn btn-primary dropdown-toggle btn-filtrar"
-                    data-bs-toggle="dropdown"
-                  >
-                    <IoCheckmark />
-                    Filtrar por...
-                  </button>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <a className="dropdown-item">Rol</a>
-                    </li>
-                  </ul>
-                  </div>
-
-                  { /* onClick={handleNuevoUsuario} */}
-                  <button className="button-t" onClick={() => setShowModal(true)}> 
-                    Nuevo Usuario
-                  </button>
-                </div>
+      <div class="card">
+        <div class="container">
+          <div className="card-1">
+            <h2>Usuarios</h2>
+            <div className="card-body d-flex align-items-center justify-content-between">
+              <form className="d-flex flex-grow-1">
+                <input
+                  className="form-control mt-3 custom-input"
+                  type="text"
+                  placeholder="Buscar usuario"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+                <ButtonBasic text="Buscar"/>
+              </form>
+              <div className="dropdown">
+              <button
+                type="button"
+                className="btn btn-primary dropdown-toggle btn-filtrar"
+                data-bs-toggle="dropdown"
+              >
+                <IoCheckmark />
+                Filtrar por...
+              </button>
+              <ul className="dropdown-menu">
+                <li>
+                  <a className="dropdown-item">Rol</a>
+                </li>
+              </ul>
               </div>
 
-              <ModalBase
-                //Implementacion de Cesar.
-                // open={showModal || showEditModal}
-                // closeModal={handleCloseModal}
-                // title={showModal ? "Crear Nuevo Usuario" : "Editar Usuario"}
-                open={showModal}
-                closeModal={() => setShowModal(false)}
-                title="Registro de Usuario"
-              >
-                <form className="mb-3">
-                {/* nombre: "",
-                cedula:"",
-                telefono:"",
-                direccion:"",
-                email: "",
-                rol_id: null */}
-                 <div className="mb-2 block">
-                    <div className="label-container">
-                      <LabelBase label="Nombre:" htmlFor="nombre" />
-                      <span className="required">*</span>
-                    </div>
-                    <input
-                      style={{ width: "100%", height: "30px" }}
-                      type="text"
-                      id="nombre"
-                      name="nombre"
-                      className="form-control"
-                      value={userData.nombre}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="mb-2 block">
-                    <div className="label-container">
-                      <LabelBase label="Cedula:" htmlFor="cedula" />
-                      <span className="required">*</span>
-                    </div>
-                    <input
-                      style={{ width: "100%", height: "30px" }}
-                      type="text"
-                      id="cedula"
-                      name="cedula"
-                      className="form-control"
-                      value={userData.cedula}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="mb-2 block">
+              { /* onClick={handleNuevoUsuario} */}
+              <button className="button-t" onClick={() => setShowModal(true)}> 
+                + Nuevo Usuario
+              </button>
+            </div>
+          </div>
+
+          <ModalBase
+            //Implementacion de Cesar.
+            open={showModal || showEditModal}
+            closeModal={handleCloseModal}
+            title={showModal ? "Crear Nuevo Usuario" : "Editar Usuario"}
+            // open={showModal}
+            // closeModal={() => setShowModal(false)}
+            // title="Registro de Usuario"
+          >
+            <form className="mb-3">
+              <div className="mb-2 block">
+                <div className="label-container">
+                  <LabelBase label="Nombre:" htmlFor="nombre" />
+                  <span className="required">*</span>
+                </div>
+                <input
+                  style={{ width: "100%", height: "30px" }}
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  className="form-control"
+                  value={userData.nombre}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div> 
+              <div className="d-flex justify-content-between">
+                <div className="row ">
+                  <div className="col-sm">
                     <div className="label-container">
                       <LabelBase label="Telefono:" htmlFor="telefono" />
                       <span className="required">*</span>
@@ -377,125 +358,96 @@ const MainUsers = () => {
                       required
                     />
                   </div>
-                  <div className="mb-2 block">
+                  <div className="col-sm">
                     <div className="label-container">
-                      <LabelBase label="Direccion:" htmlFor="direccion" />
+                      <LabelBase label="Cedula:" htmlFor="cedula" />
                       <span className="required">*</span>
                     </div>
                     <input
                       style={{ width: "100%", height: "30px" }}
                       type="text"
-                      id="direccion"
-                      name="direccion"
+                      id="cedula"
+                      name="cedula"
                       className="form-control"
-                      value={userData.direccion}
+                      value={userData.cedula}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-                  <div className="mb-2 block">
-                    <div className="label-container">
-                      <LabelBase label="e-mail:" htmlFor="e-mail" />
-                      <span className="required">*</span>
-                    </div>
-                      <input
-                        type="text"
-                        style={{ width: "100%", height: "30px" }}
-                        id="email"
-                        name="email"
-                        className="form-control"
-                        value={userData.email}
-                        onChange={handleInputChange}
-                      />
-                  </div>
-                  <div className="mb-2 block">
-                    <div className="label-container">
-                      <LabelBase label="Rol:" htmlFor="rol" />
-                      <span className="required">*</span>
-                    </div>
-                    <select
-                      style={{ width: "100%", height: "40px" }}
-                      id="rol_id"
-                      name="rol_id"
-                      className="form-control form-select"
-                      value={userData.rol_id}
-                      onChange={handleInputChange}>
-                          {roles.map((opcion)=>(
-                              <option key={opcion.value} value={opcion.value}>
-                                  {opcion.label}
-                              </option>
-                          ))}
-                    </select>
-                  </div>
-                  <div className="campo-obligatorio">
-                    <span className="required">*</span>
-                    <span className="message">Campo obligatorio</span>
-                  </div>
-
-                  <div className="d-flex justify-content-center align-items-center float-end">
-                    <ButtonBasic text="Guardar" onClick={handleSubmit}>
-                      {loading ? "Cargando..." : "Agregar Usuario"}
-                    </ButtonBasic>
-                    {/* <ButtonBasic text="Aceptar" onClick={handleAceptar} /> */}
-                  </div>
-                </form> 
-              </ModalBase>              
-            </div>
-          </div>
-        
-        {/*modal para editar Usuario*/ }
-        <ModalBase
-         open={modalOpen}
-         title="Editar Cliente"
-         closeModal={handleCloseModal}
-        >
-          <div>
-            <div className="modal-body" style={{ marginTop: "0px", paddingTop: "0px" }}>
-              <p style={{ fontWeight: "bold", fontSize: "14px" }}>Datos Personales</p>
-  
-              <form>
-                <div>
-                  <LabelBase label="Nombre:" htmlFor="nombre" />
-                  <input
-                    style={{ width: "100%", height: "30px" }}
-                    type="text"
-                    id="nombre"
-                    name="nombre"
-                    className="form-control"
-                    value={editingUser ?  editingUser.nombre:""}
-                    onChange={handleNameChange}
-                  />
                 </div>
-                <div>
-                  <LabelBase label="e-mail:" htmlFor="email" />
+              </div>
+              <div className="mb-2 block">
+                <div className="label-container">
+                  <LabelBase label="Direccion:" htmlFor="direccion" />
+                  <span className="required">*</span>
+                </div>
+                <input
+                  style={{ width: "100%", height: "30px" }}
+                  type="text"
+                  id="direccion"
+                  name="direccion"
+                  className="form-control"
+                  value={userData.direccion}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="mb-2 block">
+                <div className="label-container">
+                  <LabelBase label="e-mail:" htmlFor="e-mail" />
+                  <span className="required">*</span>
+                </div>
                   <input
                     type="text"
                     style={{ width: "100%", height: "30px" }}
                     id="email"
                     name="email"
                     className="form-control"
-                    value={editingUser ?  editingUser.email : ""}
-                    onChange={handleEmailChange}
+                    value={userData.email}
+                    onChange={handleInputChange}
                   />
+              </div>
+              <div className="mb-2 block">
+                <div className="label-container">
+                  <LabelBase label="Rol:" htmlFor="rol" />
+                  <span className="required">*</span>
                 </div>
-                <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Guardar" onClick={handleGuardarCambios}>
-                {loading ? "Cargando..." : "Guardar Cambios"}
-              </ButtonBasic>
-                </div>
-              </form>
-            </div>
-          </div>
-        </ModalBase>
-        {showAlert && userToDelete && (
-          <CustomAlert
-            message={`¿Estás seguro de eliminar a ${userToDelete.nombre}?`}
-            confirmText="Aceptar"
-            cancelText="Cancelar"
-            confirmAction={handleConfirmDelete}
-            cancelAction={handleCancelDelete}
-          />
-        )}
+                <select
+                  style={{ width: "100%", height: "40px" }}
+                  id="rol_id"
+                  name="rol_id"
+                  className="form-control form-select"
+                  value={userData.rol_id}
+                  onChange={handleInputChange}>
+                      {roles.map((opcion)=>(
+                          <option key={opcion.value} value={opcion.value}>
+                              {opcion.label}
+                          </option>
+                      ))}
+                </select>
+              </div>
+              <div className="campo-obligatorio">
+                <span className="required">*</span>
+                <span className="message">Campo obligatorio</span>
+              </div>
+
+              <div className="d-flex justify-content-center align-items-center float-end">
+                {/* <ButtonBasic text="Guardar" onClick={handleSubmit}>
+                  {loading ? "Cargando..." : "Agregar Usuario"}
+                </ButtonBasic> */}
+                <ButtonBasic text="Aceptar" onClick={handleAceptar} />
+              </div>
+            </form> 
+          </ModalBase>  
+          {showAlert && userToDelete && (
+      <CustomAlert
+        message={`¿Estás seguro de eliminar a ${userToDelete.nombre}?`}
+        confirmText="Aceptar"
+        cancelText="Cancelar"
+        confirmAction={handleConfirmDelete}
+        cancelAction={handleCancelDelete}
+      />
+          )}            
           <div class="table-container">
             <table className="custom-table">
               <thead>
@@ -512,10 +464,10 @@ const MainUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
+                {users.map((user) => (
                   <tr key={user.id}>
                     <td>{user.nombre}</td>
-                    <td>{rolByID(user.rol_id)}</td>
+                    <td><div className="estadoIDUser">{rolByID(user.rol_id)}</div></td>
                     <td>{user.email}</td>
                     <td>{user.telefono}</td>
                     <td class="text-center">
@@ -525,7 +477,7 @@ const MainUsers = () => {
                       </a>
                       <a
                         href="#"
-                        onClick={() => handleEditarProducto(user)}
+                        onClick={() => handleEditarUsuario(user)}
                         style={{ marginLeft: "1.5em", fontSize:"1.2rem"}}
                       >
                         <FiEdit2 />
@@ -536,33 +488,17 @@ const MainUsers = () => {
               </tbody>
             </table>
           </div>
-
-        <Toaster position="top-right" reverseOrder={false}
-    toastOptions={{
-      success: {
-        style: {
-          background: '#75B798',
-          color: '#0A3622'
-        },
-      },
-      error: {
-        style: {
-          background: '#FFDBD9',
-          color: '#D92D20'
-        },
-      },
-        
-    }}
-  />
-  
-        <div className="d-flex justify-content-center mt-4">
-      
-        <div className="pagination-container">
-    
-  </div>
-  
+          <div className="pagination-container">
+            <Pagination
+              count={totalPages}
+              shape="rounded"
+              color="secondary"
+              onChange={(page) => setCurrentPage(page)}
+            />
+          </div>
         </div>
       </div>
-    )
-}
+    </div>
+  );
+};
 export default MainUsers;
