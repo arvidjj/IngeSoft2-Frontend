@@ -497,6 +497,7 @@ const MainClients = () => {
                       <PiUserCircleLight
                         style={{
                           padding: "0px",
+                          id:"clienteinfo",
                           fontSize: "25px",
                           background: "#eaecf000",
                         }}
@@ -645,7 +646,7 @@ const MainClients = () => {
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Guardar" onClick={handleSubmit}>
+                <ButtonBasic  id="guardarCliente" text="Guardar" onClick={handleSubmit}>
                   {loading ? "Cargando..." : "Agregar Cliente"}
                 </ButtonBasic>
               </div>
@@ -732,7 +733,7 @@ const MainClients = () => {
                 />
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Guardar" onClick={handleGuardarCambios}>
+                <ButtonBasic text="Guardar" ButtonBasic  id="guardarClienteCambios" onClick={handleGuardarCambios}>
                   {loading ? "Cargando..." : "Guardar Cambios"}
                 </ButtonBasic>
               </div>
@@ -762,6 +763,7 @@ const MainClients = () => {
             <select
               className="select"
               value={modalidad}
+              id="modalidad"
               onChange={(e) => setModalidad(e.target.value)}
             >
               <option value="MENSUAL">Mensual</option>
@@ -777,6 +779,7 @@ const MainClients = () => {
             <input
               className="select-activity"
               type="date"
+              id="fecha"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
             />
@@ -789,6 +792,7 @@ const MainClients = () => {
             <select
               className="select"
               value=""
+              id="actividades"
               onChange={(e) => handleAddSelectedActivity(e.target.value)}
             >
               <option value="" disabled hidden>
@@ -806,6 +810,7 @@ const MainClients = () => {
                   {activity.nombre}{" "}
                   <button
                     className="button-activity"
+                    id="eliminarActividad"
                     onClick={() => handleRemoveSelectedActivity(activity)}
                   >
                     <IoClose />
@@ -817,7 +822,8 @@ const MainClients = () => {
           </div>
           
           <div className="d-flex">
-  <LabelBase label={`Costo: ${total}`} htmlFor="costo" />
+          <LabelBase label={`Costo: ${total.toLocaleString()} Gs`} htmlFor="costo" />
+    
 </div>
 
    
@@ -830,6 +836,7 @@ const MainClients = () => {
             <ButtonBasic
               text="Guardar"
               type="submit"
+              id="guardarSuscripcion"
               onClick={handleSubmitSuscripcion}
             >
               {loading ? "Cargando..." : "Guardar Cambios"}
