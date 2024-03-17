@@ -27,7 +27,13 @@ const NavBar = () => {
             <div className="navbar-left">
                 <button className="logo-btn"><img src={Logo} alt="Logo de la aplicación" className="logo-img" /></button>
                 <Link to="/clientes" ><button className="nav-btn">Clientes</button></Link>
-                <Link to="/productos" ><button className="nav-btn">Productos</button></Link>
+                {/* Modificamos "Productos" para que sea un select */}
+                <select className="nav-btn" onChange={(e) => navigate(`/${e.target.value}`)}>
+                    <option value="productos">Productos</option>
+                    <option value="servicios">Servicios</option>
+                    <option value="tienda">Tienda</option>
+                </select>
+                {/* Fin de la modificación */}
                 <Link to="/caja" ><button className="nav-btn">Caja</button></Link>
                 <Link to="/reportes" ><button className="nav-btn">Reportes</button></Link>
             </div>
