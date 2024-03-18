@@ -1,4 +1,3 @@
-import { Modal } from "flowbite-react"
 
 const ModalBase = ({ children, title, closeModal, open }) => {
     const modalClass = `modal fade ${open ? 'show' : ''}`;
