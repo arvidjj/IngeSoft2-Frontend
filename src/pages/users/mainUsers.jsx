@@ -488,6 +488,7 @@ const MainUsers = () => {
               </tbody>
             </table>
           </div>
+          
           <div className="pagination-container">
             <Pagination
               count={totalPages}
