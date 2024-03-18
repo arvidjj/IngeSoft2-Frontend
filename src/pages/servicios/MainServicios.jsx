@@ -15,7 +15,7 @@ import { IoCheckmark } from "react-icons/io5";
 import api from "../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
 import Indicador from "../../components/ManejoStock/IndicadorClientes";
-
+import { Link } from "react-router-dom";
 const MainServicios = () => {
   const [servicios, setServicios] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -321,7 +321,10 @@ const MainServicios = () => {
               <tbody>
                 {filteredServicios.map((servicio) => (
                   <tr key={servicio.id}>
-                    <td>{servicio.actividad.nombre}</td>
+                    <td><Link to={`/infoServicio/${servicio.actividad.id}`}>
+                      {" "}
+                     {servicio.actividad.nombre}
+                    </Link></td>
                     <td><Indicador clientes={servicio.clientes} /></td>
                     <td>{servicio.actividad.costoMensual.toLocaleString()}</td>
                     <td>{servicio.actividad.costoSemanal.toLocaleString()}</td>

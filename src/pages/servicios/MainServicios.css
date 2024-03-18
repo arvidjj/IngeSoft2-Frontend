@@ -6,6 +6,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   }
   
+  
   .custom-input {
     margin-left: 3%;
     width: 75%;
@@ -44,25 +45,24 @@
     border: none;
   }
   .custom-table {
-    width: 100%; /* Ajusta el ancho de la tabla según sea necesario */
-    text-align: center; /* Centra el contenido de las celdas horizontalmente */
+    width: 100%; 
+    text-align: center; 
   }
   .custom-table td {
-    padding: 1.5rem; /* Ajusta el espaciado interno de las celdas según sea necesario */
+    padding: 1%; 
+    margin: auto;
+    padding: auto;
   }
   
   .custom-table th {
-    background-color: #f2f2f2; /* Cambia el color de fondo de las celdas de encabezado si es necesario */
+    background-color: #f2f2f2; 
   }
  
   .pagination-container {
     display: flex;
     justify-content: center;
-    position: fixed; 
-    bottom: 5em; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    z-index: 999; 
+    bottom: 2em; 
+   
   }
   .custom-table-icons{
     margin: 2%;
@@ -108,19 +108,20 @@
 .container {
   
   display: flex;
-  flex-direction: column; /* Para alinear el card y la tabla verticalmente */
+  flex-direction: column; 
 
 }
 
 .table-container {
-  flex: 1; /* Para que la tabla ocupe todo el espacio restante */
-  overflow: auto; /* Si la tabla es demasiado grande, permite desplazamiento vertical */
+  flex: 1; 
+  overflow: auto; 
 }
 
 .custom-table {
   width: 98%; /* La tabla ocupará todo el ancho disponible */
   /* Otros estilos que tengas para la tabla */
 }
+
 
 .mb-2.block {
   display: flex;
@@ -151,3 +152,30 @@
   color: red; /* Color rojo */
   text-align: center; /* Alineación al centro */
 }
+
+.title-container {
+  display: flex;
+  align-items: center;
+}
+
+.back-link {
+  margin-right: 10px; /* Espacio entre el botón de retroceso y el título */
+}
+
+.title {
+  margin: 0; /* Eliminar el margen predeterminado del título */
+}
+
+.custom-table tbody tr {
+  height: 50px; /* Establece una altura fija para las filas */
+}
+
+.custom-table2{
+  padding: 8px;
+  color: #667085;
+  font-size: 14px;
+  text-align: center;
+  align-items: center;
+  margin-left: 5px;
+}
+
