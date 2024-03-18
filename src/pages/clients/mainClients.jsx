@@ -20,7 +20,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { Button } from "flowbite-react";
 import { IoAddOutline } from "react-icons/io5";
 import { IoCheckmark } from "react-icons/io5";
-import EstadoIndicador from "../../components/estado_pago/EstadoIndicador";
+import EstadoPago from "../../components/estado_pago/EstadoPago";
 
 
 const MainClients = () => {
@@ -46,7 +46,8 @@ const MainClients = () => {
   const [total, setTotal] = useState(0);
 
   //estado 
-  const [estado, setEstado] = useState([]);
+  const [filtroEstado, setFiltroEstado] = useState("");
+
 
   const [clienteData, setClienteData] = useState({
     nombre: "",
@@ -94,7 +95,7 @@ const MainClients = () => {
   const fetchClientes = async () => {
     try {
       const response = await api.get(
-        `/clientes/page/${currentPage}?perPage=${itemsPerPage}`
+        `/clientes/lista/page/${currentPage}?perPage=${itemsPerPage}`
       );
       setClientes(response.data.items);
       setFilteredClientes(response.data.items);
@@ -121,14 +122,15 @@ const MainClients = () => {
     const filtered = clientes.filter((cliente) => {
       const nombre = cliente.nombre.toLowerCase();
       const email = cliente.email.toLowerCase();
-      const telefono = cliente.telefono.toLowerCase();
+      const estado = cliente.estado;
 
-      return (
-        nombre.includes(term.toLowerCase()) ||
-        email.includes(term.toLowerCase()) ||
-        telefono.includes(term.toLowerCase())
-      );
-    });
+    return (
+      (nombre.includes(term.toLowerCase()) ||
+      email.includes(term.toLowerCase()) ||
+      telefono.includes(term.toLowerCase())) &&
+      (filtroEstado === "" || estado === filtroEstado)
+    );
+  });
     setFilteredClientes(filtered);
   };
 
@@ -436,53 +438,12 @@ const MainClients = () => {
     }
   };
 
-  //estado de pagos 
-
-  useEffect(() => {
-    // Llama a la función para obtener las suscripciones del cliente al montar el componente
-    handleGetSuscripciones();
-  }, []); 
-
-const [id,setid]= useState(null);
-
-  const handleGetSuscripciones = async () => {
-    try {
-      const response = await api.get(`/suscripciones/cliente/7/pendientes/page/1`);
-      setEstado(response.data);
-      if (Array.isArray(estado) > 0) {
-    // Filtra las suscripciones del estado 'estado' para el cliente especificado
-    const clienteSuscripciones = estado.filter(suscripcion => suscripcion.clienteId === clienteId);
-    // Retorna "PENDIENTE" si hay suscripciones para el cliente, de lo contrario, retorna "PAGADO"
-    return "PENDIENTE";
-  }
-  // Retorna "PAGADO" si no hay suscripciones o si estado no es un array
-  return "PAGADO";
-
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        console.error('La solicitud devuelve un error 404: Recurso no encontrado');
-        
-        setEstado([]);
-      } else {
-        console.error('Error al obtener suscripciones:', error);
-        toast.error('Error al obtener suscripciones');
-        setEstado([]);
-      }
-    }
+  //estado de filtro 
+  const handleFiltrar = (filtro) => {
+    setFiltro(filtro);
   };
   
- // Función para determinar el estado del cliente
-const determinarEstadoCliente = (clienteId) => {
-  // Verifica si estado es un array y tiene elementos
-  if (Array.isArray(estado) > 0) {
-    // Filtra las suscripciones del estado 'estado' para el cliente especificado
-    const clienteSuscripciones = estado.filter(suscripcion => suscripcion.clienteId === clienteId);
-    // Retorna "PENDIENTE" si hay suscripciones para el cliente, de lo contrario, retorna "PAGADO"
-    return "Pendiente";
-  }
-  // Retorna "PAGADO" si no hay suscripciones o si estado no es un array
-  return "Pagado";
-};
+
   return (
     <div className="MaquetaCliente">
       <div className="cuadro-central">
@@ -498,27 +459,33 @@ const determinarEstadoCliente = (clienteId) => {
             />
             <ButtonBasic text="Buscar" onClick={handleSearchChange} />
             <div className="dropdown">
-              <button
-                type="button"
-                className="btn btn-primary dropdown-toggle btn-filtrar"
-                data-bs-toggle="dropdown"
-              >
-                <IoCheckmark />
-                Filtrar por...
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Pagado
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Pendiente
-                  </a>
-                </li>
-              </ul>
-            </div>
+  <button
+    id="Btn-Filtrar"
+    type="button"
+    className="btn btn-secundary dropdown-toggle btn-filtrar"
+    data-bs-toggle="dropdown"
+    style={{ fontSize: "1.02rem" }}
+  >
+    Filtrar por estado
+  </button>
+  <ul className="dropdown-menu">
+    <li>
+      <button className="dropdown-item"  id="Btnpagado" onClick={() => handleFiltrar("PAGADO")}>
+        Pagado
+      </button>
+    </li>
+    <li>
+      <button className="dropdown-item"  id="BtnPendiente" onClick={() => handleFiltrar("PENDIENTE")}>
+        Pendiente
+      </button>
+    </li>
+    <li>
+      <button className="dropdown-item"  id="Btn-todos" onClick={() => handleFiltrar("")}>
+        Todos
+      </button>
+    </li>
+  </ul>
+</div>
             <button className="button" onClick={() => setShowModal(true)}>
               <IoAdd />
               Nuevo Cliente
@@ -560,8 +527,7 @@ const determinarEstadoCliente = (clienteId) => {
                   <td className=".custom-table2">
                     {cliente.active ? "Activo" : "Inactivo"}
                   </td>
-                  <td className=".custom-table2"><EstadoIndicador estado={determinarEstadoCliente(cliente.id)} />
-                  </td>
+                  <td className=".custom-table2"><EstadoPago estado={cliente.estado}/> </td>
                   <td className="custom-table2">{cliente.email}</td>
                   <td className="custom-table2">{cliente.telefono}</td>
                   <td className="custom-table2">
@@ -871,7 +837,7 @@ const determinarEstadoCliente = (clienteId) => {
           </div>
           
           <div className="d-flex">
-  <LabelBase label={`Costo: ${total}`} htmlFor="costo" />
+  <LabelBase label={`Costo: ${total.toLocaleString()}`} htmlFor="costo" />
 </div>
 
    
