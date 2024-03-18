@@ -205,10 +205,11 @@ const MainProductos = () => {
       // Eliminar los puntos de los valores formateados antes de enviarlos al servidor
       const dataToSend = {
         ...productosData,
-        cantidad: parseFloat(productosData.cantidad.replace(/\./g, "")),
-        costo: parseFloat(productosData.costo.replace(/\./g, "")),
-        precio: parseFloat(productosData.precio.replace(/\./g, "")),
+        cantidad: parseFloat(productosData.cantidad.toString().replace(/\./g, "")),
+        costo: parseFloat(productosData.costo.toString().replace(/\./g, "")),
+        precio: parseFloat(productosData.precio.toString().replace(/\./g, "")),
       };
+      
 
       // Validar el campo código para asegurarse de que tenga al menos 6 caracteres y solo números enteros
       if (modalMode === "create") {
