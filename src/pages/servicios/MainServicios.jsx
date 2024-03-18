@@ -88,18 +88,25 @@ const MainServicios = () => {
   };
   const handleAceptar = async () => {
     try {
-      // Validación para valores no negativos
+      // validar que no esten negativos 
       if (servicioData.costoMensual < 0 || servicioData.costoSemanal < 0) {
         toast.error("Los valores no pueden ser negativos");
         return;
       }
-  
-      // Validación para costo mensual mayor que costo semanal
-      if (servicioData.costoMensual <= servicioData.costoSemanal) {
-        toast.error("El costo mensual debe ser mayor que el costo semanal");
-        return;
-      }
-  
+  //convertir los numeros a enteros para un mejor manejo 
+  const costoMensual = parseInt(servicioData.costoMensual);
+  const costoSemanal = parseInt(servicioData.costoSemanal);
+
+  // validar que el costo semanal sea menor que el mensual
+  if (costoMensual <= costoSemanal) {
+    toast.error("El costo mensual debe ser mayor que el costo semanal");
+    return;
+  }
+   // Validacion para el campo vacio
+   if (!servicioData.nombre.trim()) {
+    toast.error("El nombre del servicio no puede estar vacío");
+    return;
+  }
       let response;
       if (modalMode === "create") {
         response = await api.post("/actividades", servicioData);
