@@ -36,6 +36,7 @@ const NavBar = () => {
                 {/* Fin de la modificación */}
                 <Link to="/caja" ><button className="nav-btn">Caja</button></Link>
                 <Link to="/reportes" ><button className="nav-btn">Reportes</button></Link>
+                <Link to="/proveedores" ><button className="nav-btn">Proveedores</button></Link>
             </div>
             <div className="navbar-right">
                 {userData && (
