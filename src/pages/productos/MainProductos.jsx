@@ -526,8 +526,8 @@ const MainProductos = () => {
                   <span className="required">*</span>
                 </div>
                 <select
-                  id="iva_id"
-                  name="iva_id"
+                  id="iva"
+                  name="iva"
                   className="form-control form-select"
                   value={productosData.iva}
                   onChange={handleCampoChange}
