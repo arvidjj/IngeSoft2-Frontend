@@ -38,7 +38,7 @@ const MainUsers = () => {
       telefono:"",
       direccion:"",
       email: "",
-      rol_id: null
+      rol: null
     });
     const roles = [
         {label:"rol", value: null},
@@ -50,27 +50,19 @@ const MainUsers = () => {
          fetchUsers(currentPage);
      }, [currentPage]);
     
-    const fetchUsers = async (page) => {
+     const fetchUsers = async (page) => {
       try {
         const response = await api.get(`/empleados/page/${page}`);
         setUsers(response.data.items);
         setFilteredUsers(response.data.items);
         setTotalPages(response.data.totalPages);
       } catch (error) {
-        console.error("Error al obtener los empleado:", error);
-        toast.error("No se pudo obtener empleados")
+        console.error("Error al obtener los empleados:", error);
+        toast.error("No se pudo obtener empleados");
       }
     };
-    // const handleNuevoUsuario = () => {
-    //   setModalMode("create");
-    //   setUserData({
-    //     nombre: "",
-    //     email: "",
-    //     password:"",
-    //     rol_id: null
-    //   })
-    //   setShowModal(true)
-    // }
+    
+
     const handleSearchChange = (event) => {
         const term = event.target.value;
         setSearchTerm(term);
@@ -414,10 +406,11 @@ const MainUsers = () => {
                 </div>
                 <select
                   style={{ width: "100%", height: "40px" }}
-                  id="rol_id"
-                  name="rol_id"
+                  id="rol"
+                  name="rol"
                   className="form-control form-select"
-                  value={userData.rol_id}
+                  value={userData.rol
+          }
                   onChange={handleInputChange}>
                       {roles.map((opcion)=>(
                           <option key={opcion.value} value={opcion.value}>
@@ -464,10 +457,11 @@ const MainUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                   <tr key={user.id}>
                     <td>{user.nombre}</td>
-                    <td><div className="estadoIDUser">{rolByID(user.rol_id)}</div></td>
+                    <td><div className="estadoIDUser">{rolByID(user.rol
+              )}</div></td>
                     <td>{user.email}</td>
                     <td>{user.telefono}</td>
                     <td class="text-center">
