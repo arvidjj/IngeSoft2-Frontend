@@ -31,7 +31,7 @@ const MainProveedores = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [modalMode, setModalMode] = useState("create");
 
-    const [searchQuery, setSearchQuery] = useState(""); 
+    const [searchQuery, setSearchQuery] = useState("");
     // Funciones para filtrado (No implementado)
     const [showAlert, setShowAlert] = useState(false);
     const [searchResultsFound, setSearchResultsFound] = useState(true);
@@ -116,6 +116,47 @@ const MainProveedores = () => {
             }
         }
     };
+
+    // Funciones para filtrado
+    const handleInputChange = (event) => {
+        const newSearchQuery = event.target.value;
+        setSearchQuery(newSearchQuery);
+
+        if (newSearchQuery === "") {
+            // Si el input de búsqueda está vacío, vuelve a la primera página
+            setCurrentPage(1);
+            setFilteredProveedores(productos);
+        }
+    };
+
+    const handleSearchClick = () => {
+        if (searchQuery.length >= 4) {
+            searchProveedores(searchQuery);
+        } else {
+            setFilteredProveedores(productos);
+        }
+    };
+
+      //Seccion donde esta la logica de la busqueda
+  const searchProveedores = async (term) => {
+    try {
+      const response = await api.get(
+        `/proveedores/search/${term}/page/${currentPage}`
+      );
+      const filtered = response.data.items;
+      setFilteredProveedores(filtered);
+      setSearchResultsFound(filtered.length > 0); // Si la longitud de 'filtered' es cero, establece 'searchResultsFound' en false
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // Mostrar un mensaje de "Producto no encontrado" cuando el servidor devuelve un 404
+        setFilteredProveedores([]); 
+        setSearchResultsFound(false); 
+      } else {
+        setSearchResultsFound(true);
+        console.error("Error al buscar proveedores por nombre:", error);
+      }
+    }
+  };
 
     // Funciones para el modal
     // Función para cerrar el modal
@@ -212,7 +253,6 @@ const MainProveedores = () => {
 
             let response;
             if (modalMode === "create") {
-                // TODO Agregar llamada de comprobacion
                 response = await api.post("/proveedores", proveedorDataToSend);
                 console.log("Proveedor creado:", response.data);
                 toast.success("Proveedor creado satisfactoriamente");
@@ -272,7 +312,6 @@ const MainProveedores = () => {
                     <div className="card-1">
                         <h2>Proveedores</h2>
                         <div className="card-body d-flex align-items-center ">
-                            <div className="TODO hacerFormFiltro"></div>
                             <form className="d-flex flex-grow-1">
                                 <input
                                     id="Btn-Buscar"
@@ -280,12 +319,12 @@ const MainProveedores = () => {
                                     type="text"
                                     placeholder="Search"
                                     value={searchQuery}
-                                    onChange={console.log("TODO handleInputChange")}
+                                    onChange={handleInputChange}
                                 />
                                 <ButtonBasic
                                     id="Btn-Buscar"
                                     text="Buscar"
-                                    onClick={console.log("TODO handleSearchClick")}
+                                    onClick={handleSearchClick}
                                 />
                             </form>
 
