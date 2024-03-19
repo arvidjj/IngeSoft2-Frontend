@@ -3,25 +3,22 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./mainUsers.css";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FiEdit2 } from "react-icons/fi";
-import { BsSearch } from "react-icons/bs";
-import { IoAdd, IoCheckmark } from "react-icons/io5";
-import { PiUserCircleLight } from "react-icons/pi";
+import { IoCheckmark } from "react-icons/io5";
 import { TbArrowDown } from "react-icons/tb";
 import { GoQuestion } from "react-icons/go";
-import { Link } from "react-router-dom";
 import api from "../../utils/api";
 import LabelBase from "../../components/labels/LabelBase";
 import ModalBase from "../../components/modals/ModalBase";
 import ButtonBasic from "../../components/bottons/ButtonBasic";
-import EstadoRol from "../../components/estadoRol/estadoRol";
 import CustomAlert from "../../components/alert/CustomAlert";
-import Pagination from "@mui/material/Pagination";
+import ErrorPagina from "../../components/errores/ErrorPagina";
+import Pagination from "../../components/pagination/PaginationContainer";
+import ElementoNoEncontrado from "../../components/errores/ElementoNoEncontrado";
 import toast, { Toaster } from "react-hot-toast";
 
 const MainUsers = () => {
+    const [selectedRole, setSelectedRole] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editingUser, setEditingUser] = useState(null);
     const [userToDelete, setUserToDelete] = useState(null);
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
@@ -30,8 +27,11 @@ const MainUsers = () => {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [modalMode, setModalMode] = useState("create");
+    const [searchResultsFound, setSearchResultsFound] = useState(true);
     const [showEditModal, setShowEditModal] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false)
+    
     const [userData, setUserData] = useState({
       nombre: "",
       cedula:"",
@@ -49,20 +49,52 @@ const MainUsers = () => {
      useEffect(() => {
          fetchUsers(currentPage);
      }, [currentPage]);
+     
+     const handlePageChange = (pageNumber) => {
+      setCurrentPage(pageNumber);
+    };
     
      const fetchUsers = async (page) => {
       try {
         const response = await api.get(`/empleados/page/${page}`);
         setUsers(response.data.items);
         setFilteredUsers(response.data.items);
+        filterUsersByRole(selectedRole, response.data.items);
         setTotalPages(response.data.totalPages);
       } catch (error) {
-        console.error("Error al obtener los empleados:", error);
-        toast.error("No se pudo obtener empleados");
+        setError(true);
+        console.error("Error al obtener los usuarios:", error);
       }
     };
-    
-
+    const filterUsersByRole = (role, usersList) => {
+      if (role === null) {
+        setFilteredUsers(usersList);
+      } else {
+        const filtered = usersList.filter((user) => user.rol === role);
+        setFilteredUsers(filtered);
+      }
+    };
+    const searchUsuarios = async (term) => {
+      try {
+        const response = await api.get(
+          `/empleados/search/${term}/page/${currentPage}`
+        );
+        const filtered = response.data.items;
+        setFilteredUsers(filtered);
+        setSearchResultsFound(filtered.length > 0); // Si la longitud de 'filtered' es cero, establece 'searchResultsFound' en true
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          // Mostrar un mensaje de "Producto no encontrado" cuando el servidor devuelve un 404
+          setFilteredProductos([]); // Establecer los productos filtrados como vacíos
+          setSearchResultsFound(false); // Indicar que no se encontraron resultados
+        } else {
+          // Manejar otros errores de manera similar a como lo haces actualmente
+          setSearchResultsFound(true);
+          console.error("Error al buscar productos por nombre:", error);
+        }
+      }
+    };
+  
     const handleSearchChange = (event) => {
         const term = event.target.value;
         setSearchTerm(term);
@@ -70,12 +102,13 @@ const MainUsers = () => {
         if (term.length >= 4) {
           searchClientes(term);
         } else {
-            setFilteredUsers(users);
+          filterUsersByRole(selectedRole, users);
+          //setFilteredUsers(users);
           // Siempre vuelve a la primera página cuando se borra el término de búsqueda
           setCurrentPage(1);
         }
     };
-    const searchClientes = (term) => {
+    const xClientes = (term) => {
           const filtered = users.filter((user) => {
           const nombre = user.nombre.toLowerCase();
           const email = user.email.toLowerCase();
@@ -111,7 +144,17 @@ const MainUsers = () => {
       setUserData(usuario); // Establece los datos del user a editar en el estado
       setShowEditModal(true);
     };
-  
+
+    const handleRoleChange = (roleValue) => {
+      setSelectedRole(roleValue);
+      filterUsersByRole(roleValue, users);
+    };
+    const handleSearchClick = () => {
+      searchUsuarios(searchTerm);
+    };
+
+
+
     // Función para cerrar el modal
     const handleCloseModal = () => {
       setShowModal(false);
@@ -182,6 +225,18 @@ const MainUsers = () => {
         toast.error("Error al procesar la solicitud");
       }
     };
+
+    const handleInputChan = (event) => {
+      const newSearchTerm = event.target.value;
+      setSearchTerm(newSearchTerm);
+    
+      if (newSearchTerm === "") {
+        // Si el input de búsqueda está vacío, vuelve a la primera página
+        setCurrentPage(1);
+        setFilteredUsers(users);
+      }
+    };
+    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -275,32 +330,43 @@ const MainUsers = () => {
             <div className="card-body d-flex align-items-center justify-content-between">
               <form className="d-flex flex-grow-1">
                 <input
+                  id="input-search"
                   className="form-control mt-3 custom-input"
                   type="text"
                   placeholder="Buscar usuario"
                   value={searchTerm}
-                  onChange={handleSearchChange}
+                  onChange={handleInputChan}
                 />
-                <ButtonBasic text="Buscar"/>
+                <ButtonBasic text="Buscar"
+                onClick={handleSearchClick}/>
               </form>
               <div className="dropdown">
               <button
+                id="btn-search"
                 type="button"
                 className="btn btn-primary dropdown-toggle btn-filtrar"
                 data-bs-toggle="dropdown"
               >
                 <IoCheckmark />
-                Filtrar por...
+                Filtrar por rol...
               </button>
               <ul className="dropdown-menu">
                 <li>
-                  <a className="dropdown-item">Rol</a>
+                  <a className="dropdown-item" onClick={() => handleRoleChange(1)}>Administrador</a>
+                </li>
+                <li>
+                  <a className="dropdown-item" onClick={() => handleRoleChange(3)}>Cajero</a>
+                </li>
+                <li>
+                  <a className="dropdown-item" onClick={() => handleRoleChange(4)}>Entrenador</a>
                 </li>
               </ul>
+
+
               </div>
 
               { /* onClick={handleNuevoUsuario} */}
-              <button className="button-t" onClick={() => setShowModal(true)}> 
+              <button id="btn-crearUser"className="button-t" onClick={() => setShowModal(true)}> 
                 + Nuevo Usuario
               </button>
             </div>
@@ -322,9 +388,9 @@ const MainUsers = () => {
                   <span className="required">*</span>
                 </div>
                 <input
+                  id="input-name"
                   style={{ width: "100%", height: "30px" }}
                   type="text"
-                  id="nombre"
                   name="nombre"
                   className="form-control"
                   value={userData.nombre}
@@ -342,7 +408,7 @@ const MainUsers = () => {
                     <input
                       style={{ width: "100%", height: "30px" }}
                       type="text"
-                      id="telefono"
+                      id="input-phone"
                       name="telefono"
                       className="form-control"
                       value={userData.telefono}
@@ -358,7 +424,7 @@ const MainUsers = () => {
                     <input
                       style={{ width: "100%", height: "30px" }}
                       type="text"
-                      id="cedula"
+                      id="input-cedula"
                       name="cedula"
                       className="form-control"
                       value={userData.cedula}
@@ -376,7 +442,7 @@ const MainUsers = () => {
                 <input
                   style={{ width: "100%", height: "30px" }}
                   type="text"
-                  id="direccion"
+                  id="input-direccion"
                   name="direccion"
                   className="form-control"
                   value={userData.direccion}
@@ -392,7 +458,7 @@ const MainUsers = () => {
                   <input
                     type="text"
                     style={{ width: "100%", height: "30px" }}
-                    id="email"
+                    id="input-direccion"
                     name="email"
                     className="form-control"
                     value={userData.email}
@@ -428,7 +494,7 @@ const MainUsers = () => {
                 {/* <ButtonBasic text="Guardar" onClick={handleSubmit}>
                   {loading ? "Cargando..." : "Agregar Usuario"}
                 </ButtonBasic> */}
-                <ButtonBasic text="Aceptar" onClick={handleAceptar} />
+                <ButtonBasic id="btn-aceptar" text="Aceptar" onClick={handleAceptar} />
               </div>
             </form> 
           </ModalBase>  
@@ -442,7 +508,19 @@ const MainUsers = () => {
       />
           )}            
           <div class="table-container">
-            <table className="custom-table">
+            {error && (
+              <ErrorPagina
+                mensaje=" ¡Ups! Parece que hubo un problema al cargar los usuarios. Por favor,
+                          inténtalo de nuevo más tarde."
+              />
+            )}
+            {!error &&
+              filteredUsers.length === 0 &&
+              !searchResultsFound && (
+                <ElementoNoEncontrado mensaje="¡Producto no encontrado!" />
+              )}
+            {!error && filteredUsers.length > 0 && (
+              <table className="custom-table">
               <thead>
                 <tr>
                   <th scope="col">Nombre del Usuario</th>
@@ -480,16 +558,17 @@ const MainUsers = () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>              
+            )}  
+
           </div>
           
           <div className="pagination-container">
-            <Pagination
-              count={totalPages}
-              shape="rounded"
-              color="secondary"
-              onChange={(page) => setCurrentPage(page)}
-            />
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
           </div>
         </div>
       </div>
