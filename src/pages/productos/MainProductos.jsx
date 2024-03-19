@@ -364,22 +364,22 @@ const handlePriceInputChange = (event, setter) => {
             <div className="card-body d-flex align-items-center ">
               <form className="d-flex flex-grow-1">
                 <input
-                  id="Search-Input"
+                  id="input-search"
                   className="form-control mt-3 custom-input"
                   type="text"
-                  placeholder="Search"
+                  placeholder="Buscar producto en tienda..."
                   value={searchQuery}
                   onChange={handleInputChange}
                 />
                 <ButtonBasic
-                  id="Btn-Buscar"
+                  id="btn-buscar"
                   text="Buscar"
                   onClick={handleSearchClick}
                 />
               </form>
               <div className="dropdown">
                 <button
-                  id="Btn-Filtrar"
+                  id="btn-filtrar"
                   type="button"
                   className="btn btn-secundary dropdown-toggle btn-filtrar"
                   data-bs-toggle="dropdown"
@@ -415,7 +415,7 @@ const handlePriceInputChange = (event, setter) => {
                     />
                     <div className="d-grid">
                       <ButtonCrear
-                        id="Btn-Crear"
+                        id="btn-filtar-aplicar"
                         text="Aplicar"
                         onClick={() =>
                           handleFilterByPriceRange(
@@ -430,7 +430,7 @@ const handlePriceInputChange = (event, setter) => {
               </div>
 
               <ButtonCrear
-                id="Btn-Crear"
+                id="btn-crear"
                 text="Nuevo Producto"
                 onClick={handleNuevoProducto}
                 icon={<IoAdd />}
@@ -569,7 +569,7 @@ const handlePriceInputChange = (event, setter) => {
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
                 <ButtonCrear
-                  id="Btn-Crear"
+                  id="btn-crear"
                   text="Aceptar"
                   onClick={() => handleAceptar()}
                 />
@@ -627,7 +627,7 @@ const handlePriceInputChange = (event, setter) => {
                       <td>{formatNumber(producto.precio)}</td>
                       <td class="text-center">
                         <a
-                          id="Btn-Eliminar-${producto.id}"
+                          id={`btn-eliminar-producto-${id}`}
                           href="#"
                           onClick={() => handleShowAlert(producto)}
                           style={{ fontSize: "1.2rem" }}
@@ -635,7 +635,7 @@ const handlePriceInputChange = (event, setter) => {
                           <RiDeleteBinLine />
                         </a>
                         <a
-                          id="Btn-Editar-${producto.id}"
+                          id={`btn-editar-producto-${id}`}
                           href="#"
                           onClick={() => handleEditarProducto(producto)}
                           style={{ marginLeft: "1.5em", fontSize: "1.2rem" }}
