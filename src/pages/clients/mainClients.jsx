@@ -486,7 +486,7 @@ try {
           </div>
         </div>
         <hr />
-        <div className="tabla ">
+        <div className="tabla">
           <table className="custom-table">
             <thead>
               <tr>
@@ -836,11 +836,11 @@ try {
           </div>
           
           <div className="d-flex">
+            {/*Para manejar el costo mostrar 50.000 o 390.000 */}
           <LabelBase label={`Costo: ${total.toLocaleString()} Gs`} htmlFor="costo" />
     
 </div>
-
-   
+ 
           <div className="campo-obligatorio">
             <span className="required">*</span>
             <span className="message">Campo obligatorio</span>

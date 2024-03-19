@@ -119,7 +119,11 @@ const MainProductos = () => {
   };
 
   const handleSearchClick = () => {
-   searchProductos(searchQuery);
+    if (searchQuery.length >= 4) {
+      searchProductos(searchQuery);
+    } else {
+      setFilteredProductos(productos);
+    }
   };
 
   const handleInputChange = (event) => {
@@ -232,6 +236,7 @@ const handlePriceInputChange = (event, setter) => {
         costo: parseFloat(productosData.costo.toString().replace(/\./g, "")),
         precio: parseFloat(productosData.precio.toString().replace(/\./g, "")),
       };
+      
 
       // Validar el campo código para asegurarse de que tenga al menos 6 caracteres y solo números enteros
       if (modalMode === "create") {
