@@ -309,7 +309,7 @@ const handlePriceInputChange = (event, setter) => {
         fetchProductos(currentPage);
         toast.success("Producto eliminado satisfactoriamente");
       } catch (error) {
-        console.error("Error al eliminar el producto:", error);
+        
         toast.error("Error al eliminar el producto");
       }
     }
@@ -321,7 +321,7 @@ const handlePriceInputChange = (event, setter) => {
         await handleEliminarProducto();
         setShowAlert(false);
       } catch (error) {
-        console.error("Error al eliminar producto:", error);
+        
         toast.error("Error al eliminar producto" + error);
       }
     }
@@ -569,7 +569,7 @@ const handlePriceInputChange = (event, setter) => {
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
                 <ButtonCrear
-                  id="btn-crear"
+                  id="btn-guardar"
                   text="Aceptar"
                   onClick={() => handleAceptar()}
                 />
@@ -627,7 +627,7 @@ const handlePriceInputChange = (event, setter) => {
                       <td>{formatNumber(producto.precio)}</td>
                       <td class="text-center">
                         <a
-                          id={`btn-eliminar-producto-${id}`}
+                          id={`btn-eliminar-producto-${producto.id}`}
                           href="#"
                           onClick={() => handleShowAlert(producto)}
                           style={{ fontSize: "1.2rem" }}
@@ -635,7 +635,7 @@ const handlePriceInputChange = (event, setter) => {
                           <RiDeleteBinLine />
                         </a>
                         <a
-                          id={`btn-editar-producto-${id}`}
+                          id={`btn-editar-producto-${producto.id}`}
                           href="#"
                           onClick={() => handleEditarProducto(producto)}
                           style={{ marginLeft: "1.5em", fontSize: "1.2rem" }}
