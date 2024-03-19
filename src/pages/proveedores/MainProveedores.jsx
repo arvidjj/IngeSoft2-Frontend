@@ -130,6 +130,19 @@ const MainProveedores = () => {
         setShowEditModal(true);
     };
 
+    const handleNuevoProveedor = () => {
+        setModalMode("create"); // Establece el modo como crear
+        setProveedorDataToSend({
+          nombre: "",
+          descripcion: "",
+          codigo: "",
+          costo: "",
+          cantidad: "",
+          precio: "",
+        });
+        setShowModal(true);
+      };
+
     const handleCampoChange = (event) => {
         const { name, value } = event.target;
         // Comprobaciones en tiempo real de ser necesarias
@@ -177,30 +190,30 @@ const MainProveedores = () => {
 
             // Validar el formato del RUC
             const rucRegex = /^[0-9]{6,8}[A-Z]?(-[0-9])?$/;
-            if (!rucRegex.test(proveedorData.ruc)) {
+            if (!rucRegex.test(proveedorDataToSend.ruc)) {
                 toast.error("RUC inválido.");
                 return;
             }
 
             // Validar el formato del RUC
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(proveedorData.email)) {
+            if (!emailRegex.test(proveedorDataToSend.email)) {
                 toast.error("Correo electrónico inválido");
                 return;
             }
 
             //
             const telefonoRegex = /^\+?[0-9]{8,}$/
-            if (!telefonoRegex.test(proveedorData.telefono)) {
+            if (!telefonoRegex.test(proveedorDataToSend.telefono)) {
                 toast.error("Número de teléfono inválido");
                 return;
             }
 
             let response;
             if (modalMode === "create") {
-                response = await api.post("/productos", dataToSend);
-                console.log("Producto creado:", response.data);
-                toast.success("Producto creado satisfactoriamente");
+                response = await api.post("/proveedores", proveedorDataToSend);
+                console.log("Proveedor creado:", response.data);
+                toast.success("Proveedor creado satisfactoriamente");
             } else if (modalMode === "edit") {
                 // Verificar si se realizaron cambios
                 let sonIguales = true;
@@ -280,7 +293,7 @@ const MainProveedores = () => {
                             <ButtonCrear
                                 id="Btn-Crear"
                                 text="Nuevo Proveedor"
-                                onClick={console.log("TODO handleNuevoProducto")}
+                                onClick={handleNuevoProveedor}
                                 icon={<IoAdd />}
                                 color="secondary"
                             />
