@@ -137,26 +137,26 @@ const MainProveedores = () => {
         }
     };
 
-      //Seccion donde esta la logica de la busqueda
-  const searchProveedores = async (term) => {
-    try {
-      const response = await api.get(
-        `/proveedores/search/${term}/page/${currentPage}`
-      );
-      const filtered = response.data.items;
-      setFilteredProveedores(filtered);
-      setSearchResultsFound(filtered.length > 0); // Si la longitud de 'filtered' es cero, establece 'searchResultsFound' en false
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        // Mostrar un mensaje de "Producto no encontrado" cuando el servidor devuelve un 404
-        setFilteredProveedores([]); 
-        setSearchResultsFound(false); 
-      } else {
-        setSearchResultsFound(true);
-        console.error("Error al buscar proveedores por nombre:", error);
-      }
-    }
-  };
+    //Seccion donde esta la logica de la busqueda
+    const searchProveedores = async (term) => {
+        try {
+            const response = await api.get(
+                `/proveedores/search/${term}/page/${currentPage}`
+            );
+            const filtered = response.data.items;
+            setFilteredProveedores(filtered);
+            setSearchResultsFound(filtered.length > 0); // Si la longitud de 'filtered' es cero, establece 'searchResultsFound' en false
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                // Mostrar un mensaje de "Producto no encontrado" cuando el servidor devuelve un 404
+                setFilteredProveedores([]);
+                setSearchResultsFound(false);
+            } else {
+                setSearchResultsFound(true);
+                console.error("Error al buscar proveedores por nombre:", error);
+            }
+        }
+    };
 
     // Funciones para el modal
     // Función para cerrar el modal
@@ -176,11 +176,10 @@ const MainProveedores = () => {
         setModalMode("create"); // Establece el modo como crear
         setProveedorDataToSend({
             nombre: "",
-            descripcion: "",
-            codigo: "",
-            costo: "",
-            cantidad: "",
-            precio: "",
+            ruc: "",
+            email: "",
+            telefono: "",
+            direccion: ""
         });
         setShowModal(true);
     };
@@ -223,12 +222,40 @@ const MainProveedores = () => {
     };
 
     const handleAceptar = async () => {
+        console.log("PULSADO ACEPTAR");
         try {
+            // Validar campos obligatorios
+            if (proveedorDataToSend.nombre == "") {
+                toast.error("El Nombre es un campo obligatorio.");
+                return;
+            }
+
+            if (proveedorDataToSend.ruc == "") {
+                toast.error("El RUC es un campo obligatorio.");
+                return;
+            }
+
+            if (proveedorDataToSend.email == "") {
+                toast.error("El email es un campo obligatorio.");
+                return;
+            }
+
+            if (proveedorDataToSend.telefono == "") {
+                toast.error("El teléfono es un campo obligatorio.");
+                return;
+            }
+
+            if (proveedorDataToSend.direccion == "") {
+                toast.error("La direccion es un campo obligatorio.");
+                return;
+            }
+
             setProveedorDataToSend((prevData) => ({
                 ...prevData,
                 nombre: proveedorDataToSend.nombre.trim(),
-                direccion: proveedorDataToSend.direccion.trim()
+                direccion: proveedorDataToSend.direccion == "" ? proveedorDataToSend.direccion.trim() : ""
             }));
+
 
             // Validar el formato del RUC
             const rucRegex = /^[0-9]{6,8}[A-Z]?(-[0-9])?$/;
@@ -239,20 +266,25 @@ const MainProveedores = () => {
 
             // Validar el formato del RUC
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(proveedorDataToSend.email)) {
-                toast.error("Correo electrónico inválido");
-                return;
+            if (proveedorDataToSend.email != "") {
+                if (!emailRegex.test(proveedorDataToSend.email)) {
+                    toast.error("Correo electrónico inválido");
+                    return;
+                }
             }
 
             //
             const telefonoRegex = /^\+?[0-9]{8,}$/
-            if (!telefonoRegex.test(proveedorDataToSend.telefono)) {
-                toast.error("Número de teléfono inválido");
-                return;
+            if (proveedorDataToSend.telefono != "") {
+                if (!telefonoRegex.test(proveedorDataToSend.telefono)) {
+                    toast.error("Número de teléfono inválido");
+                    return;
+                }
             }
 
             let response;
             if (modalMode === "create") {
+                console.log(proveedorDataToSend);
                 response = await api.post("/proveedores", proveedorDataToSend);
                 console.log("Proveedor creado:", response.data);
                 toast.success("Proveedor creado satisfactoriamente");
@@ -328,8 +360,27 @@ const MainProveedores = () => {
                                 />
                             </form>
 
-                            <div className="TODO hacerdropdownParaFiltro">
-
+                            <div className="dropdown">
+                                <button
+                                    type="button"
+                                    className="btn btn-primary dropdown-toggle btn-filtrar"
+                                    data-bs-toggle="dropdown"
+                                >
+                                    <IoCheckmark />
+                                    Filtrar por...
+                                </button>
+                                <ul className="dropdown-menu">
+                                    <li>
+                                        <a className="dropdown-item" href="#">
+                                            Nombre
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="dropdown-item" href="#">
+                                            RUC
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
 
                             <ButtonCrear
@@ -381,6 +432,7 @@ const MainProveedores = () => {
                             <div className="mb-2 block">
                                 <div className="label-container">
                                     <LabelBase label="Email:" htmlFor="email" />
+                                    <span className="required">*</span>
                                 </div>
                                 <input
                                     type="text"
@@ -393,7 +445,8 @@ const MainProveedores = () => {
                             </div>
                             <div className="mb-2 block">
                                 <div className="label-container">
-                                    <LabelBase label="Telefono:" htmlFor="telefono" />
+                                    <LabelBase label="Teléfono:" htmlFor="telefono" />
+                                    <span className="required">*</span>
                                 </div>
                                 <input
                                     type="text"
@@ -406,7 +459,8 @@ const MainProveedores = () => {
                             </div>
                             <div className="mb-2 block">
                                 <div className="label-container">
-                                    <LabelBase label="Direccion:" htmlFor="direccion" />
+                                    <LabelBase label="Dirección:" htmlFor="direccion" />
+                                    <span className="required">*</span>
                                 </div>
                                 <input
                                     type="text"
