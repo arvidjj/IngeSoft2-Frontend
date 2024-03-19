@@ -46,7 +46,7 @@ const MainProductos = () => {
   const tipo_iva = [
     { label: "0%", value: 0 },
     { label: "5%", value: 0.05 },
-    { label: "10%", value: 0.10 },
+    { label: "10%", value: 0.1 },
   ];
   useEffect(() => {
     fetchProductos(currentPage);
@@ -87,6 +87,11 @@ const MainProductos = () => {
   };
 
   const handleFilterByPriceRange = async (minPrice, maxPrice) => {
+    // Validar que los valores no sean negativos
+    if (minPrice < 0 || maxPrice < 0) {
+      toast.error("Los valores no pueden ser negativos");
+      return;
+    }
     try {
       // Realizar búsqueda por rango de precios
       const response = await api.get(
@@ -95,6 +100,10 @@ const MainProductos = () => {
       const filtered = response.data.items;
       setFilteredProductos(filtered);
       setSearchResultsFound(filtered.length > 0);
+      // Mostrar mensaje si no hay productos en el rango especificado
+      if (filtered.length === 0) {
+        toast.error("No hay productos en el rango de precios especificado");
+      }
     } catch (error) {
       if (error.response && error.response.status === 404) {
         // Mostrar un mensaje de "Producto no encontrado" cuando el servidor devuelve un 404
@@ -104,16 +113,13 @@ const MainProductos = () => {
         // Manejar otros errores de manera similar a como lo haces actualmente
         setSearchResultsFound(true);
         console.error("Error al buscar productos por precio:", error);
+        toast.error("Error al buscar productos por precio");
       }
     }
   };
 
   const handleSearchClick = () => {
-    if (searchQuery.length >= 4) {
-      searchProductos(searchQuery);
-    } else {
-      setFilteredProductos(productos);
-    }
+   searchProductos(searchQuery);
   };
 
   const handleInputChange = (event) => {
@@ -129,7 +135,6 @@ const MainProductos = () => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    // Aquí podrías realizar otras acciones relacionadas con el cambio de página, como cargar datos adicionales, etc.
   };
   const handleNuevoProducto = () => {
     setModalMode("create"); // Establece el modo como crear
@@ -159,7 +164,7 @@ const MainProductos = () => {
 
   const handleCampoChange = (event) => {
     const { name, value } = event.target;
-  
+
     // Verificar si el campo es cantidad, costo, precio o código
     if (name === "cantidad" || name === "costo" || name === "precio") {
       let formattedValue = value.replace(/\D/g, ""); // Eliminar todos los caracteres que no sean dígitos
@@ -194,8 +199,26 @@ const MainProductos = () => {
       }));
     }
   };
-  
 
+// Función para manejar el cambio en los campos de precio mínimo y máximo
+const handlePriceInputChange = (event, setter) => {
+  let value = event.target.value;
+
+  // Eliminar todos los caracteres que no sean dígitos o un punto
+  value = value.replace(/[^\d.]/g, "");
+
+  // Validar el formato del número
+  const parts = value.split(".");
+  if (parts.length > 2) {
+    // Si hay más de un punto, solo se permite uno y se elimina el resto
+    value = parts[0] + "." + parts.slice(1).join("");
+  }
+
+  // Asignar el valor al estado
+  setter(value);
+};
+
+  
   const formatNumber = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
@@ -205,9 +228,9 @@ const MainProductos = () => {
       // Eliminar los puntos de los valores formateados antes de enviarlos al servidor
       const dataToSend = {
         ...productosData,
-        cantidad: parseFloat(productosData.cantidad.replace(/\./g, "")),
-        costo: parseFloat(productosData.costo.replace(/\./g, "")),
-        precio: parseFloat(productosData.precio.replace(/\./g, "")),
+        cantidad: parseFloat(productosData.cantidad.toString().replace(/\./g, "")),
+        costo: parseFloat(productosData.costo.toString().replace(/\./g, "")),
+        precio: parseFloat(productosData.precio.toString().replace(/\./g, "")),
       };
 
       // Validar el campo código para asegurarse de que tenga al menos 6 caracteres y solo números enteros
@@ -340,7 +363,7 @@ const MainProductos = () => {
             <div className="card-body d-flex align-items-center ">
               <form className="d-flex flex-grow-1">
                 <input
-                  id="Btn-Buscar"
+                  id="Search-Input"
                   className="form-control mt-3 custom-input"
                   type="text"
                   placeholder="Search"
@@ -375,7 +398,7 @@ const MainProductos = () => {
                         className="form-control"
                         id="minPrice"
                         value={minPrice}
-                        onChange={(e) => setMinPrice(e.target.value)}
+                        onChange={(e) => handlePriceInputChange(e, setMinPrice)}
                       />
                     </div>
 
@@ -387,7 +410,7 @@ const MainProductos = () => {
                       className="form-control"
                       id="maxPrice"
                       value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value)}
+                      onChange={(e) => handlePriceInputChange(e, setMaxPrice)}
                     />
                     <div className="d-grid">
                       <ButtonCrear
@@ -563,7 +586,12 @@ const MainProductos = () => {
             />
           )}
           <div class="table-container">
-            {error && <ErrorPagina />}{" "}
+            {error && (
+              <ErrorPagina
+                mensaje=" ¡Ups! Parece que hubo un problema al cargar los productos. Por favor,
+                          inténtalo de nuevo más tarde."
+              />
+            )}
             {/* Muestra el componente de error si hay un error */}
             {!error &&
               filteredProductos.length === 0 &&
@@ -598,6 +626,7 @@ const MainProductos = () => {
                       <td>{formatNumber(producto.precio)}</td>
                       <td class="text-center">
                         <a
+                          id="Btn-Eliminar-${producto.id}"
                           href="#"
                           onClick={() => handleShowAlert(producto)}
                           style={{ fontSize: "1.2rem" }}
@@ -605,6 +634,7 @@ const MainProductos = () => {
                           <RiDeleteBinLine />
                         </a>
                         <a
+                          id="Btn-Editar-${producto.id}"
                           href="#"
                           onClick={() => handleEditarProducto(producto)}
                           style={{ marginLeft: "1.5em", fontSize: "1.2rem" }}
