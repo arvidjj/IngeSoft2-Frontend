@@ -131,7 +131,7 @@ const MainProveedores = () => {
     };
 
     const handleSearchClick = () => {
-        if(appliedFilter === null){
+        if (appliedFilter === null) {
             toast.error("Seleccione un tipo de filtro");
             return
         }
@@ -146,12 +146,12 @@ const MainProveedores = () => {
     const searchProveedores = async (term) => {
         try {
             let response;
-            if(appliedFilter === "RUC"){
+            if (appliedFilter === "RUC") {
                 const responseRUC = await api.get(
                     `/proveedores/searchByRuc/${term}/page/${currentPage}`
                 );
                 response = responseRUC;
-            } else if(appliedFilter === "nombre"){
+            } else if (appliedFilter === "nombre") {
                 const responseNombre = await api.get(
                     `/proveedores/search/${term}/page/${currentPage}`
                 );
@@ -172,7 +172,7 @@ const MainProveedores = () => {
         }
     };
 
-    const handleFilterSelector= (filtro) => {
+    const handleFilterSelector = (filtro) => {
         setAppliedFilter(filtro);
     };
 
@@ -364,15 +364,15 @@ const MainProveedores = () => {
                         <div className="card-body d-flex align-items-center ">
                             <form className="d-flex flex-grow-1">
                                 <input
-                                    id="Btn-Buscar"
+                                    id="input-buscar"
                                     className="form-control mt-3 custom-input"
                                     type="text"
-                                    placeholder="Search"
+                                    placeholder="Buscar..."
                                     value={searchQuery}
                                     onChange={handleInputChange}
                                 />
                                 <ButtonBasic
-                                    id="Btn-Buscar"
+                                    id="botton-buscar"
                                     text="Buscar"
                                     onClick={handleSearchClick}
                                 />
@@ -380,6 +380,7 @@ const MainProveedores = () => {
 
                             <div className="dropdown">
                                 <button
+                                    id="desplegable-filtro"
                                     type="button"
                                     className="btn btn-primary dropdown-toggle btn-filtrar"
                                     data-bs-toggle="dropdown"
@@ -390,12 +391,14 @@ const MainProveedores = () => {
                                 <ul className="dropdown-menu">
                                     <li>
                                         <a className="dropdown-item" href="#"
+                                            id="filtro-opcion-nombre"
                                             onClick={() => handleFilterSelector("nombre")}>
                                             Nombre
                                         </a>
                                     </li>
                                     <li>
                                         <a className="dropdown-item" href="#"
+                                            id="filtro-opcion-ruc"
                                             onClick={() => handleFilterSelector("RUC")}>
                                             RUC
                                         </a>
@@ -404,7 +407,7 @@ const MainProveedores = () => {
                             </div>
 
                             <ButtonCrear
-                                id="Btn-Crear"
+                                id="botton-crear"
                                 text="Nuevo Proveedor"
                                 onClick={handleNuevoProveedor}
                                 icon={<IoAdd />}
@@ -426,7 +429,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="nombre"
+                                    id="campo-nombre"
                                     name="nombre"
                                     className="form-control"
                                     value={proveedorDataToSend.nombre}
@@ -441,7 +444,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="ruc"
+                                    id="campo-ruc"
                                     name="ruc"
                                     className="form-control"
                                     value={proveedorDataToSend.ruc}
@@ -456,7 +459,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="email"
+                                    id="campo-email"
                                     name="email"
                                     className="form-control"
                                     value={proveedorDataToSend.email}
@@ -470,7 +473,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="telefono"
+                                    id="campo-telefono"
                                     name="telefono"
                                     className="form-control"
                                     value={proveedorDataToSend.telefono}
@@ -484,7 +487,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="direccion"
+                                    id="campo-direccion"
                                     name="direccion"
                                     className="form-control"
                                     value={proveedorDataToSend.direccion}
@@ -498,7 +501,7 @@ const MainProveedores = () => {
                             </div>
                             <div className="d-flex justify-content-center align-items-center float-end">
                                 <ButtonCrear
-                                    id="Btn-Crear"
+                                    id="botton-modal-aceptar"
                                     text="Aceptar"
                                     onClick={() => handleAceptar()}
                                 />
@@ -509,6 +512,7 @@ const MainProveedores = () => {
                     {showAlert && proveedorToDelete && (
                         <CustomAlert
                             message={`¿Estás seguro de eliminar el proveedor ${proveedorToDelete.nombre}?`}
+                            id="alerta-personalizada"
                             confirmText="Aceptar"
                             cancelText="Cancelar"
                             confirmAction={handleConfirmDelete}
@@ -551,6 +555,7 @@ const MainProveedores = () => {
                                             <td class="text-center">
                                                 <a
                                                     href="#"
+                                                    id={`botton-borrar-proveedor-${proveedor.id}`}
                                                     onClick={() => handleShowAlert(proveedor)}
                                                     style={{ fontSize: "1.2rem" }}
                                                 >
@@ -558,6 +563,7 @@ const MainProveedores = () => {
                                                 </a>
                                                 <a
                                                     href="#"
+                                                    id={`botton-editar-proveedor-${proveedor.id}`}
                                                     onClick={() => handleEditarProveedor(proveedor)}
                                                     style={{ marginLeft: "1.5em", fontSize: "1.2rem" }}
                                                 >
@@ -574,6 +580,7 @@ const MainProveedores = () => {
                 </div>
                 <div className="pagination-container">
                     <Pagination
+                        id="selector-paginacion"
                         totalPages={totalPages}
                         currentPage={currentPage}
                         onPageChange={handlePageChange}
