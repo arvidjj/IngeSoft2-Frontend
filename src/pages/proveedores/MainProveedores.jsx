@@ -25,9 +25,11 @@ const MainProveedores = () => {
 
     const [proveedores, setProveedores] = useState([]);
     const [filteredProveedores, setFilteredProveedores] = useState([]);
+    const [proveedorToDelete, setProveedorToDelete] = useState(null);
 
-    const [searchQuery, setSearchQuery] = useState(""); //TODO
-    const [searchResultsFound, setSearchResultsFound] = useState(true); // TODO
+    const [showAlert, setShowAlert] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResultsFound, setSearchResultsFound] = useState(true);
 
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
@@ -37,11 +39,6 @@ const MainProveedores = () => {
     useEffect(() => {
         fetchProveedores(currentPage);
     }, [currentPage]);
-
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-        // Aquí podrías realizar otras acciones relacionadas con el cambio de página, como cargar datos adicionales, etc.
-    };
 
     const fetchProveedores = async (page) => {
         try {
@@ -57,6 +54,47 @@ const MainProveedores = () => {
         }
     };
 
+    // Para el cambio de pagina por Paginacion
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        // Aquí podrías realizar otras acciones relacionadas con el cambio de página, como cargar datos adicionales, etc.
+    };
+
+    // Para la alerta de borrado
+    const handleShowAlert = (proveedor) => {
+        setProveedorToDelete(proveedor);
+        setShowAlert(true);
+    };
+
+    const handleCancelDelete = () => {
+        setShowAlert(false); // Oculta la alerta
+    };
+
+    const handleEliminarProveedor = async () => {
+        if (proveedorToDelete) {
+          try {
+            await api.delete(`/proveedores/${proveedorToDelete.id}`);
+    
+            fetchProveedores(currentPage);
+            toast.success("Proveedor eliminado satisfactoriamente");
+          } catch (error) {
+            console.error("Error al eliminar el proveedor:", error);
+            toast.error("Error al eliminar el proveedor");
+          }
+        }
+      };
+
+    const handleConfirmDelete = async () => {
+        if (proveedorToDelete) {
+            try {
+                await handleEliminarProveedor();
+                setShowAlert(false);
+            } catch (error) {
+                console.error("Error al eliminar proveedor:", error);
+                toast.error("Error al eliminar proveedor" + error);
+            }
+        }
+    };
 
     return (
         <div className="MaquetaCliente">
@@ -115,8 +153,16 @@ const MainProveedores = () => {
 
                     <div className="TODO hacerModalBase">
                     </div>
-                    <div className="TODO hacerAlerta">
-                    </div>
+
+                    {showAlert && proveedorToDelete && (
+                        <CustomAlert
+                            message={`¿Estás seguro de eliminar el proveedor ${proveedorToDelete.nombre}?`}
+                            confirmText="Aceptar"
+                            cancelText="Cancelar"
+                            confirmAction={handleConfirmDelete}
+                            cancelAction={handleCancelDelete}
+                        />
+                    )}
 
                     <div class="table-container">
                         {error && <ErrorPagina />}{" "}
@@ -143,17 +189,17 @@ const MainProveedores = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredProveedores.map((producto) => (
-                                        <tr key={producto.id}>
-                                            <td>{producto.nombre}</td>
-                                            <td>{producto.ruc}</td>
-                                            <td>{producto.email}</td>
-                                            <td>{producto.telefono}</td>
-                                            <td>{producto.direccion}</td>
+                                    {filteredProveedores.map((proveedor) => (
+                                        <tr key={proveedor.id}>
+                                            <td>{proveedor.nombre}</td>
+                                            <td>{proveedor.ruc}</td>
+                                            <td>{proveedor.email}</td>
+                                            <td>{proveedor.telefono}</td>
+                                            <td>{proveedor.direccion}</td>
                                             <td class="text-center">
                                                 <a
                                                     href="#"
-                                                    onClick={() => console.log("handleShowAlert(producto)")}
+                                                    onClick={() => handleShowAlert(proveedor)}
                                                     style={{ fontSize: "1.2rem" }}
                                                 >
                                                     <RiDeleteBinLine />
