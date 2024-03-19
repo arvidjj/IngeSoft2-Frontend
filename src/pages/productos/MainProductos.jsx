@@ -119,11 +119,7 @@ const MainProductos = () => {
   };
 
   const handleSearchClick = () => {
-    if (searchQuery.length >= 4) {
       searchProductos(searchQuery);
-    } else {
-      setFilteredProductos(productos);
-    }
   };
 
   const handleInputChange = (event) => {
