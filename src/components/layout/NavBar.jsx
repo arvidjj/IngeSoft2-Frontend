@@ -31,11 +31,10 @@ const NavBar = () => {
         <nav className="navbar">
             <div className="navbar-left">
                 <button className="logo-btn"><img src={Logo} alt="Logo de la aplicación" className="logo-img" /></button>
-                <Link to="/clientes" ><button className={isActiveLink("/clientes") ? "nav-btn active" : "nav-btn"}>Clientes</button></Link>
-                <Link to="/productos" ><button className={isActiveLink("/productos") ? "nav-btn active" : "nav-btn"}>Productos</button></Link>
-                <Link to="/caja" ><button className={isActiveLink("/caja") ? "nav-btn active" : "nav-btn"}>Caja</button></Link>
-                <Link to="/reportes" ><button className={isActiveLink("/reportes") ? "nav-btn active" : "nav-btn"}>Reportes</button></Link>
-                <Link to="/users" ><button className={isActiveLink("/users") ? "nav-btn active" : "nav-btn"}>Usuarios</button></Link>
+                <Link to="/clientes" ><button className="nav-btn">Clientes</button></Link>
+                <Link to="/productos" ><button className="nav-btn">Productos</button></Link>
+                <Link to="/caja" ><button className="nav-btn">Caja</button></Link>
+                <Link to="/reportes" ><button className="nav-btn">Reportes</button></Link>
             </div>
             <div className="navbar-right">
                 {userData && (

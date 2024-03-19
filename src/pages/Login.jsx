@@ -89,10 +89,11 @@ const Login = () => {
         }} />
             <div className="login-card">
                 <center><img src={Logo} alt="Logo de la aplicación" className="logo" /></center>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} id="login-form">
                     <div className={`form-email ${emailFocused || usuario.email ? 'focused' : ''}`}>
                         <div className="input-container">
                             <input
+                                id="login-email"
                                 name="email"
                                 value={usuario.email}
                                 className="form-input"
@@ -111,6 +112,7 @@ const Login = () => {
                     <div className={`form-password ${passwordFocused || usuario.password ? 'focused' : ''}`}>
                         <div className="input-container">
                             <input
+                                id="login-password"
                                 name="password"
                                 value={usuario.password}
                                 className="form-input"
@@ -128,6 +130,7 @@ const Login = () => {
                     <div className="form-checkbox">
                         <label>
                             <input
+                                id="login-checkbox"
                                 type="checkbox"
                                 onChange={toggleMostrarPassword}
                                 checked={mostrarPassword}
@@ -136,7 +139,7 @@ const Login = () => {
                         </label>
                     </div>
                     <div className="form-buttom">
-                        <button type="submit" className="login-button" disabled={loading} style={{ position: 'relative' }}>
+                        <button id="login" type="submit" className="login-button" disabled={loading} style={{ position: 'relative' }}>
                             {loading ? (
                                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}}>
                                     <ThreeDots
