@@ -35,6 +35,7 @@ const MainProveedores = () => {
     // Funciones para filtrado (No implementado)
     const [showAlert, setShowAlert] = useState(false);
     const [searchResultsFound, setSearchResultsFound] = useState(true);
+    const [appliedFilter, setAppliedFilter] = useState(null);
 
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
@@ -130,19 +131,32 @@ const MainProveedores = () => {
     };
 
     const handleSearchClick = () => {
+        if(appliedFilter === null){
+            toast.error("Seleccione un tipo de filtro");
+            return
+        }
         if (searchQuery.length >= 4) {
             searchProveedores(searchQuery);
         } else {
-            setFilteredProveedores(productos);
+            setFilteredProveedores(proveedores);
         }
     };
 
     //Seccion donde esta la logica de la busqueda
     const searchProveedores = async (term) => {
         try {
-            const response = await api.get(
-                `/proveedores/search/${term}/page/${currentPage}`
-            );
+            let response;
+            if(appliedFilter === "RUC"){
+                const responseRUC = await api.get(
+                    `/proveedores/searchByRuc/${term}/page/${currentPage}`
+                );
+                response = responseRUC;
+            } else if(appliedFilter === "nombre"){
+                const responseNombre = await api.get(
+                    `/proveedores/search/${term}/page/${currentPage}`
+                );
+                response = responseNombre;
+            }
             const filtered = response.data.items;
             setFilteredProveedores(filtered);
             setSearchResultsFound(filtered.length > 0); // Si la longitud de 'filtered' es cero, establece 'searchResultsFound' en false
@@ -156,6 +170,10 @@ const MainProveedores = () => {
                 console.error("Error al buscar proveedores por nombre:", error);
             }
         }
+    };
+
+    const handleFilterSelector= (filtro) => {
+        setAppliedFilter(filtro);
     };
 
     // Funciones para el modal
@@ -367,16 +385,18 @@ const MainProveedores = () => {
                                     data-bs-toggle="dropdown"
                                 >
                                     <IoCheckmark />
-                                    Filtrar por...
+                                    {appliedFilter ? `Filtrado por ${appliedFilter}` : "Filtrar por..."}
                                 </button>
                                 <ul className="dropdown-menu">
                                     <li>
-                                        <a className="dropdown-item" href="#">
+                                        <a className="dropdown-item" href="#"
+                                            onClick={() => handleFilterSelector("nombre")}>
                                             Nombre
                                         </a>
                                     </li>
                                     <li>
-                                        <a className="dropdown-item" href="#">
+                                        <a className="dropdown-item" href="#"
+                                            onClick={() => handleFilterSelector("RUC")}>
                                             RUC
                                         </a>
                                     </li>
