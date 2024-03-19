@@ -31,8 +31,9 @@ const MainProveedores = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [modalMode, setModalMode] = useState("create");
 
+    const [searchQuery, setSearchQuery] = useState(""); 
+    // Funciones para filtrado (No implementado)
     const [showAlert, setShowAlert] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
     const [searchResultsFound, setSearchResultsFound] = useState(true);
 
     const [totalPages, setTotalPages] = useState(1);
@@ -133,15 +134,15 @@ const MainProveedores = () => {
     const handleNuevoProveedor = () => {
         setModalMode("create"); // Establece el modo como crear
         setProveedorDataToSend({
-          nombre: "",
-          descripcion: "",
-          codigo: "",
-          costo: "",
-          cantidad: "",
-          precio: "",
+            nombre: "",
+            descripcion: "",
+            codigo: "",
+            costo: "",
+            cantidad: "",
+            precio: "",
         });
         setShowModal(true);
-      };
+    };
 
     const handleCampoChange = (event) => {
         const { name, value } = event.target;
@@ -211,6 +212,7 @@ const MainProveedores = () => {
 
             let response;
             if (modalMode === "create") {
+                // TODO Agregar llamada de comprobacion
                 response = await api.post("/proveedores", proveedorDataToSend);
                 console.log("Proveedor creado:", response.data);
                 toast.success("Proveedor creado satisfactoriamente");
@@ -270,6 +272,7 @@ const MainProveedores = () => {
                     <div className="card-1">
                         <h2>Proveedores</h2>
                         <div className="card-body d-flex align-items-center ">
+                            <div className="TODO hacerFormFiltro"></div>
                             <form className="d-flex flex-grow-1">
                                 <input
                                     id="Btn-Buscar"
@@ -286,7 +289,7 @@ const MainProveedores = () => {
                                 />
                             </form>
 
-                            <div className="TODO hacerdropdown">
+                            <div className="TODO hacerdropdownParaFiltro">
 
                             </div>
 
