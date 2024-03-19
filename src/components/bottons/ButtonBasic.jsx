@@ -24,9 +24,9 @@ const ButtonTextContainer = styled('div')({
     marginLeft: '0.5em', // Agregar espacio entre el ícono y el texto
 });
 
-const ButtonBasic = ({ icon, color, text, onClick }) => {
+const ButtonBasic = ({ icon, color, text, onClick, ...props }) => {
     return (
-        <StyledIconButton color={color} onClick={onClick}>
+        <StyledIconButton color={color} onClick={onClick} {...props}>
             {icon}
             <ButtonTextContainer>{text}</ButtonTextContainer>
         </StyledIconButton>

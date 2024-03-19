@@ -46,7 +46,7 @@ const MainProductos = () => {
   const tipo_iva = [
     { label: "0%", value: 0 },
     { label: "5%", value: 0.05 },
-    { label: "10%", value: 0.10 },
+    { label: "10%", value: 0.1 },
   ];
   useEffect(() => {
     fetchProductos(currentPage);
@@ -87,6 +87,11 @@ const MainProductos = () => {
   };
 
   const handleFilterByPriceRange = async (minPrice, maxPrice) => {
+    // Validar que los valores no sean negativos
+    if (minPrice < 0 || maxPrice < 0) {
+      toast.error("Los valores no pueden ser negativos");
+      return;
+    }
     try {
       // Realizar búsqueda por rango de precios
       const response = await api.get(
@@ -95,6 +100,10 @@ const MainProductos = () => {
       const filtered = response.data.items;
       setFilteredProductos(filtered);
       setSearchResultsFound(filtered.length > 0);
+      // Mostrar mensaje si no hay productos en el rango especificado
+      if (filtered.length === 0) {
+        toast.error("No hay productos en el rango de precios especificado");
+      }
     } catch (error) {
       if (error.response && error.response.status === 404) {
         // Mostrar un mensaje de "Producto no encontrado" cuando el servidor devuelve un 404
@@ -104,6 +113,7 @@ const MainProductos = () => {
         // Manejar otros errores de manera similar a como lo haces actualmente
         setSearchResultsFound(true);
         console.error("Error al buscar productos por precio:", error);
+        toast.error("Error al buscar productos por precio");
       }
     }
   };
@@ -125,7 +135,6 @@ const MainProductos = () => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    // Aquí podrías realizar otras acciones relacionadas con el cambio de página, como cargar datos adicionales, etc.
   };
   const handleNuevoProducto = () => {
     setModalMode("create"); // Establece el modo como crear
@@ -155,7 +164,7 @@ const MainProductos = () => {
 
   const handleCampoChange = (event) => {
     const { name, value } = event.target;
-  
+
     // Verificar si el campo es cantidad, costo, precio o código
     if (name === "cantidad" || name === "costo" || name === "precio") {
       let formattedValue = value.replace(/\D/g, ""); // Eliminar todos los caracteres que no sean dígitos
@@ -190,8 +199,26 @@ const MainProductos = () => {
       }));
     }
   };
-  
 
+// Función para manejar el cambio en los campos de precio mínimo y máximo
+const handlePriceInputChange = (event, setter) => {
+  let value = event.target.value;
+
+  // Eliminar todos los caracteres que no sean dígitos o un punto
+  value = value.replace(/[^\d.]/g, "");
+
+  // Validar el formato del número
+  const parts = value.split(".");
+  if (parts.length > 2) {
+    // Si hay más de un punto, solo se permite uno y se elimina el resto
+    value = parts[0] + "." + parts.slice(1).join("");
+  }
+
+  // Asignar el valor al estado
+  setter(value);
+};
+
+  
   const formatNumber = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
@@ -337,22 +364,22 @@ const MainProductos = () => {
             <div className="card-body d-flex align-items-center ">
               <form className="d-flex flex-grow-1">
                 <input
-                  id="Btn-Buscar"
+                  id="input-search"
                   className="form-control mt-3 custom-input"
                   type="text"
-                  placeholder="Search"
+                  placeholder="Buscar producto en tienda..."
                   value={searchQuery}
                   onChange={handleInputChange}
                 />
                 <ButtonBasic
-                  id="Btn-Buscar"
+                  id="btn-buscar"
                   text="Buscar"
                   onClick={handleSearchClick}
                 />
               </form>
               <div className="dropdown">
                 <button
-                  id="Btn-Filtrar"
+                  id="btn-filtrar"
                   type="button"
                   className="btn btn-secundary dropdown-toggle btn-filtrar"
                   data-bs-toggle="dropdown"
@@ -372,7 +399,7 @@ const MainProductos = () => {
                         className="form-control"
                         id="minPrice"
                         value={minPrice}
-                        onChange={(e) => setMinPrice(e.target.value)}
+                        onChange={(e) => handlePriceInputChange(e, setMinPrice)}
                       />
                     </div>
 
@@ -384,11 +411,11 @@ const MainProductos = () => {
                       className="form-control"
                       id="maxPrice"
                       value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value)}
+                      onChange={(e) => handlePriceInputChange(e, setMaxPrice)}
                     />
                     <div className="d-grid">
                       <ButtonCrear
-                        id="Btn-Crear"
+                        id="btn-filtar-aplicar"
                         text="Aplicar"
                         onClick={() =>
                           handleFilterByPriceRange(
@@ -403,7 +430,7 @@ const MainProductos = () => {
               </div>
 
               <ButtonCrear
-                id="Btn-Crear"
+                id="btn-crear"
                 text="Nuevo Producto"
                 onClick={handleNuevoProducto}
                 icon={<IoAdd />}
@@ -523,8 +550,8 @@ const MainProductos = () => {
                   <span className="required">*</span>
                 </div>
                 <select
-                  id="iva_id"
-                  name="iva_id"
+                  id="iva"
+                  name="iva"
                   className="form-control form-select"
                   value={productosData.iva}
                   onChange={handleCampoChange}
@@ -542,7 +569,7 @@ const MainProductos = () => {
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
                 <ButtonCrear
-                  id="Btn-Crear"
+                  id="btn-crear"
                   text="Aceptar"
                   onClick={() => handleAceptar()}
                 />
@@ -560,7 +587,12 @@ const MainProductos = () => {
             />
           )}
           <div class="table-container">
-            {error && <ErrorPagina />}{" "}
+            {error && (
+              <ErrorPagina
+                mensaje=" ¡Ups! Parece que hubo un problema al cargar los productos. Por favor,
+                          inténtalo de nuevo más tarde."
+              />
+            )}
             {/* Muestra el componente de error si hay un error */}
             {!error &&
               filteredProductos.length === 0 &&
@@ -595,6 +627,7 @@ const MainProductos = () => {
                       <td>{formatNumber(producto.precio)}</td>
                       <td class="text-center">
                         <a
+                          id={`btn-eliminar-producto-${id}`}
                           href="#"
                           onClick={() => handleShowAlert(producto)}
                           style={{ fontSize: "1.2rem" }}
@@ -602,6 +635,7 @@ const MainProductos = () => {
                           <RiDeleteBinLine />
                         </a>
                         <a
+                          id={`btn-editar-producto-${id}`}
                           href="#"
                           onClick={() => handleEditarProducto(producto)}
                           style={{ marginLeft: "1.5em", fontSize: "1.2rem" }}

@@ -3,13 +3,20 @@ import { useForm } from "react-hook-form";
 import ButtonBasic from "../bottons/ButtonBasic";
 import LabelBase from "../labels/LabelBase";
 
-const Formulario = ({  handleCampoChange, productosData }) => {
+const Formulario = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
+  console.log(errors);
+  
+  const onSubmit = handleSubmit((data) =>{
+    console.log(data);
+  });
+
+  /*
   const onSubmit = async (data) => {
     try {
       // Llamar a la API para crear un producto
@@ -22,9 +29,10 @@ const Formulario = ({  handleCampoChange, productosData }) => {
       console.error("Error al crear el producto:", error);
       toast.error("Error al crear el producto");
     }
-  };
+  };*/
+  
   return (
-    <form className="mb-3" onSubmit={handleSubmit(onSubmit)}>
+    <form className="mb-3" onSubmit={onSubmit}>
       <div className="mb-2 block">
         <div className="label-container">
           <LabelBase label="Nombre:" htmlFor="nombre" />
@@ -35,9 +43,22 @@ const Formulario = ({  handleCampoChange, productosData }) => {
           id="nombre"
           name="nombre"
           className="form-control"
-          {...register("nombre", { required: true })}
+          {...register("nombre", {
+            required: {
+              value: true,
+              message: "Nombre requerido",
+            },
+            minLength: {
+              value: 3,
+              message: "El nombre debe tener al menos 3 caracteres",
+            },
+            maxLength: {
+              value: 20,
+              message: "El nombre debe tener al maximo 20 caracteres",
+            },
+          })}
         />
-        {errors.nombre?.type === "required" && <p>Este campo es obligatorio</p>}
+        {errors.nombre && <span>{errors.nombre.message}</span>}
       </div>
       <div className="mb-2 block">
         <div className="label-container">
@@ -49,10 +70,13 @@ const Formulario = ({  handleCampoChange, productosData }) => {
           name="descripcion"
           className="form-control"
           {...register("descripcion", {
-            required: false,
-            maxLength: 20,
+            maxLength: {
+              value: 40,
+              message: "La descripcion solo puede tener 40 caracteres",
+            },
           })}
         />
+        {errors.descripcion && <span>{errors.descripcion.message}</span>}
       </div>
       <div className="d-flex justify-content-between">
         <div className="d-flex flex-column mr-2">
@@ -66,11 +90,22 @@ const Formulario = ({  handleCampoChange, productosData }) => {
               id="codigo"
               name="codigo"
               className="form-control"
-              {...register("codigo", { required: true })}
+              {...register("codigo", {
+                required: {
+                  value: true,
+                  message: "Codigo requerido",
+                },
+                minLength: {
+                  value: 6,
+                  message: "El codigo solo debe tener 6 digitos",
+                },
+                maxLength: {
+                  value: 6,
+                  message: "El codigo solo debe tener 6 digitos",
+                },
+              })}
             />
-            {errors.codigo?.type === "required" && (
-              <p>Este campo es obligatorio</p>
-            )}
+            {errors.codigo && <span>{errors.codigo.message}</span>}
           </div>
           <div className="mb-2 block">
             <div className="label-container">
@@ -82,11 +117,18 @@ const Formulario = ({  handleCampoChange, productosData }) => {
               id="cantidad"
               name="cantidad"
               className="form-control"
-              {...register("cantidad", { required: true })}
+              {...register("cantidad", {
+                required: {
+                  value: true,
+                  message: "Cantidad requerido",
+                },
+                maxLength: {
+                  value: 999,
+                  message: "La cantidad no puede superar las 1000 unidades",
+                },
+              })}
             />
-            {errors.cantidad?.type === "required" && (
-              <p>Este campo es obligatorio</p>
-            )}
+            {errors.cantidad && <span>{errors.cantidad.message}</span>}
           </div>
         </div>
         <div className="d-flex flex-column">
@@ -100,11 +142,18 @@ const Formulario = ({  handleCampoChange, productosData }) => {
               id="costo"
               name="costo"
               className="form-control"
-              {...register("costo", { required: true })}
+              {...register("costo", {
+                required: {
+                  value: true,
+                  message: "Costo requerido",
+                },
+                minLength: {
+                  value: 1,
+                  message: "El costo no puede ser 0",
+                },
+              })}
             />
-            {errors.costo?.type === "required" && (
-              <p>Este campo es obligatorio</p>
-            )}
+            {errors.costo && <span>{errors.costo.message}</span>}
           </div>
           <div className="mb-2 block">
             <div className="label-container">
@@ -116,11 +165,18 @@ const Formulario = ({  handleCampoChange, productosData }) => {
               id="precio"
               name="precio"
               className="form-control"
-              {...register("precio", { required: true })}
+              {...register("precio", {
+                required: {
+                  value: true,
+                  message: "Precio requerido",
+                },
+                minLength: {
+                  value: 2,
+                  message: "El precio debe ser mayor al costo",
+                },
+              })}
             />
-           {errors.precio?.type === 'required' && (
-          <p>Este campo es obligatorio</p>
-        )}
+            {errors.precio && <span>{errors.precio.message}</span>}
           </div>
         </div>
       </div>
