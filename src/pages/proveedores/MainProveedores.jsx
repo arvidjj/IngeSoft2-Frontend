@@ -27,6 +27,10 @@ const MainProveedores = () => {
     const [filteredProveedores, setFilteredProveedores] = useState([]);
     const [proveedorToDelete, setProveedorToDelete] = useState(null);
 
+    const [showModal, setShowModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [modalMode, setModalMode] = useState("create");
+
     const [showAlert, setShowAlert] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResultsFound, setSearchResultsFound] = useState(true);
@@ -35,6 +39,22 @@ const MainProveedores = () => {
     const [currentPage, setCurrentPage] = useState(1);
 
     const [error, setError] = useState(false); // Estado para manejo de errores
+
+    const [proveedorData, setProveedorData] = useState({
+        nombre: "",
+        ruc: "",
+        email: "",
+        telefono: "",
+        direccion: ""
+    });
+
+    const [proveedorDataToSend, setProveedorDataToSend] = useState({
+        nombre: "",
+        ruc: "",
+        email: "",
+        telefono: "",
+        direccion: ""
+    });
 
     useEffect(() => {
         fetchProveedores(currentPage);
@@ -54,13 +74,13 @@ const MainProveedores = () => {
         }
     };
 
-    // Para el cambio de pagina por Paginacion
+    // Funciones para el cambio de pagina por Paginacion
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
         // Aquí podrías realizar otras acciones relacionadas con el cambio de página, como cargar datos adicionales, etc.
     };
 
-    // Para la alerta de borrado
+    // Funciones para la alerta de borrado
     const handleShowAlert = (proveedor) => {
         setProveedorToDelete(proveedor);
         setShowAlert(true);
@@ -72,17 +92,17 @@ const MainProveedores = () => {
 
     const handleEliminarProveedor = async () => {
         if (proveedorToDelete) {
-          try {
-            await api.delete(`/proveedores/${proveedorToDelete.id}`);
-    
-            fetchProveedores(currentPage);
-            toast.success("Proveedor eliminado satisfactoriamente");
-          } catch (error) {
-            console.error("Error al eliminar el proveedor:", error);
-            toast.error("Error al eliminar el proveedor");
-          }
+            try {
+                await api.delete(`/proveedores/${proveedorToDelete.id}`);
+
+                fetchProveedores(currentPage);
+                toast.success("Proveedor eliminado satisfactoriamente");
+            } catch (error) {
+                console.error("Error al eliminar el proveedor:", error);
+                toast.error("Error al eliminar el proveedor");
+            }
         }
-      };
+    };
 
     const handleConfirmDelete = async () => {
         if (proveedorToDelete) {
@@ -93,6 +113,122 @@ const MainProveedores = () => {
                 console.error("Error al eliminar proveedor:", error);
                 toast.error("Error al eliminar proveedor" + error);
             }
+        }
+    };
+
+    // Funciones para el modal
+    // Función para cerrar el modal
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setShowEditModal(false);
+    };
+
+    const handleEditarProveedor = (proveedor) => {
+        setModalMode("edit"); // Establece el modo como editar
+        setProveedorData(proveedor); // Establece los datos del proveedor a editar en el estado
+        setProveedorDataToSend(proveedor);
+        setShowEditModal(true);
+    };
+
+    const handleCampoChange = (event) => {
+        const { name, value } = event.target;
+        // Comprobaciones en tiempo real de ser necesarias
+        if (name === "nombre") {
+            setProveedorDataToSend((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        } else if (name === "ruc") {
+            setProveedorDataToSend((prevData) => ({
+                ...prevData,
+                [name]: value.trim(),
+            }));
+        } else if (name === "email") {
+            setProveedorDataToSend((prevData) => ({
+                ...prevData,
+                [name]: value.trim(),
+            }));
+        } else if (name === "telefono") {
+            setProveedorDataToSend((prevData) => ({
+                ...prevData,
+                [name]: value.trim(),
+            }));
+        } else if (name === "direccion") {
+            setProveedorDataToSend((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        } else {
+            // Si el campo no es uno de los anteriores, simplemente actualizar el estado con el valor ingresado
+            setProveedorDataToSend((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
+    };
+
+    const handleAceptar = async () => {
+        try {
+            setProveedorDataToSend((prevData) => ({
+                ...prevData,
+                nombre: proveedorDataToSend.nombre.trim(),
+                direccion: proveedorDataToSend.direccion.trim()
+            }));
+
+            // Validar el formato del RUC
+            const rucRegex = /^[0-9]{6,8}[A-Z]?(-[0-9])?$/;
+            if (!rucRegex.test(proveedorData.ruc)) {
+                toast.error("RUC inválido.");
+                return;
+            }
+
+            // Validar el formato del RUC
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(proveedorData.email)) {
+                toast.error("Correo electrónico inválido");
+                return;
+            }
+
+            //
+            const telefonoRegex = /^\+?[0-9]{8,}$/
+            if (!telefonoRegex.test(proveedorData.telefono)) {
+                toast.error("Número de teléfono inválido");
+                return;
+            }
+
+            let response;
+            if (modalMode === "create") {
+                response = await api.post("/productos", dataToSend);
+                console.log("Producto creado:", response.data);
+                toast.success("Producto creado satisfactoriamente");
+            } else if (modalMode === "edit") {
+                // Verificar si se realizaron cambios
+                let sonIguales = true;
+                const clavesOriginal = Object.keys(proveedorData);
+
+                // Iteramos sobre las claves de uno de los objetos
+                for (let clave of clavesOriginal) {
+                    // Verificamos si los valores de las claves son iguales en ambos objetos
+                    if (proveedorData[clave] !== proveedorDataToSend[clave]) {
+                        sonIguales = false;
+                    }
+                }
+                if (sonIguales) {
+                    toast.error("No se realizó ningún cambio en el proveedor");
+                    return
+                }
+
+                response = await api.put(`/proveedores/${proveedorDataToSend.id}`, proveedorDataToSend);
+                console.log("Proveedor editado:", response.data);
+                toast.success("Proveedor actualizado satisfactoriamente");
+            }
+
+            setShowModal(false);
+            setShowEditModal(false);
+            fetchProveedores(currentPage);
+        } catch (error) {
+            console.error("Error al procesar la solicitud:", error);
+            toast.error("Error al procesar la solicitud");
         }
     };
 
@@ -151,8 +287,95 @@ const MainProveedores = () => {
                         </div>
                     </div>
 
-                    <div className="TODO hacerModalBase">
-                    </div>
+                    <ModalBase
+                        open={showModal || showEditModal}
+                        closeModal={handleCloseModal}
+                        title={showModal ? "Crear Nuevo Proveedor" : "Editar Proveedor"}
+                    >
+                        <form className="mb-3">
+                            <div className="mb-2 block">
+                                <div className="label-container">
+                                    <LabelBase label="Nombre:" htmlFor="nombre" />
+                                    <span className="required">*</span>
+                                </div>
+                                <input
+                                    type="text"
+                                    id="nombre"
+                                    name="nombre"
+                                    className="form-control"
+                                    value={proveedorDataToSend.nombre}
+                                    onChange={handleCampoChange}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-2 block">
+                                <div className="label-container">
+                                    <LabelBase label="Ruc:" htmlFor="ruc" />
+                                    <span className="required">*</span>
+                                </div>
+                                <input
+                                    type="text"
+                                    id="ruc"
+                                    name="ruc"
+                                    className="form-control"
+                                    value={proveedorDataToSend.ruc}
+                                    onChange={handleCampoChange}
+                                    required
+                                ></input>
+                            </div>
+                            <div className="mb-2 block">
+                                <div className="label-container">
+                                    <LabelBase label="Email:" htmlFor="email" />
+                                </div>
+                                <input
+                                    type="text"
+                                    id="email"
+                                    name="email"
+                                    className="form-control"
+                                    value={proveedorDataToSend.email}
+                                    onChange={handleCampoChange}
+                                ></input>
+                            </div>
+                            <div className="mb-2 block">
+                                <div className="label-container">
+                                    <LabelBase label="Telefono:" htmlFor="telefono" />
+                                </div>
+                                <input
+                                    type="text"
+                                    id="telefono"
+                                    name="telefono"
+                                    className="form-control"
+                                    value={proveedorDataToSend.telefono}
+                                    onChange={handleCampoChange}
+                                ></input>
+                            </div>
+                            <div className="mb-2 block">
+                                <div className="label-container">
+                                    <LabelBase label="Direccion:" htmlFor="direccion" />
+                                </div>
+                                <input
+                                    type="text"
+                                    id="direccion"
+                                    name="direccion"
+                                    className="form-control"
+                                    value={proveedorDataToSend.direccion}
+                                    onChange={handleCampoChange}
+                                ></input>
+                            </div>
+
+                            <div className="campo-obligatorio">
+                                <span className="required">*</span>
+                                <span className="message">Campo obligatorio</span>
+                            </div>
+                            <div className="d-flex justify-content-center align-items-center float-end">
+                                <ButtonCrear
+                                    id="Btn-Crear"
+                                    text="Aceptar"
+                                    onClick={() => handleAceptar()}
+                                />
+                            </div>
+                        </form>
+                    </ModalBase>
 
                     {showAlert && proveedorToDelete && (
                         <CustomAlert
@@ -206,7 +429,7 @@ const MainProveedores = () => {
                                                 </a>
                                                 <a
                                                     href="#"
-                                                    onClick={() => console.log("handleEditarProducto(producto)")}
+                                                    onClick={() => handleEditarProveedor(proveedor)}
                                                     style={{ marginLeft: "1.5em", fontSize: "1.2rem" }}
                                                 >
                                                     <FiEdit2 />
