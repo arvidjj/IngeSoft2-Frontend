@@ -115,3 +115,39 @@
 .logout-options button:hover {
   background-color: #f9f9f9;
 }
+
+
+
+/* Dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #333;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content.show {
+  display: block;
+}
+
+.dropdown-content .nav-link {
+  color: rgb(149, 149, 149);
+  background-color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content .nav-link:hover {
+  background-color:  #E2E2E2;
+}
+
+
