@@ -413,6 +413,7 @@ const InfoServicios = () => {
         </div>
       </div>
       <ModalBase
+      id="ModalAgregar"
       title="Agrgar Cliente"
         open={modalOpen}
         closeModal={() => {
@@ -445,7 +446,7 @@ const InfoServicios = () => {
               <span className="required">*</span>
             </div>
             <input
-             id="fechainicio"
+             id="Agregarfechainicio"
               className="select-activity"
               type="date"
               value={fechaInicio}
@@ -460,6 +461,7 @@ const InfoServicios = () => {
               <span className="required">*</span>
             </div>
             <input
+            id="EscribirCedula"
               type="text"
               className="select"
               placeholder="Ingrese la cedula del cliente"
@@ -469,7 +471,7 @@ const InfoServicios = () => {
             {/* Buscar por CI  */}
             <ul>
               {searchCedulaResults.map((cliente) => (
-                <a className="select-activity" key={cliente.id} href="#" onClick={() => handleSelectCliente(cliente)}>
+                <a id="listarInfo" className="select-activity" key={cliente.id} href="#" onClick={() => handleSelectCliente(cliente)}>
                 {cliente.nombre} CI: {cliente.cedula}
               </a>
               ))}
@@ -497,6 +499,7 @@ const InfoServicios = () => {
 
       {/* Modal para editar suscripciones */}
       <ModalBase
+      id="ModalEditar"
       title="Editar Cliente"
         open={editingSubscription !== null}
         closeModal={() => setEditingSubscription(null)}
@@ -510,7 +513,7 @@ const InfoServicios = () => {
               </div>
               <select
                 className="select"
-                id="slecModalidad"
+                id="selecModalidad"
                 value={editingSubscription.suscripcionDto.modalidad}
                 onChange={(e) =>
                   setEditingSubscription({
@@ -604,6 +607,7 @@ const InfoServicios = () => {
     message={`¿Estás seguro de eliminar el servicio ${servicioToDelete.actividad.nombre}?`}
     confirmText="Aceptar"
     cancelText="Cancelar"
+    id="confirmacion"
     confirmAction={handleConfirmDelete}
     cancelAction={handleCancelDelete}
   />
