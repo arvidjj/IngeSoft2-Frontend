@@ -19,6 +19,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { Button } from "flowbite-react";
 import { IoAddOutline } from "react-icons/io5";
 import { IoCheckmark } from "react-icons/io5";
+import EstadoPago from "../../components/estado_pago/EstadoPago";
 
 const MainClients = () => {
   const [showAlert, setShowAlert] = useState(false);
@@ -44,6 +45,11 @@ const MainClients = () => {
   const [loadingActividades, setLoadingActividades] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
   const [actividadesPage, setActividadesPage] = useState(1);
+
+  //estado 
+  const [filtroEstado, setFiltroEstado] = useState("");
+
+
   const [clienteData, setClienteData] = useState({
     nombre: "",
     ruc: "",
@@ -93,7 +99,7 @@ const MainClients = () => {
   const fetchClientes = async () => {
     try {
       const response = await api.get(
-        `/clientes/page/${currentPage}?perPage=${itemsPerPage}`
+        `/clientes/lista/page/${currentPage}?perPage=${itemsPerPage}`
       );
       setClientes(response.data.items);
       setFilteredClientes(response.data.items);
@@ -121,14 +127,15 @@ const MainClients = () => {
     const filtered = clientes.filter((cliente) => {
       const nombre = cliente.nombre.toLowerCase();
       const email = cliente.email.toLowerCase();
-      const telefono = cliente.telefono.toLowerCase();
+      const estado = cliente.estado;
 
-      return (
-        nombre.includes(term.toLowerCase()) ||
-        email.includes(term.toLowerCase()) ||
-        telefono.includes(term.toLowerCase())
-      );
-    });
+    return (
+      (nombre.includes(term.toLowerCase()) ||
+      email.includes(term.toLowerCase()) ||
+      telefono.includes(term.toLowerCase())) &&
+      (filtroEstado === "" || estado === filtroEstado)
+    );
+  });
     setFilteredClientes(filtered);
   };
 
@@ -443,6 +450,13 @@ try {
     }
   };
 
+  //estado de filtro 
+  const handleFiltrar = (filtro) => {
+    setFiltro(filtro);
+  };
+  
+
+
   return (
     <div className="MaquetaCliente">
       <div className="cuadro-central">
@@ -454,31 +468,37 @@ try {
               placeholder="Buscar..."
               className="form-control me-2"
               value={searchTerm}
-              onChange={handleSearchChange}
+             // onChange={handleSearchChange}
             />
             <ButtonBasic text="Buscar" onClick={handleSearchChange} />
             <div className="dropdown">
-              <button
-                type="button"
-                className="btn btn-primary dropdown-toggle btn-filtrar"
-                data-bs-toggle="dropdown"
-              >
-                <IoCheckmark />
-                Filtrar por...
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Pagado
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Pendiente
-                  </a>
-                </li>
-              </ul>
-            </div>
+  <button
+    id="Btn-Filtrar"
+    type="button"
+    className="btn btn-secundary dropdown-toggle btn-filtrar"
+    data-bs-toggle="dropdown"
+    style={{ fontSize: "1.02rem" }}
+  >
+    Filtrar por estado
+  </button>
+  <ul className="dropdown-menu">
+    <li>
+      <button className="dropdown-item"  id="Btnpagado" onClick={() => handleFiltrar("PAGADO")}>
+        Pagado
+      </button>
+    </li>
+    <li>
+      <button className="dropdown-item"  id="BtnPendiente" onClick={() => handleFiltrar("PENDIENTE")}>
+        Pendiente
+      </button>
+    </li>
+    <li>
+      <button className="dropdown-item"  id="Btn-todos" onClick={() => handleFiltrar("")}>
+        Todos
+      </button>
+    </li>
+  </ul>
+</div>
             <button className="button" onClick={() => setShowModal(true)}>
               <IoAdd />
               Nuevo Cliente
@@ -521,7 +541,7 @@ try {
                   <td className="custom-table2">
                     {cliente.active ? "Activo" : "Inactivo"}
                   </td>
-                  <td className="custom-table2">Plan</td>
+                  <td className=".custom-table2"><EstadoPago estado={cliente.estado}/> </td>
                   <td className="custom-table2">{cliente.email}</td>
                   <td className="custom-table2">{cliente.telefono}</td>
                   <td className="custom-table2">
@@ -840,7 +860,6 @@ try {
           <LabelBase label={`Costo: ${total.toLocaleString()} Gs`} htmlFor="costo" />
     
 </div>
- 
           <div className="campo-obligatorio">
             <span className="required">*</span>
             <span className="message">Campo obligatorio</span>
@@ -878,16 +897,14 @@ try {
               color: "#0A3622",
             },
           },
-          error: {
+           error: {
             style: {
               background: "#FFDBD9",
               color: "#D92D20",
             },
           },
         }}
-      />
-
-      
+      />  
     </div>
   );
 };
