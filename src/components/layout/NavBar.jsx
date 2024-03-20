@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "./NavBar.css";
 import Logo from "../../assets/logo.png";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const NavBar = () => {
     const [userData, setUserData] = useState(null);
     const [showLogoutOptions, setShowLogoutOptions] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
@@ -22,11 +23,16 @@ const NavBar = () => {
         setShowLogoutOptions(!showLogoutOptions);
     };
 
+    const isActiveLink = (link) => {
+        return location.pathname === link;
+    };
+
     return (
         <nav className="navbar">
             <div className="navbar-left">
                 <button className="logo-btn"><img src={Logo} alt="Logo de la aplicación" className="logo-img" /></button>
                 <Link to="/clientes" ><button className="nav-btn">Clientes</button></Link>
+<<<<<<< HEAD
                 {/* Modificamos "Productos" para que sea un select */}
                 <select className="nav-btn" onChange={(e) => navigate(`/${e.target.value}`)}>
                     <option value="productos">Productos</option>
@@ -35,6 +41,9 @@ const NavBar = () => {
                 </select>
                 {/* Fin de la modificación */}
                 <Link to="/proveedores" ><button className="nav-btn">Proveedores</button></Link>
+=======
+                <Link to="/productos" ><button className="nav-btn">Productos</button></Link>
+>>>>>>> 5007063db172fa4ca76f35ccfa6c8da6fa671610
                 <Link to="/caja" ><button className="nav-btn">Caja</button></Link>
                 <Link to="/reportes" ><button className="nav-btn">Reportes</button></Link>
             </div>
