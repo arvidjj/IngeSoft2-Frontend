@@ -1,16 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./NavBar.css";
 import Logo from "../../assets/logo.png";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { RiArrowDropDownFill } from "react-icons/ri";
 
 const NavBar = () => {
     const [userData, setUserData] = useState(null);
     const [showLogoutOptions, setShowLogoutOptions] = useState(false);
+    const [showClientesDropdown, setShowClientesDropdown] = useState(false); //para mostrar/ocultar el Dropdown de clientes
+    const [showProveedoresDropdown, setShowProveedoresDropdown] = useState(false); // el Dropdown de proveedores
     const navigate = useNavigate();
+    const location = useLocation();
+    const dropdownClientesRef = useRef(null);
+    const dropdownProveedoresRef = useRef(null);
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
         setUserData(user);
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
     }, []);
 
     const handleLogout = () => {
@@ -22,20 +32,57 @@ const NavBar = () => {
         setShowLogoutOptions(!showLogoutOptions);
     };
 
+    const toggleClientesDropdown = () => {
+        setShowClientesDropdown(!showClientesDropdown);
+        setShowProveedoresDropdown(false); // Cierra el dropdown de proveedores al abrir el de clientes
+    };
+
+    const toggleProveedoresDropdown = () => {
+        setShowProveedoresDropdown(!showProveedoresDropdown);
+        setShowClientesDropdown(false); // Cierra el dropdown de clientes al abrir el de proveedores
+    };
+
+    const isActiveLink = (link) => {
+        return location.pathname.startsWith(link);
+    };
+
+    const closeDropdowns = () => {
+        setShowClientesDropdown(false);
+        setShowProveedoresDropdown(false);
+    };
+
+    const handleClickOutside = (event) => {
+        if (
+            dropdownClientesRef.current &&
+            !dropdownClientesRef.current.contains(event.target) &&
+            dropdownProveedoresRef.current &&
+            !dropdownProveedoresRef.current.contains(event.target)
+        ) {
+            closeDropdowns();
+        }
+    };
+
     return (
         <nav className="navbar">
             <div className="navbar-left">
-                <button className="logo-btn"><img src={Logo} alt="Logo de la aplicación" className="logo-img" /></button>
-                <Link to="/clientes" ><button className="nav-btn">Clientes</button></Link>
-                {/* Modificamos "Productos" para que sea un select */}
-                <select className="nav-btn" onChange={(e) => navigate(`/${e.target.value}`)}>
-                    <option value="productos">Productos</option>
-                    <option value="servicios">Servicios</option>
-                    <option value="tienda">Tienda</option>
-                </select>
-                {/* Fin de la modificación */}
-                <Link to="/caja" ><button className="nav-btn">Caja</button></Link>
-                <Link to="/reportes" ><button className="nav-btn">Reportes</button></Link>
+                <button className="logo-btn" onClick={closeDropdowns}><img src={Logo} alt="Logo de la aplicación" className="logo-img" /></button>
+                <div ref={dropdownClientesRef} className=".dropdown">
+                    <button onClick={toggleClientesDropdown} className={`nav-btn ${showClientesDropdown ? 'active' : ''}`}>Clientes <RiArrowDropDownFill /></button>
+                    <div className={`dropdown-content ${showClientesDropdown ? 'show' : ''}`}>
+                        <Link to="/clientes" className={`nav-link ${isActiveLink("/clientes") ? 'active' : ''}`} onClick={closeDropdowns}>Lista de clientes</Link>
+                        <Link to="/users" className={`nav-link ${isActiveLink("/users") ? 'active' : ''}`} onClick={closeDropdowns}>Lista de usuarios</Link>
+                    </div>
+                </div>
+                <div ref={dropdownProveedoresRef} className=".dropdown">
+                    <button onClick={toggleProveedoresDropdown} className={`nav-btn ${showProveedoresDropdown ? 'active' : ''}`}>Proveedores <RiArrowDropDownFill /></button>
+                    <div className={`dropdown-content ${showProveedoresDropdown ? 'show' : ''}`}>
+                        <Link to="/proveedores" className={`nav-link ${isActiveLink("/proveedores") ? 'active' : ''}`} onClick={closeDropdowns}>Lista de proveedores</Link>
+                        <Link to="/productos" className={`nav-link ${isActiveLink("/productos") ? 'active' : ''}`} onClick={closeDropdowns}>Lista de productos</Link>
+                    </div>
+                </div>
+                <Link to="/servicios" ><button className={`nav-btn ${isActiveLink("/servicios") ? 'active' : ''}`}>Servicios</button></Link>
+                <Link to="/caja" ><button className={`nav-btn ${isActiveLink("/caja") ? 'active' : ''}`}>Caja</button></Link>
+                <Link to="/reportes" ><button className={`nav-btn ${isActiveLink("/reportes") ? 'active' : ''}`}>Reportes</button></Link>
             </div>
             <div className="navbar-right">
                 {userData && (
@@ -47,7 +94,7 @@ const NavBar = () => {
                             </button>
                             {showLogoutOptions && (
                                 <div className="logout-options">
-                                    <button  onClick={handleLogout}>Cerrar sesión</button>
+                                    <button onClick={handleLogout}>Cerrar sesión</button>
                                 </div>
                             )}
                         </div>

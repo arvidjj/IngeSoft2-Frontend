@@ -19,6 +19,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { Button } from "flowbite-react";
 import { IoAddOutline } from "react-icons/io5";
 import { IoCheckmark } from "react-icons/io5";
+import EstadoPago from "../../components/estado_pago/EstadoPago";
 
 const MainClients = () => {
   const [showAlert, setShowAlert] = useState(false);
@@ -41,6 +42,13 @@ const MainClients = () => {
   const [suscripcionSuccess, setSuscripcionSuccess] = useState(false);
   const [suscripcionError, setSuscripcionError] = useState(false);
   const [total, setTotal] = useState(0);
+  const [loadingActividades, setLoadingActividades] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+  const [actividadesPage, setActividadesPage] = useState(1);
+
+  //estado 
+  const [filtroEstado, setFiltroEstado] = useState("");
+
 
   const [clienteData, setClienteData] = useState({
     nombre: "",
@@ -53,6 +61,7 @@ const MainClients = () => {
   const [clienteDataExtra, setClienteDataExtra] = useState({
     apellido: "",
   });
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4; // Define la cantidad de elementos por página
 
@@ -61,8 +70,10 @@ const MainClients = () => {
   }, [currentPage]);
 
   useEffect(() => {
-    fetchActividades();
-  }, []);
+    if (suscripcionModalOpen) {
+      fetchActividades();
+    }
+  }, [suscripcionModalOpen, actividadesPage]);
 
   useEffect(() => {
     // Concatenar el apellido al nombre al cargar el componente
@@ -88,10 +99,11 @@ const MainClients = () => {
   const fetchClientes = async () => {
     try {
       const response = await api.get(
-        `/clientes/page/${currentPage}?perPage=${itemsPerPage}`
+        `/clientes/lista/page/${currentPage}?perPage=${itemsPerPage}`
       );
       setClientes(response.data.items);
       setFilteredClientes(response.data.items);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error al obtener clientes:", error);
       toast.error("Error al actualizar cliente ");
@@ -115,14 +127,15 @@ const MainClients = () => {
     const filtered = clientes.filter((cliente) => {
       const nombre = cliente.nombre.toLowerCase();
       const email = cliente.email.toLowerCase();
-      const telefono = cliente.telefono.toLowerCase();
+      const estado = cliente.estado;
 
-      return (
-        nombre.includes(term.toLowerCase()) ||
-        email.includes(term.toLowerCase()) ||
-        telefono.includes(term.toLowerCase())
-      );
-    });
+    return (
+      (nombre.includes(term.toLowerCase()) ||
+      email.includes(term.toLowerCase()) ||
+      telefono.includes(term.toLowerCase())) &&
+      (filtroEstado === "" || estado === filtroEstado)
+    );
+  });
     setFilteredClientes(filtered);
   };
 
@@ -188,55 +201,60 @@ const MainClients = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Verificar si algún campo esta vacio
-    for (const key in clienteData) {
-      if (clienteData[key] === "") {
-        toast.error(`El campo ${key} no puede estar vacío`);
-        return;
-      }
-    }
-
-    // Verificar la validez del correo
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(clienteData.email)) {
-      toast.error("Correo electrónico inválido");
+    // Verificar si algún campo esta vacios
+  const camposObligatorios = ["nombre", "apellido", "ruc"];
+  for (const campo of camposObligatorios) {
+    if (clienteData[campo] === "") {
+      toast.error(`El campo ${campo} es obligatorio`);
       return;
     }
+  }
+// Verificar la validez del correo si se proporciona
+if (clienteData.email && clienteData.email.trim() !== "") {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(clienteData.email)) {
+    toast.error("Correo electrónico inválido");
+    return;
+  }
+}
 
-    // Verificar la longitud del numero de teléfono
-    if (clienteData.telefono.length < 8) {
-      toast.error("El número de teléfono debe tener al menos 8 dígitos");
-      return;
-    }
+// Verificar la longitud del número de teléfono si se proporciona
+if (clienteData.telefono && clienteData.telefono.trim() !== "") {
+  if (clienteData.telefono.length < 8) {
+    toast.error("El número de teléfono debe tener al menos 8 dígitos");
+    return;
+  }
+}
 
-    setLoading(true);
+setLoading(true);
 
-    // Concatenar el apellido al nombre completo antes de enviar los datos
-    const nombreCompleto = `${clienteData.nombre} ${clienteDataExtra.apellido}`;
-    const datosCliente = { ...clienteData, nombre: nombreCompleto };
+// Concatenar el apellido al nombre completo antes de enviar los datos
+const nombreCompleto = `${clienteData.nombre} ${clienteDataExtra.apellido}`;
+const datosCliente = { ...clienteData, nombre: nombreCompleto };
 
-    try {
-      const response = await api.post(`/clientes`, datosCliente);
-      console.log("Cliente agregado:", response.data);
-      toast.success("Cliente guardado exitosamente");
-      fetchClientes();
-      setClienteDataExtra({ apellido: "" });
-      setClienteData({
-        nombre: "",
-        ruc: "",
-        cedula: "",
-        telefono: "",
-        email: "",
-        direccion: "",
-      });
-      setShowModal(false);
-    } catch (error) {
-      console.error("Error al registrar cliente:", error);
-      toast.error("Error al registrar cliente");
-    } finally {
-      setLoading(false);
-    }
-  };
+try {
+  const response = await api.post(`/clientes`, datosCliente);
+  console.log("Cliente agregado:", response.data);
+  toast.success("Cliente guardado exitosamente");
+  fetchClientes();
+  setClienteDataExtra({ apellido: "" });
+  setClienteData({
+    nombre: "",
+    apellido: "",
+    ruc: "",
+    cedula: "",
+    telefono: "",
+    email: "",
+    direccion: "",
+  });
+  setShowModal(false);
+} catch (error) {
+  console.error("Error al registrar cliente:", error);
+  toast.error("Error al registrar cliente");
+} finally {
+  setLoading(false);
+}
+};
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -296,6 +314,7 @@ const MainClients = () => {
       // Vuelve a cargar la lista de clientes despues de eliminar uno
       toast.success("El cliente se elimino con exito");
       fetchClientes();
+      
     } catch (error) {
       console.error("Error al eliminar cliente:", error);
       toast.error("Error al eliminar cliente");
@@ -311,9 +330,7 @@ const MainClients = () => {
 
   const fetchActividades = async () => {
     try {
-      const response = await api.get(
-        "http://localhost:8080/actividades/page/1"
-      );
+      const response = await api.get(`actividades/page/${actividadesPage}`);
       const actividadesData = response.data.items.map((actividad) => ({
         id: actividad.id,
         nombre: actividad.nombre,
@@ -322,14 +339,17 @@ const MainClients = () => {
       }));
       setActividades(actividadesData);
     } catch (error) {
-      console.error("Error al obtener actividades:", error);
-      toast.error("Error al obtener actividades");
+      console.error("No hay actividades en la lista", error);
+      toast.error("No hay actividades en la lista");
     }
   };
 
   const handleSuscripcionModalOpen = (client) => {
     setSelectedClienteId(client);
     setSuscripcionModalOpen(true);
+    
+    setLoadingActividades(true);
+    fetchActividades(); //actualizar actividades 
   };
 
   const handleSuscripcionModalClose = () => {
@@ -430,6 +450,13 @@ const MainClients = () => {
     }
   };
 
+  //estado de filtro 
+  const handleFiltrar = (filtro) => {
+    setFiltro(filtro);
+  };
+  
+
+
   return (
     <div className="MaquetaCliente">
       <div className="cuadro-central">
@@ -441,31 +468,37 @@ const MainClients = () => {
               placeholder="Buscar..."
               className="form-control me-2"
               value={searchTerm}
-              onChange={handleSearchChange}
+             // onChange={handleSearchChange}
             />
             <ButtonBasic text="Buscar" onClick={handleSearchChange} />
             <div className="dropdown">
-              <button
-                type="button"
-                className="btn btn-primary dropdown-toggle btn-filtrar"
-                data-bs-toggle="dropdown"
-              >
-                <IoCheckmark />
-                Filtrar por...
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Pagado
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Pendiente
-                  </a>
-                </li>
-              </ul>
-            </div>
+  <button
+    id="Btn-Filtrar"
+    type="button"
+    className="btn btn-secundary dropdown-toggle btn-filtrar"
+    data-bs-toggle="dropdown"
+    style={{ fontSize: "1.02rem" }}
+  >
+    Filtrar por estado
+  </button>
+  <ul className="dropdown-menu">
+    <li>
+      <button className="dropdown-item"  id="Btnpagado" onClick={() => handleFiltrar("PAGADO")}>
+        Pagado
+      </button>
+    </li>
+    <li>
+      <button className="dropdown-item"  id="BtnPendiente" onClick={() => handleFiltrar("PENDIENTE")}>
+        Pendiente
+      </button>
+    </li>
+    <li>
+      <button className="dropdown-item"  id="Btn-todos" onClick={() => handleFiltrar("")}>
+        Todos
+      </button>
+    </li>
+  </ul>
+</div>
             <button className="button" onClick={() => setShowModal(true)}>
               <IoAdd />
               Nuevo Cliente
@@ -478,8 +511,8 @@ const MainClients = () => {
             <thead>
               <tr>
                 <th scope="col">Nombre</th>
-                <th scope="col">
-                  Estado <TbArrowDown />
+                <th scope="col" >
+                   Estado <TbArrowDown />
                 </th>
                 <th scope="col">
                   Plan <GoQuestion />
@@ -497,6 +530,7 @@ const MainClients = () => {
                       <PiUserCircleLight
                         style={{
                           padding: "0px",
+                          id:"clienteinfo",
                           fontSize: "25px",
                           background: "#eaecf000",
                         }}
@@ -504,10 +538,10 @@ const MainClients = () => {
                       {cliente.nombre}
                     </Link>
                   </td>
-                  <td className=".custom-table2">
+                  <td className="custom-table2">
                     {cliente.active ? "Activo" : "Inactivo"}
                   </td>
-                  <td className=".custom-table2">Plan</td>
+                  <td className=".custom-table2"><EstadoPago estado={cliente.estado}/> </td>
                   <td className="custom-table2">{cliente.email}</td>
                   <td className="custom-table2">{cliente.telefono}</td>
                   <td className="custom-table2">
@@ -529,14 +563,15 @@ const MainClients = () => {
             </tbody>
           </table>
         </div>
-        <div className="d-flex justify-content-center mt-4">
-          <Pagination
-            count={Math.ceil(filteredClientes.length / itemsPerPage)}
-            page={currentPage <= 2 ? currentPage : 1}
-            onChange={(event, value) => setCurrentPage(value)}
-            shape="rounded"
-            color="secondary"
-          />
+        
+        <div className="pagination-container">
+            <Pagination
+              count={totalPages}
+              shape="rounded"
+              color="secondary"
+              onChange={(event, page) => setCurrentPage(page)}
+            />
+          
         </div>
       </div>
       {/* Modal para registrar nuevo cliente */}
@@ -645,7 +680,7 @@ const MainClients = () => {
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Guardar" onClick={handleSubmit}>
+                <ButtonBasic  id="guardarCliente" text="Guardar" onClick={handleSubmit}>
                   {loading ? "Cargando..." : "Agregar Cliente"}
                 </ButtonBasic>
               </div>
@@ -732,7 +767,7 @@ const MainClients = () => {
                 />
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Guardar" onClick={handleGuardarCambios}>
+                <ButtonBasic text="Guardar" ButtonBasic  id="guardarClienteCambios" onClick={handleGuardarCambios}>
                   {loading ? "Cargando..." : "Guardar Cambios"}
                 </ButtonBasic>
               </div>
@@ -762,6 +797,7 @@ const MainClients = () => {
             <select
               className="select"
               value={modalidad}
+              id="modalidad"
               onChange={(e) => setModalidad(e.target.value)}
             >
               <option value="MENSUAL">Mensual</option>
@@ -777,6 +813,7 @@ const MainClients = () => {
             <input
               className="select-activity"
               type="date"
+              id="fecha"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
             />
@@ -789,6 +826,7 @@ const MainClients = () => {
             <select
               className="select"
               value=""
+              id="actividades"
               onChange={(e) => handleAddSelectedActivity(e.target.value)}
             >
               <option value="" disabled hidden>
@@ -806,6 +844,7 @@ const MainClients = () => {
                   {activity.nombre}{" "}
                   <button
                     className="button-activity"
+                    id="eliminarActividad"
                     onClick={() => handleRemoveSelectedActivity(activity)}
                   >
                     <IoClose />
@@ -817,10 +856,10 @@ const MainClients = () => {
           </div>
           
           <div className="d-flex">
-  <LabelBase label={`Costo: ${total}`} htmlFor="costo" />
+            {/*Para manejar el costo mostrar 50.000 o 390.000 */}
+          <LabelBase label={`Costo: ${total.toLocaleString()} Gs`} htmlFor="costo" />
+    
 </div>
-
-   
           <div className="campo-obligatorio">
             <span className="required">*</span>
             <span className="message">Campo obligatorio</span>
@@ -830,6 +869,7 @@ const MainClients = () => {
             <ButtonBasic
               text="Guardar"
               type="submit"
+              id="guardarSuscripcion"
               onClick={handleSubmitSuscripcion}
             >
               {loading ? "Cargando..." : "Guardar Cambios"}
@@ -857,18 +897,14 @@ const MainClients = () => {
               color: "#0A3622",
             },
           },
-          error: {
+           error: {
             style: {
               background: "#FFDBD9",
               color: "#D92D20",
             },
           },
         }}
-      />
-
-      <div className="d-flex justify-content-center mt-4">
-        <div className="pagination-container"></div>
-      </div>
+      />  
     </div>
   );
 };
