@@ -4,15 +4,12 @@ import "./MainProveedores.css";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FiEdit2 } from "react-icons/fi";
 import { IoAdd } from "react-icons/io5";
-import { TbArrowDown } from "react-icons/tb";
-import { GoQuestion } from "react-icons/go";
 
 import ButtonBasic from "../../components/bottons/ButtonBasic";
 import ButtonCrear from "../../components/bottons/ButtonCrear";
 import ModalBase from "../../components/modals/ModalBase";
 import LabelBase from "../../components/labels/LabelBase";
 import CustomAlert from "../../components/alert/CustomAlert";
-import StockIndicator from "../../components/ManejoStock/StockIndicator";
 import { IoCheckmark } from "react-icons/io5";
 import api from "../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
