@@ -179,3 +179,36 @@
   margin-left: 5px;
 }
 
+.select{
+  border: 0.5px solid rgba(0, 0, 0, 0.537);
+  border-radius: 3px;
+  padding: 3px;
+  margin: 4px;
+  position: relative;
+  height: 30px;
+  width: 100%;
+  
+  }
+
+  .select-activity {
+    border: 0.5px solid rgba(43, 38, 38, 0.434);
+    border-radius: 3px;
+    padding: 3px;
+    margin: 4px;
+    position: relative;
+    height: 30px;
+    width: 100%; /* Cambia el ancho al 100% */
+    color: #1a181dbb;
+  }
+  
+  /* Agrega estilos para los elementos <a> dentro del <ul> */
+  ul {
+    list-style: none; /* Elimina los puntos de la lista */
+    padding: 0; /* Elimina el padding por defecto */
+  }
+  
+  a.select-activity {
+    display: block; /* Hace que los elementos <a> sean bloques */
+    margin-bottom: 5px; /* Espacio entre los elementos <a> */
+  }
+  

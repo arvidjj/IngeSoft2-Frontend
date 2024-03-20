@@ -39,11 +39,19 @@ const InfoServicios = () => {
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [servicioToDelete, setServicioToDelete] = useState(null);
-  
+  const [searchCedulaTerm, setSearchCedulaTerm] = useState("");
+  const [searchCedulaResults, setSearchCedulaResults] = useState([]);
+
   useEffect(() => {
-    fetchClientes();
     fetchSuscripciones(id, currentPage);
   }, [id, currentPage]);
+
+  useEffect(() => {
+    if (modalOpen) {
+      fetchClientes();
+    }
+  }, [modalOpen]);
+  
 
   useEffect(() => {
     const fetchActividadNombre = async () => {
@@ -68,10 +76,16 @@ const InfoServicios = () => {
     }
   };
 
-  const fetchClientes = async () => {
+  const fetchClientes = async (page = 1, allClientes = []) => {
     try {
-      const response = await api.get("/clientes/page/1");
-      setClientes(response.data.items);
+      const response = await api.get(`/clientes/page/${page}`);
+      const clientesData = response.data.items;
+      const updatedClientes = [...allClientes, ...clientesData];
+      setClientes(updatedClientes);
+      if (response.data.hasNextPage) {
+        // Si existe mas paginas llama a las que faltan 
+        fetchClientes(page + 1, updatedClientes);
+      }
     } catch (error) {
       console.error("Error al obtener los clientes:", error);
     }
@@ -104,18 +118,6 @@ const InfoServicios = () => {
     setSuscripciones(filtered);
   };
 
-  const handleSearchChange = (event) => {
-    const term = event.target.value;
-    setSearchTerm(term);
-  
-    if (term.length >= 4) {
-      searchServicios(term);
-      setCurrentPage(1);
-    } else {
-      fetchSuscripciones(id, currentPage); 
-    }
-  };
-
   const handleSubmitSuscripcion = async (event) => {
     event.preventDefault();
   
@@ -124,9 +126,14 @@ const InfoServicios = () => {
       return;
     }
 
+    if (!selectedCliente) {
+      toast.error("Falta llenar campos. Ingresa un cliente.");
+      return;
+    }
+
     try {
       const suscripcionData = {
-        clienteId: selectedCliente,
+        clienteId: selectedCliente.id,
         actividadId: id,
         modalidad: modalidad,
         estado: "PENDIENTE",
@@ -225,9 +232,52 @@ const InfoServicios = () => {
       }
     }
   };
-  
-  
 
+  // manejar la cedula del cliente
+  const searchByCedula = () => {
+    const filtered = clientes.filter((cliente) =>
+      cliente.cedula.toLowerCase().includes(searchCedulaTerm.toLowerCase())
+    );
+    setSearchCedulaResults(filtered);
+  };
+  const handleSearchCedulaChange = (event) => {
+    const term = event.target.value;
+    setSearchCedulaTerm(term);
+
+    // buscar si mayor o igual a 3 caracteres
+    if (term.length >= 3) {
+      searchByCedula();
+    } else {
+      setSearchCedulaResults([]);
+    }
+  };
+
+  const handleSelectCliente = (clientId) => {
+    setSelectedCliente(clientId);
+    setSearchCedulaTerm(""); 
+    setSearchCedulaResults([]); 
+  };
+  //buscador mejorado 
+  const handleInputChange = (event) => {
+    const term = event.target.value;
+    setSearchTerm(term);
+  
+    if (term === "") {
+      // Si el input de búsqueda está vacío, vuelve a la primera página
+      setCurrentPage(1);
+      fetchSuscripciones(id, 1);
+    }
+  };
+  
+  const handleSearchChange = () => {
+    console.log(searchTerm);
+    if (searchTerm.length >= 4) {
+      searchServicios(searchTerm); // Usa searchTerm en lugar de term
+    } else {
+      fetchSuscripciones(id, currentPage); 
+    }
+  };
+  
   return ( 
     <div className="MaquetaCliente">
       <Toaster
@@ -259,18 +309,23 @@ const InfoServicios = () => {
             </div>
             <div className="card-body d-flex align-items-center ">
               <form className="d-flex flex-grow-1">
-                <input
+              <input
                   id="Btn-Buscar"
                   className="form-control mt-3 custom-input"
                   type="text"
-                  placeholder="Buscar ..."
+                  placeholder="Search"
                   value={searchTerm}
-                  onChange={handleSearchChange}
+                  onChange={handleInputChange}
                 />
-                <ButtonBasic
-                  id="Btn-Buscar"
-                  text="Buscar"
-                />
+             
+
+<ButtonBasic
+  id="Btn-Buscar"
+  text="Buscar"
+  onClick={handleSearchChange} // Mantén el onClick para llamar a la función handleSearchChange
+/>
+  
+  
               </form>
               <div className="dropdown">
                 <button
@@ -358,8 +413,15 @@ const InfoServicios = () => {
         </div>
       </div>
       <ModalBase
+      title="Agrgar Cliente"
         open={modalOpen}
-        closeModal={() => setModalOpen(false)}      
+        closeModal={() => {
+          setModalOpen(false); 
+          // Limpiar los campos 
+          setSelectedCliente("");
+          setModalidad("MENSUAL");
+          setFechaInicio("");
+        }}     
       >
         <form onSubmit={handleSubmitSuscripcion}>
           <div>
@@ -390,27 +452,32 @@ const InfoServicios = () => {
               onChange={(e) => setFechaInicio(e.target.value)}
             />
           </div>
+
+
           <div>
             <div className="label-container">
               <LabelBase label="Seleccione un cliente:" htmlFor="clientes" />
               <span className="required">*</span>
             </div>
-            <select
-             id="selectCliente"
+            <input
+              type="text"
               className="select"
-              value={selectedCliente}
-              onChange={(e) => setSelectedCliente(e.target.value)}
-            >
-              <option value="" disabled>
-                Seleccione un cliente
-              </option>
-              {clientes.map((cliente) => (
-                <option key={cliente.id} value={cliente.id}>
-                  {cliente.nombre}
-                </option>
+              placeholder="Ingrese la cedula del cliente"
+              value={searchCedulaTerm}
+              onChange={handleSearchCedulaChange}
+            />
+            {/* Buscar por CI  */}
+            <ul>
+              {searchCedulaResults.map((cliente) => (
+                <a className="select-activity" key={cliente.id} href="#" onClick={() => handleSelectCliente(cliente)}>
+                {cliente.nombre} CI: {cliente.cedula}
+              </a>
               ))}
-            </select>
+            </ul>
           </div>
+          {selectedCliente && (
+    <p>Seleccionado: {selectedCliente.nombre} CI: {selectedCliente.cedula}</p>
+  )}
           <div className="campo-obligatorio">
             <span className="required">*</span>
             <span className="message">Campo obligatorio</span>
@@ -430,6 +497,7 @@ const InfoServicios = () => {
 
       {/* Modal para editar suscripciones */}
       <ModalBase
+      title="Editar Cliente"
         open={editingSubscription !== null}
         closeModal={() => setEditingSubscription(null)}
       >
