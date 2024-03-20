@@ -361,7 +361,7 @@ const MainProveedores = () => {
                         <div className="card-body d-flex align-items-center ">
                             <form className="d-flex flex-grow-1">
                                 <input
-                                    id="input-buscar"
+                                    id="input-search"
                                     className="form-control mt-3 custom-input"
                                     type="text"
                                     placeholder="Buscar..."
@@ -369,7 +369,7 @@ const MainProveedores = () => {
                                     onChange={handleInputChange}
                                 />
                                 <ButtonBasic
-                                    id="botton-buscar"
+                                    id="btn-buscar"
                                     text="Buscar"
                                     onClick={handleSearchClick}
                                 />
@@ -377,7 +377,7 @@ const MainProveedores = () => {
 
                             <div className="dropdown">
                                 <button
-                                    id="desplegable-filtro"
+                                    id="btn-filtrar"
                                     type="button"
                                     className="btn btn-primary dropdown-toggle btn-filtrar"
                                     data-bs-toggle="dropdown"
@@ -388,14 +388,14 @@ const MainProveedores = () => {
                                 <ul className="dropdown-menu">
                                     <li>
                                         <a className="dropdown-item" href="#"
-                                            id="filtro-opcion-nombre"
+                                            id="nombre-filtro"
                                             onClick={() => handleFilterSelector("nombre")}>
                                             Nombre
                                         </a>
                                     </li>
                                     <li>
                                         <a className="dropdown-item" href="#"
-                                            id="filtro-opcion-ruc"
+                                            id="ruc-filtro"
                                             onClick={() => handleFilterSelector("RUC")}>
                                             RUC
                                         </a>
@@ -404,7 +404,7 @@ const MainProveedores = () => {
                             </div>
 
                             <ButtonCrear
-                                id="botton-crear"
+                                id="btn-crear"
                                 text="Nuevo Proveedor"
                                 onClick={handleNuevoProveedor}
                                 icon={<IoAdd />}
@@ -426,7 +426,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="campo-nombre"
+                                    id="nombre"
                                     name="nombre"
                                     className="form-control"
                                     value={proveedorDataToSend.nombre}
@@ -441,7 +441,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="campo-ruc"
+                                    id="ruc"
                                     name="ruc"
                                     className="form-control"
                                     value={proveedorDataToSend.ruc}
@@ -456,7 +456,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="campo-email"
+                                    id="email"
                                     name="email"
                                     className="form-control"
                                     value={proveedorDataToSend.email}
@@ -470,7 +470,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="campo-telefono"
+                                    id="telefono"
                                     name="telefono"
                                     className="form-control"
                                     value={proveedorDataToSend.telefono}
@@ -484,7 +484,7 @@ const MainProveedores = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    id="campo-direccion"
+                                    id="direccion"
                                     name="direccion"
                                     className="form-control"
                                     value={proveedorDataToSend.direccion}
@@ -498,7 +498,7 @@ const MainProveedores = () => {
                             </div>
                             <div className="d-flex justify-content-center align-items-center float-end">
                                 <ButtonCrear
-                                    id="botton-modal-aceptar"
+                                    id="btn-guardar"
                                     text="Aceptar"
                                     onClick={() => handleAceptar()}
                                 />
@@ -552,7 +552,7 @@ const MainProveedores = () => {
                                             <td class="text-center">
                                                 <a
                                                     href="#"
-                                                    id={`botton-borrar-proveedor-${proveedor.id}`}
+                                                    id={`btn-eliminar-proveedor-${proveedor.id}`}
                                                     onClick={() => handleShowAlert(proveedor)}
                                                     style={{ fontSize: "1.2rem" }}
                                                 >
@@ -560,7 +560,7 @@ const MainProveedores = () => {
                                                 </a>
                                                 <a
                                                     href="#"
-                                                    id={`botton-editar-proveedor-${proveedor.id}`}
+                                                    id={`btn-editar-proveedor-${proveedor.id}`}
                                                     onClick={() => handleEditarProveedor(proveedor)}
                                                     style={{ marginLeft: "1.5em", fontSize: "1.2rem" }}
                                                 >
