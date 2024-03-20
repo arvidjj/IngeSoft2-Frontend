@@ -119,7 +119,7 @@ const MainProductos = () => {
   };
 
   const handleSearchClick = () => {
-      searchProductos(searchQuery);
+    searchProductos(searchQuery);
   };
 
   const handleInputChange = (event) => {
@@ -200,25 +200,24 @@ const MainProductos = () => {
     }
   };
 
-// Función para manejar el cambio en los campos de precio mínimo y máximo
-const handlePriceInputChange = (event, setter) => {
-  let value = event.target.value;
+  // Función para manejar el cambio en los campos de precio mínimo y máximo
+  const handlePriceInputChange = (event, setter) => {
+    let value = event.target.value;
 
-  // Eliminar todos los caracteres que no sean dígitos o un punto
-  value = value.replace(/[^\d.]/g, "");
+    // Eliminar todos los caracteres que no sean dígitos o un punto
+    value = value.replace(/[^\d.]/g, "");
 
-  // Validar el formato del número
-  const parts = value.split(".");
-  if (parts.length > 2) {
-    // Si hay más de un punto, solo se permite uno y se elimina el resto
-    value = parts[0] + "." + parts.slice(1).join("");
-  }
+    // Validar el formato del número
+    const parts = value.split(".");
+    if (parts.length > 2) {
+      // Si hay más de un punto, solo se permite uno y se elimina el resto
+      value = parts[0] + "." + parts.slice(1).join("");
+    }
 
-  // Asignar el valor al estado
-  setter(value);
-};
+    // Asignar el valor al estado
+    setter(value);
+  };
 
-  
   const formatNumber = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
@@ -228,11 +227,12 @@ const handlePriceInputChange = (event, setter) => {
       // Eliminar los puntos de los valores formateados antes de enviarlos al servidor
       const dataToSend = {
         ...productosData,
-        cantidad: parseFloat(productosData.cantidad.toString().replace(/\./g, "")),
+        cantidad: parseFloat(
+          productosData.cantidad.toString().replace(/\./g, "")
+        ),
         costo: parseFloat(productosData.costo.toString().replace(/\./g, "")),
         precio: parseFloat(productosData.precio.toString().replace(/\./g, "")),
       };
-      
 
       // Validar el campo código para asegurarse de que tenga al menos 6 caracteres y solo números enteros
       if (modalMode === "create") {
@@ -309,7 +309,6 @@ const handlePriceInputChange = (event, setter) => {
         fetchProductos(currentPage);
         toast.success("Producto eliminado satisfactoriamente");
       } catch (error) {
-        
         toast.error("Error al eliminar el producto");
       }
     }
@@ -321,7 +320,6 @@ const handlePriceInputChange = (event, setter) => {
         await handleEliminarProducto();
         setShowAlert(false);
       } catch (error) {
-        
         toast.error("Error al eliminar producto" + error);
       }
     }
@@ -489,6 +487,7 @@ const handlePriceInputChange = (event, setter) => {
                       id="codigo"
                       name="codigo"
                       className="form-control custom-input"
+                      style={{ width: "100%" }}
                       value={productosData.codigo}
                       onChange={handleCampoChange}
                       required
@@ -504,6 +503,7 @@ const handlePriceInputChange = (event, setter) => {
                       id="cantidad"
                       name="cantidad"
                       className="form-control custom-input"
+                      style={{ width: "100%" }}
                       value={productosData.cantidad}
                       onChange={handleCampoChange}
                       required
@@ -521,6 +521,7 @@ const handlePriceInputChange = (event, setter) => {
                       id="costo"
                       name="costo"
                       className="form-control custom-input"
+                      style={{ width: "100%" }}
                       value={productosData.costo}
                       onChange={handleCampoChange}
                       required
@@ -536,6 +537,7 @@ const handlePriceInputChange = (event, setter) => {
                       id="precio"
                       name="precio"
                       className="form-control custom-input"
+                      style={{ width: "100%" }}
                       value={productosData.precio}
                       onChange={handleCampoChange}
                       required
@@ -568,6 +570,7 @@ const handlePriceInputChange = (event, setter) => {
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
+              <button type="button"  id = "btn-cancelar" className="btn-cancelar" onClick={handleCloseModal}>Cancelar</button>
                 <ButtonCrear
                   id="btn-guardar"
                   text="Aceptar"
@@ -599,6 +602,9 @@ const handlePriceInputChange = (event, setter) => {
               !searchResultsFound && (
                 <ElementoNoEncontrado mensaje="¡Producto no encontrado!" />
               )}
+            {!error && filteredProductos.length === 0 && searchResultsFound && (
+              <ElementoNoEncontrado mensaje="Todavia no hay productos cargados" />
+            )}
             {!error && filteredProductos.length > 0 && (
               <table className="custom-table">
                 <thead>
