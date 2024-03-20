@@ -9,6 +9,7 @@ import MainUsers from "./pages/users/mainUsers";
 import Login from "./pages/Login";
 import MainProductos  from './pages/productos/MainProductos';
 import Servicios from './pages/servicios/MainServicios';
+import MainProveedores from './pages/proveedores/MainProveedores';
 createRoot(document.getElementById("root")).render(
     <React.StrictMode>
       <Router>
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/clientesinfo/:id" element={<Layout><InfoClients /></Layout>} />
           <Route path="/productos" element={<Layout><MainProductos /></Layout>} />
           <Route path="/servicios" element={<Layout><Servicios /></Layout>} />
+          <Route path="/proveedores" element={<Layout><MainProveedores /></Layout>} />
           <Route path="*" element={<Layout><PageNotFound /></Layout>} />
         </Routes>
       </Router>
