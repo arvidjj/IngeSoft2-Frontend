@@ -5,6 +5,7 @@ import InfoClients from "./pages/clients/InfoClients";
 import PageNotFound from "./pages/PageNotFound";
 import Layout from "./components/layout/Layout";
 import MainClients from "./pages/clients/mainClients";
+import MainUsers from "./pages/users/mainUsers"; 
 import Login from "./pages/Login";
 import MainProductos  from './pages/productos/MainProductos';
 import Servicios from './pages/servicios/MainServicios';
@@ -14,6 +15,7 @@ createRoot(document.getElementById("root")).render(
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/clientes" element={<Layout><MainClients /></Layout>} />
+          <Route path="/users" element={<Layout><MainUsers /></Layout>} />
           <Route path="/clientesinfo/:id" element={<Layout><InfoClients /></Layout>} />
           <Route path="/productos" element={<Layout><MainProductos /></Layout>} />
           <Route path="/servicios" element={<Layout><Servicios /></Layout>} />

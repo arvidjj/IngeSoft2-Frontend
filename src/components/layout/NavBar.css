@@ -64,6 +64,9 @@
   display: inline-block;
   margin-right: 15px; /* Ajusta el margen a la derecha */
 }
+.active {
+  border-bottom: 5px solid #6941C6;
+}
 
 .icono-usuario {
   width: 40px;
