@@ -38,10 +38,11 @@
 .custom-table {
   width: 98%;
   text-align: center;
+  
 }
 
 .custom-table td {
-  padding: 25px;
+  padding: 45px;
   padding-left: 30px;
   color: #667085;
   font-size: 14px;
@@ -100,7 +101,11 @@
   font-size: 16px;
   color: #333; /* Color del texto */
 }
-
+.btn-cancelar{
+  color:#7749F8 ;
+  border: none;
+  background-color: #FFFFFF;
+}
 /* Media queries para pantallas más pequeñas */
 @media screen and (max-width: 900px) {
  
