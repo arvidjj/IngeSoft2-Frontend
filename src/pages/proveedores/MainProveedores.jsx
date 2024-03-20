@@ -32,7 +32,7 @@ const MainProveedores = () => {
     // Funciones para filtrado (No implementado)
     const [showAlert, setShowAlert] = useState(false);
     const [searchResultsFound, setSearchResultsFound] = useState(true);
-    const [appliedFilter, setAppliedFilter] = useState(null);
+    const [appliedFilter, setAppliedFilter] = useState("nombre");
 
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
@@ -123,7 +123,7 @@ const MainProveedores = () => {
         if (newSearchQuery === "") {
             // Si el input de búsqueda está vacío, vuelve a la primera página
             setCurrentPage(1);
-            setFilteredProveedores(productos);
+            setFilteredProveedores(proveedores);
         }
     };
 
