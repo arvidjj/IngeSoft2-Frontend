@@ -36,7 +36,7 @@
 ## Como poner IDs a los elementos
 - Inputs: input-<nombre> ej: input-search
 - Botones: btn-<nombre>
-  - Botones dentro de tablas o listas: btn-<nombre>-<elemento>-<id> ej: btn-editar-elemento-5
-  - Botones dentro de listas plegables: btn-<seccion>-<nombre> ej: btn-filtrar-stock+
+  - Botones dentro de tablas o listas: btn-**nombre**-**elemento**-**id** ej: btn-editar-elemento-5
+  - Botones dentro de listas plegables: btn-**seccion**-**nombre** ej: btn-filtrar-stock+
 
 ### Otros elementos que quieran ponerle ID y no estén en la lista, ponerse de acuerdo con el equipo de FrontEnd para mantener el orden. Para mayor orden

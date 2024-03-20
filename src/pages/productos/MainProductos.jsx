@@ -11,7 +11,7 @@ import ButtonCrear from "../../components/bottons/ButtonCrear";
 import ModalBase from "../../components/modals/ModalBase";
 import LabelBase from "../../components/labels/LabelBase";
 import CustomAlert from "../../components/alert/CustomAlert";
-import StockIndicator from "../../components/ManejoStock/StockIndicator";
+import StockIndicator from "../../components/ManejoStock/StockIndicador";
 import { IoCheckmark } from "react-icons/io5";
 import api from "../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
