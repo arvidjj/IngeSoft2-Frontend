@@ -49,6 +49,7 @@ const MainClients = () => {
   //estado 
   const [filtroEstado, setFiltroEstado] = useState("");
 
+
   const [clienteData, setClienteData] = useState({
     nombre: "",
     ruc: "",
@@ -858,7 +859,7 @@ try {
             {/*Para manejar el costo mostrar 50.000 o 390.000 */}
           <LabelBase label={`Costo: ${total.toLocaleString()} Gs`} htmlFor="costo" />
     
-</div> 
+</div>
           <div className="campo-obligatorio">
             <span className="required">*</span>
             <span className="message">Campo obligatorio</span>
@@ -896,7 +897,7 @@ try {
               color: "#0A3622",
             },
           },
-          error: {
+           error: {
             style: {
               background: "#FFDBD9",
               color: "#D92D20",

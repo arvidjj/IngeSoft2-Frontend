@@ -128,8 +128,9 @@
 }
 
 .custom-table td {
-  padding: 8px;
-  padding-left: 30px;
+  padding: 1%; 
+  margin: auto;
+  padding: auto;
   color: #667085;
   font-size: 14px;
 }
