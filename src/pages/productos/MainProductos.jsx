@@ -569,7 +569,7 @@ const handlePriceInputChange = (event, setter) => {
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
                 <ButtonCrear
-                  id="btn-crear"
+                  id="btn-guardar"
                   text="Aceptar"
                   onClick={() => handleAceptar()}
                 />
