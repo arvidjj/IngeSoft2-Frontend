@@ -383,7 +383,7 @@ const MainProveedores = () => {
                                     data-bs-toggle="dropdown"
                                 >
                                     <IoCheckmark />
-                                    {appliedFilter ? `Filtrado por ${appliedFilter}` : "Filtrar por..."}
+                                    {appliedFilter ? `Filtrar por ${appliedFilter}` : "Filtrar por..."}
                                 </button>
                                 <ul className="dropdown-menu">
                                     <li>
