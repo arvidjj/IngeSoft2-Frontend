@@ -15,6 +15,7 @@ import { IoCheckmark } from "react-icons/io5";
 import api from "../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
 import Indicador from "../../components/ManejoStock/IndicadorClientes";
+import { Link } from "react-router-dom";
 
 const MainServicios = () => {
   const [servicios, setServicios] = useState([]);
@@ -88,14 +89,27 @@ const MainServicios = () => {
   };
   const handleAceptar = async () => {
     try {
-      // Validación para valores no negativos
+      // Validar que ningún campo esté vacío
+      if (
+        !servicioData.nombre.trim() ||
+        !servicioData.costoMensual ||
+        !servicioData.costoSemanal
+      ) {
+        toast.error("Existen campos vacios");
+        return;
+      }
+  
       if (servicioData.costoMensual < 0 || servicioData.costoSemanal < 0) {
         toast.error("Los valores no pueden ser negativos");
         return;
       }
   
-      // Validación para costo mensual mayor que costo semanal
-      if (servicioData.costoMensual <= servicioData.costoSemanal) {
+      // Convertir a entero para comparar
+      const costoMensual = parseInt(servicioData.costoMensual);
+      const costoSemanal = parseInt(servicioData.costoSemanal);
+  
+      // el costo mensual debe ser mayor que el semanal
+      if (costoMensual <= costoSemanal) {
         toast.error("El costo mensual debe ser mayor que el costo semanal");
         return;
       }
@@ -151,17 +165,24 @@ const MainServicios = () => {
     setShowAlert(false);
   };
 
-  const handleSearchChange = (event) => {
+  const handleInputChange = (event) => {
     const term = event.target.value;
     setSearchTerm(term);
-
-    if (term.length >= 4) {
-      searchServicios(term);
+    if (term === "") {
+      // Si el input esta vacio vuelve a la primera pagina
       setCurrentPage(1);
+      setFilteredServicios(servicios);
+    }
+  };
+ 
+  const handleSearchChange = () => {
+    if (searchTerm.length >= 4) {
+      searchServicios(searchTerm); 
     } else {
       setFilteredServicios(servicios);
     }
   };
+  
 
   const searchServicios = (term) => {
     const filtered = servicios.filter((servicio) => {
@@ -198,16 +219,22 @@ const MainServicios = () => {
             <h2>Servicios</h2>
             <div className="card-body d-flex align-items-center justify-content-between">
               <form className="d-flex flex-grow-1">
-                <input
+                  <input
+                  id="Btn-Buscar"
                   className="form-control mt-3 custom-input"
                   type="text"
-                  placeholder="Buscar servicio por nombre"
+                  placeholder="Buscar actividad..."
                   value={searchTerm}
-                  id="searchInput"
-                  onChange={handleSearchChange}
+                  onChange={handleInputChange}
                 />
-                <ButtonBasic id="searchButton"text="Buscar" onClick={handleSearchChange}/>
-              </form>
+             
+
+<ButtonBasic
+  id="Btn-Buscar"
+  text="Buscar"
+  onClick={handleSearchChange} // Mantén el onClick para llamar a la función handleSearchChange
+/>
+  </form>
 
               <button id="nuevoServicioButton" className="button-t" onClick={handleNuevoServicio}>
                 <IoAdd />
@@ -217,6 +244,7 @@ const MainServicios = () => {
           </div>
 
           <ModalBase
+          id="ModalRegitro&edit"
             open={showModal || showEditModal}
             closeModal={handleCloseModal}
             title={showModal ? "Registrar Actividad" : "Editar Actividad"}
@@ -233,7 +261,7 @@ const MainServicios = () => {
                 </div>
                 <input
                   type="text"
-                  id="nombre"
+                  id="Inputnombre"
                   name="nombre"
                   className="form-control"
                   value={servicioData.nombre}
@@ -293,7 +321,7 @@ const MainServicios = () => {
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Guardar" onClick={handleAceptar}  />
+                <ButtonBasic id="BtnGuardar" text="Guardar" onClick={handleAceptar}  />
               </div>
             </form>
           </ModalBase>
@@ -303,6 +331,7 @@ const MainServicios = () => {
               message={`¿Estás seguro de eliminar el servicio ${servicioToDelete.actividad.nombre}?`}
               confirmText="Aceptar"
               cancelText="Cancelar"
+              id="confirmacion"
               confirmAction={handleConfirmDelete}
               cancelAction={handleCancelDelete}
             />
@@ -321,15 +350,19 @@ const MainServicios = () => {
               <tbody>
                 {filteredServicios.map((servicio) => (
                   <tr key={servicio.id}>
-                    <td>{servicio.actividad.nombre}</td>
+                     <td><Link to={`/infoServicio/${servicio.actividad.id}`}>
+                      {" "}
+                     {servicio.actividad.nombre}
+                    </Link></td>
                     <td><Indicador clientes={servicio.clientes} /></td>
                     <td>{servicio.actividad.costoMensual.toLocaleString()}</td>
                     <td>{servicio.actividad.costoSemanal.toLocaleString()}</td>
                     <td class="text-center">
-                      <a href="#" onClick={() => handleShowAlert(servicio)}>
+                      <a id="eliminar" href="#" onClick={() => handleShowAlert(servicio)}>
                         <RiDeleteBinLine />
                       </a>
                       <a
+                      id="editar"
                         href="#"
                         onClick={() => handleEditarServicio(servicio)}
                         style={{ marginLeft: "1.5em" }}
@@ -344,6 +377,7 @@ const MainServicios = () => {
           </div>
           <div className="pagination-container">
             <Pagination
+            id="ModalRegitro&edit"
               count={totalPages}
               shape="rounded"
               color="secondary"
