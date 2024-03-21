@@ -495,7 +495,7 @@ const MainClients = () => {
         <div className="card-body d-flex align-items-center ">
         <form className="d-flex flex-grow-1">
             <input
-              id="Btn-Buscar"
+              id="input-search"
               className="form-control mt-3 custom-input"
               type="text"
               placeholder="Buscar..."
@@ -503,14 +503,14 @@ const MainClients = () => {
               onChange={handleInputChanges}
             />
             <ButtonBasic
-              id="Btn-Buscar"
+              id="btn-Buscar"
               text="Buscar"
               onClick={handleSearchChange}
             />
              </form>
             <div className="dropdown">
               <button
-                id="Btn-Filtrar"
+                id="btn-Filtrar"
                 type="button"
                 className="btn btn-primary dropdown-toggle btn-filtrar"
                 data-bs-toggle="dropdown"
@@ -521,7 +521,7 @@ const MainClients = () => {
                 <li>
                 <button
                     className="dropdown-item"
-                    id="filtro-opcion-pagado"
+                    id="btn-pagado"
                     onClick={() => handleFiltrar("PAGADO")}
                   >
                     Pagado
@@ -530,7 +530,7 @@ const MainClients = () => {
                 <li>
                 <button
                     className="dropdown-item"
-                    id="filtro-opcion-pendiente"
+                    id="btn-pendiente"
                     onClick={() => handleFiltrar("PENDIENTE")}
                   >
                     Pendiente
@@ -539,7 +539,7 @@ const MainClients = () => {
                 <li>
                   <button
                     className="dropdown-item"
-                    id="filtro-todos"
+                    id="btn-todos"
                     onClick={() => handleFiltrar("")}
                   >
                     Todos
@@ -548,7 +548,7 @@ const MainClients = () => {
               </ul>
             </div>
             <ButtonCrear 
-            id="botton-crear"
+            id="btn-crear"
             text="Nuevo Proveedor"
             onClick={() => setShowModal(true)}
                icon={<IoAdd />}
@@ -663,7 +663,7 @@ const MainClients = () => {
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
                 <ButtonBasic
-                  id="guardarCliente"
+                  id="btn-guardar"
                   text="Guardar"
                   onClick={handleSubmit}
                 >
@@ -695,7 +695,7 @@ const MainClients = () => {
                 <input
                   style={{ width: "100%", height: "30px" }}
                   type="text"
-                  id="nombre"
+                  id="nombreEdit"
                   name="nombre"
                   className="form-control"
                   value={editingClient ? editingClient.nombre : ""}
@@ -708,7 +708,7 @@ const MainClients = () => {
                   <input
                     type="text"
                     style={{ width: "100%", height: "30px" }}
-                    id="ruc"
+                    id="rucEdit"
                     name="ruc"
                     className="form-control"
                     value={editingClient ? editingClient.ruc : ""}
@@ -720,7 +720,7 @@ const MainClients = () => {
                   <input
                     type="text"
                     style={{ width: "100%", height: "30px" }}
-                    id="telefono"
+                    id="telefonoEdit"
                     name="telefono"
                     className="form-control"
                     value={editingClient ? editingClient.telefono : ""}
@@ -733,7 +733,7 @@ const MainClients = () => {
                 <input
                   type="text"
                   style={{ width: "100%", height: "30px" }}
-                  id="email"
+                  id="emailEdit"
                   name="email"
                   className="form-control"
                   value={editingClient ? editingClient.email : ""}
@@ -745,7 +745,7 @@ const MainClients = () => {
                 <input
                   type="text"
                   style={{ width: "100%", height: "30px" }}
-                  id="direccion"
+                  id="direccionEdit"
                   name="direccion"
                   className="form-control"
                   value={editingClient ? editingClient.direccion : ""}
@@ -756,7 +756,7 @@ const MainClients = () => {
                 <ButtonBasic
                   text="Guardar"
                   ButtonBasic
-                  id="guardarClienteCambios"
+                  id="btn-guardarEdit"
                   onClick={handleGuardarCambios}
                 >
                   {loading ? "Cargando..." : "Guardar Cambios"}
@@ -824,7 +824,7 @@ const MainClients = () => {
                 Selecciona una actividad
               </option>
               {actividades.map((actividad) => (
-                <option key={actividad.id} value={actividad.id}>
+                <option  id ="opcion" key={actividad.id} value={actividad.id}>
                   {actividad.nombre}
                 </option>
               ))}
@@ -862,7 +862,7 @@ const MainClients = () => {
             <ButtonBasic
               text="Guardar"
               type="submit"
-              id="guardarSuscripcion"
+              id="btn-guardarSuscripcion"
               onClick={handleSubmitSuscripcion}
             >
               {loading ? "Cargando..." : "Guardar Cambios"}
@@ -922,6 +922,7 @@ const MainClients = () => {
                   <td>{cliente.telefono}</td>
                   <td className="custom-table2">
                     <a
+                    id={`btn-eliminar-cliente-${cliente.id}`}
                       href="#"
                       onClick={() => handleShowAlert(cliente)}
                       style={{ fontSize: "0.8rem" }}
@@ -929,6 +930,7 @@ const MainClients = () => {
                       <RiDeleteBinLine />
                     </a>
                     <a
+                    id={`btn-editar-cliente-${cliente.id}`}
                       href="#"
                       onClick={() => handleEditClientClick(cliente)}
                       style={{ marginLeft: "1em", fontSize: "0.8rem" }}
@@ -936,6 +938,7 @@ const MainClients = () => {
                       <FiEdit2 />
                     </a>
                     <a
+                    id={`btn-agregar-suscripcion-${cliente.id}`}
                       href="#"
                       onClick={() => handleSuscripcionModalOpen(cliente)}
                       style={{ marginLeft: "1em", fontSize: "0.8rem" }}

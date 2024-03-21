@@ -5,7 +5,6 @@ import { FiEdit2 } from "react-icons/fi";
 import { IoAdd } from "react-icons/io5";
 import { TbArrowDown } from "react-icons/tb";
 import { GoQuestion } from "react-icons/go";
-import ButtonCrear from "../../components/bottons/ButtonCrear";
 import Pagination from "@mui/material/Pagination";
 import ButtonBasic from "../../components/bottons/ButtonBasic";
 import ModalBase from "../../components/modals/ModalBase";
@@ -17,6 +16,7 @@ import api from "../../utils/api";
 import toast, { Toaster } from "react-hot-toast";
 import Indicador from "../../components/ManejoStock/IndicadorClientes";
 import { Link } from "react-router-dom";
+
 const MainServicios = () => {
   const [servicios, setServicios] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -63,11 +63,6 @@ const MainServicios = () => {
     setShowModal(true);
   };
 
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
   const handleEditarServicio = (servicio) => {
     setModalMode("edit");
     setServicioData({
@@ -94,14 +89,27 @@ const MainServicios = () => {
   };
   const handleAceptar = async () => {
     try {
-      // Validación para valores no negativos
+      // Validar que ningún campo esté vacío
+      if (
+        !servicioData.nombre.trim() ||
+        !servicioData.costoMensual ||
+        !servicioData.costoSemanal
+      ) {
+        toast.error("Existen campos vacios");
+        return;
+      }
+  
       if (servicioData.costoMensual < 0 || servicioData.costoSemanal < 0) {
         toast.error("Los valores no pueden ser negativos");
         return;
       }
   
-      // Validación para costo mensual mayor que costo semanal
-      if (servicioData.costoMensual <= servicioData.costoSemanal) {
+      // Convertir a entero para comparar
+      const costoMensual = parseInt(servicioData.costoMensual);
+      const costoSemanal = parseInt(servicioData.costoSemanal);
+  
+      // el costo mensual debe ser mayor que el semanal
+      if (costoMensual <= costoSemanal) {
         toast.error("El costo mensual debe ser mayor que el costo semanal");
         return;
       }
@@ -157,17 +165,24 @@ const MainServicios = () => {
     setShowAlert(false);
   };
 
-  const handleSearchChange = (event) => {
+  const handleInputChange = (event) => {
     const term = event.target.value;
     setSearchTerm(term);
-
-    if (term.length >= 4) {
-      searchServicios(term);
+    if (term === "") {
+      // Si el input esta vacio vuelve a la primera pagina
       setCurrentPage(1);
+      setFilteredServicios(servicios);
+    }
+  };
+ 
+  const handleSearchChange = () => {
+    if (searchTerm.length >= 4) {
+      searchServicios(searchTerm); 
     } else {
       setFilteredServicios(servicios);
     }
   };
+  
 
   const searchServicios = (term) => {
     const filtered = servicios.filter((servicio) => {
@@ -204,27 +219,32 @@ const MainServicios = () => {
             <h2>Servicios</h2>
             <div className="card-body d-flex align-items-center justify-content-between">
               <form className="d-flex flex-grow-1">
-                <input
+                  <input
+                   id="input-search"
                   className="form-control mt-3 custom-input"
                   type="text"
-                  placeholder="Buscar servicio por nombre"
+                  placeholder="Buscar actividad..."
                   value={searchTerm}
-                  id="input-search"
-                  onChange={handleSearchChange}
+                  onChange={handleInputChange}
                 />
-                <ButtonBasic id="searchButton" text="Buscar" onClick={handleSearchChange}/>
-              </form>
-              <ButtonCrear
-                id="btn-crear"
-                text="Nuevo Servicio"
-                onClick={handleNuevoServicio}
-                icon={<IoAdd />}
-                color="secondary"
-              />
+             
+
+<ButtonBasic
+  id="btn-buscar"
+  text="Buscar"
+  onClick={handleSearchChange} // Mantén el onClick para llamar a la función handleSearchChange
+/>
+  </form>
+
+              <button id="btn-crear" className="button-t" onClick={handleNuevoServicio}>
+                <IoAdd />
+                Nuevo Servicio
+              </button>
             </div>
           </div>
 
           <ModalBase
+          id="ModalRegitro&edit"
             open={showModal || showEditModal}
             closeModal={handleCloseModal}
             title={showModal ? "Registrar Actividad" : "Editar Actividad"}
@@ -301,7 +321,7 @@ const MainServicios = () => {
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Guardar" onClick={handleAceptar}  />
+                <ButtonBasic id="btn-guardar" text="Guardar" onClick={handleAceptar}  />
               </div>
             </form>
           </ModalBase>
@@ -311,6 +331,7 @@ const MainServicios = () => {
               message={`¿Estás seguro de eliminar el servicio ${servicioToDelete.actividad.nombre}?`}
               confirmText="Aceptar"
               cancelText="Cancelar"
+              id="confirmacion"
               confirmAction={handleConfirmDelete}
               cancelAction={handleCancelDelete}
             />
@@ -329,7 +350,7 @@ const MainServicios = () => {
               <tbody>
                 {filteredServicios.map((servicio) => (
                   <tr key={servicio.id}>
-                    <td><Link to={`/infoServicio/${servicio.actividad.id}`}>
+                     <td><Link to={`/infoServicio/${servicio.actividad.id}`}>
                       {" "}
                      {servicio.actividad.nombre}
                     </Link></td>
@@ -337,10 +358,13 @@ const MainServicios = () => {
                     <td>{servicio.actividad.costoMensual.toLocaleString()}</td>
                     <td>{servicio.actividad.costoSemanal.toLocaleString()}</td>
                     <td class="text-center">
-                      <a href="#" onClick={() => handleShowAlert(servicio)}>
+                      <a 
+                       id={`btn-eliminar-actividad-${servicio.id}`}
+                      href="#" onClick={() => handleShowAlert(servicio)}>
                         <RiDeleteBinLine />
                       </a>
                       <a
+                         id={`btn-editar-actividad-${servicio.id}`}
                         href="#"
                         onClick={() => handleEditarServicio(servicio)}
                         style={{ marginLeft: "1.5em" }}
@@ -355,9 +379,11 @@ const MainServicios = () => {
           </div>
           <div className="pagination-container">
             <Pagination
+            id="ModalRegitro&edit"
               count={totalPages}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
+              shape="rounded"
+              color="secondary"
+              onChange={(event, page) => setCurrentPage(page)}
             />
           </div>
         </div>
