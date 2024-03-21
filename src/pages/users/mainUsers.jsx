@@ -17,6 +17,14 @@ import ElementoNoEncontrado from "../../components/errores/ElementoNoEncontrado"
 import toast, { Toaster } from "react-hot-toast";
 
 const MainUsers = () => {
+    const emptyUser = {
+      nombre: "",
+      cedula:"",
+      telefono:"",
+      direccion:"",
+      email: "",
+      rol: null
+    };
     const [selectedRole, setSelectedRole] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
@@ -30,25 +38,31 @@ const MainUsers = () => {
     const [searchResultsFound, setSearchResultsFound] = useState(true);
     const [showEditModal, setShowEditModal] = useState(false);
     const [loading, setLoading] = useState(false);
+    const nameRegex = /^[a-zA-ZÁáÉéÍíÓóÚúÑñ ]{2,}$/;
+    const cedulaRegex = /^[0-9A-Za-z]+$/;
+    const telefonoRegex = /^\d+$/;
+    const direccionRegex = /^[a-zA-Z0-9\s]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const [error, setError] = useState(false)
     
-    const [userData, setUserData] = useState({
-      nombre: "",
-      cedula:"",
-      telefono:"",
-      direccion:"",
-      email: "",
-      rol: null
-    });
+    const [userData, setUserData] = useState(emptyUser);
     const roles = [
         {label:"rol", value: null},
         {label:"admin", value: 1},
         {label:"cajero", value: 3},
         {label:"entrenador", value: 4}
     ]
+
+    
      useEffect(() => {
          fetchUsers(currentPage);
      }, [currentPage]);
+
+     const getRoleName = (id) => {
+      if (id === 1) return 'Administrador';
+      if (id === 3) return 'Cajero';
+      if (id === 4) return 'Administrador';
+     }
      
      const handlePageChange = (pageNumber) => {
       setCurrentPage(pageNumber);
@@ -62,7 +76,12 @@ const MainUsers = () => {
         filterUsersByRole(selectedRole, response.data.items);
         setTotalPages(response.data.totalPages);
       } catch (error) {
-        setError(true);
+        // ver si mantener o borrar una vez que se resuelva el problema de la api
+        setUsers([]);
+        setFilteredUsers([]);
+        filterUsersByRole(selectedRole, []);
+        setTotalPages(1);
+        //setError(true);
         console.error("Error al obtener los usuarios:", error);
       }
     };
@@ -74,6 +93,8 @@ const MainUsers = () => {
         setFilteredUsers(filtered);
       }
     };
+    
+    
     const searchUsuarios = async (term) => {
       try {
         const response = await api.get(
@@ -84,13 +105,13 @@ const MainUsers = () => {
         setSearchResultsFound(filtered.length > 0); // Si la longitud de 'filtered' es cero, establece 'searchResultsFound' en true
       } catch (error) {
         if (error.response && error.response.status === 404) {
-          // Mostrar un mensaje de "Producto no encontrado" cuando el servidor devuelve un 404
-          setFilteredProductos([]); // Establecer los productos filtrados como vacíos
+          // Mostrar un mensaje de "Usuario no encontrado" cuando el servidor devuelve un 404
+          setFilteredUsers([]); // Establecer los usuarios filtrados como vacíos
           setSearchResultsFound(false); // Indicar que no se encontraron resultados
         } else {
           // Manejar otros errores de manera similar a como lo haces actualmente
           setSearchResultsFound(true);
-          console.error("Error al buscar productos por nombre:", error);
+          console.error("Error al buscar usuario por nombre:", error);
         }
       }
     };
@@ -145,10 +166,25 @@ const MainUsers = () => {
       setShowEditModal(true);
     };
 
-    const handleRoleChange = (roleValue) => {
-      setSelectedRole(roleValue);
-      filterUsersByRole(roleValue, users);
+    const handleRoleChange = async(roleValue) => {
+  
+      try {
+        const response = await api.get(`/empleados/searchByRol/${roleValue}/page/${currentPage}`);
+        setSelectedRole(roleValue);
+        
+        setFilteredUsers(response.data.items);
+      } catch (error) {
+        // ver si mantener o borrar una vez que se resuelva el problema de la api
+        setUsers([]);
+        setFilteredUsers([]);
+        filterUsersByRole(selectedRole, []);
+        setTotalPages(1);
+        //setError(true);
+        console.error("Error al obtener los usuarios:", error);
+      }
+     
     };
+
     const handleSearchClick = () => {
       searchUsuarios(searchTerm);
     };
@@ -159,6 +195,7 @@ const MainUsers = () => {
     const handleCloseModal = () => {
       setShowModal(false);
       setShowEditModal(false);
+      setUserData(emptyUser);
     };
     const handleAceptar = async () => {
       try {
@@ -172,12 +209,15 @@ const MainUsers = () => {
             toast.error("El nombre del usuario ya existe.");
             return;
           }
-  
-          // Validación de Código
-          if (userData.cedula.length < 4) {
-            toast.error("El código debe tener al menos 4 caracteres.");
+          if (userData.nombre.length < 2){
+            toast.error("El nombre debe tener al menos 2 caracteres.");
             return;
           }
+          if (!nameRegex.test(userData.nombre)) {
+            toast.error("El nombre no puede contener caracteres especiales o números");
+            return;
+          }
+
           const cedulaExists = users.some(
             (user) =>
               user.cedula.toLowerCase() === userData.cedula.toLowerCase()
@@ -186,13 +226,59 @@ const MainUsers = () => {
             toast.error("La cedula del user ya está en uso.");
             return;
           }
+          if (!cedulaRegex.test(userData.cedula)){
+            toast.error("El número de cedula solo puede contener números y letra")
+          }
+          if (userData.cedula.length > 9) {
+            toast.error("El numero de cédula no debe más de 9 caracteres.");
+            return;
+          }
+          const telefonoExists = users.some(
+            (user) =>
+              user.telefono.toLowerCase() === userData.telefono.toLowerCase()
+          );
+          if (!telefonoRegex.test(userData.telefono)) {
+            toast.error("El teléfono solo puede contener números.");
+            return;
+          }
+          if (userData.telefono.length < 7 || userData.telefono.length > 15) {
+            toast.error("El teléfono debe tener entre 7 y 15 caracteres.");
+            return;
+          }
+          const direccionExists = users.some(
+            (user) =>
+              user.direccion.toLowerCase() === userData.direccion.toLowerCase()
+          );
+          if (!direccionRegex.test(userData.direccion)) {
+            toast.error("La dirección solo puede contener letras, números y espacios.");
+            return;
+          }
+          if (userData.direccion.length < 5) {
+            toast.error("La dirección debe tener al menos 5 caracteres.");
+            return;
+          }
+          const emailExists = users.some(
+            (user) =>
+              user.email.toLowerCase() === userData.email.toLowerCase()
+          );
+          if (!emailRegex.test(userData.email)) {
+            toast.error("El email no es válido.");
+            return;
+          }
+          if (userData.email.length > 50) {
+            toast.error("El email no debe tener más de 50 caracteres.");
+            return;
+          }
+
         }
+
   
         let response;
         if (modalMode === "create") {
           response = await api.post("/empleados", userData);
           console.log("Usuario creado:", response.data);
           toast.success("Usuario creado satisfactoriamente");
+          setFilteredUsers([...filteredUsers, response.data]);
         } else if (modalMode === "edit") {
           // Verificar si se realizaron cambios
           const editedUsuarios = users.find(
@@ -216,7 +302,7 @@ const MainUsers = () => {
           console.log("Usuario editado:", response.data);
           toast.success("Usuario actualizado satisfactoriamente");
         }
-  
+        setUserData(emptyUser);
         setShowModal(false);
         setShowEditModal(false);
         fetchUsers(currentPage);
@@ -237,11 +323,15 @@ const MainUsers = () => {
       }
     };
     
-
+    const handleCloseFilter = () => {
+      setFilteredUsers(users);
+      setSelectedRole(null);
+      setFilterOpen(false);
+    };
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         // Verificar si el campo es 'telefono' y si el valor contiene solo numeros
-        if (name === "telefono" && !(/^\d+$/.test(value))) {
+        if (name === "telefono" && !(/^\d*$/.test(value))) {
           return;
         }
     
@@ -265,7 +355,6 @@ const MainUsers = () => {
           });
         }
     };
-
 
     const handleConfirmDelete = async () => {
         if (userToDelete) {
@@ -340,29 +429,38 @@ const MainUsers = () => {
                 <ButtonBasic text="Buscar"
                 onClick={handleSearchClick}/>
               </form>
-              <div className="dropdown">
-              <button
-                id="btn-search"
-                type="button"
-                className="btn btn-primary dropdown-toggle btn-filtrar"
-                data-bs-toggle="dropdown"
-              >
-                <IoCheckmark />
-                Filtrar por rol...
-              </button>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" onClick={() => handleRoleChange(1)}>Administrador</a>
-                </li>
-                <li>
-                  <a className="dropdown-item" onClick={() => handleRoleChange(3)}>Cajero</a>
-                </li>
-                <li>
-                  <a className="dropdown-item" onClick={() => handleRoleChange(4)}>Entrenador</a>
-                </li>
-              </ul>
-
-
+              <div className="dropdown contenedorFiltro">
+                <div>
+                  <button
+                    id="btn-search"
+                    type="button"
+                    className="btn btn-primary dropdown-toggle btn-filtrar"
+                    data-bs-toggle="dropdown"
+                  >
+                    {selectedRole ? getRoleName(selectedRole) : <IoCheckmark />}
+                    {selectedRole ? null : "Filtrar por rol..."}
+                  </button>
+                  <ul className="dropdown-menu">
+                    <li>
+                      <a className="dropdown-item"  style={{cursor: "pointer"}} onClick={() => handleRoleChange(1)}>Administrador</a>
+                    </li>
+                    <li>
+                      <a className="dropdown-item" style={{cursor: "pointer"}} onClick={() => handleRoleChange(3)}>Cajero</a>
+                    </li>
+                    <li>
+                      <a className="dropdown-item" style={{cursor: "pointer"}} onClick={() => handleRoleChange(4)}>Entrenador</a>
+                    </li>
+                  </ul>
+                </div>
+                <div className="outFilter">
+                {selectedRole && (
+                  <button 
+                    className="btn btn-sm btn-close justify-content-between x"
+                    onClick={handleCloseFilter}
+                  >
+                  </button>
+                )}
+                </div>
               </div>
 
               { /* onClick={handleNuevoUsuario} */}
@@ -517,7 +615,7 @@ const MainUsers = () => {
             {!error &&
               filteredUsers.length === 0 &&
               !searchResultsFound && (
-                <ElementoNoEncontrado mensaje="¡Producto no encontrado!" />
+                <ElementoNoEncontrado mensaje="Usuario no encontrado!" />
               )}
             {!error && filteredUsers.length > 0 && (
               <table className="custom-table">
