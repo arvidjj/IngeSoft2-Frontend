@@ -61,7 +61,7 @@ const MainUsers = () => {
      const getRoleName = (id) => {
       if (id === 1) return 'Administrador';
       if (id === 3) return 'Cajero';
-      if (id === 4) return 'Administrador';
+      if (id === 4) return 'Entrenador';
      }
      
      const handlePageChange = (pageNumber) => {
