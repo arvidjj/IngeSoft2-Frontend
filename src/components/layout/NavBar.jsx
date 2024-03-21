@@ -70,7 +70,6 @@ const NavBar = () => {
                     <button onClick={toggleClientesDropdown} className={`nav-btn ${showClientesDropdown ? 'active' : ''}`}>Clientes <RiArrowDropDownFill /></button>
                     <div className={`dropdown-content ${showClientesDropdown ? 'show' : ''}`}>
                         <Link to="/clientes" className={`nav-link ${isActiveLink("/clientes") ? 'active' : ''}`} onClick={closeDropdowns}>Lista de clientes</Link>
-                        <Link to="/users" className={`nav-link ${isActiveLink("/users") ? 'active' : ''}`} onClick={closeDropdowns}>Lista de usuarios</Link>
                     </div>
                 </div>
                 <div ref={dropdownProveedoresRef} className=".dropdown">
@@ -80,7 +79,8 @@ const NavBar = () => {
                         <Link to="/productos" className={`nav-link ${isActiveLink("/productos") ? 'active' : ''}`} onClick={closeDropdowns}>Lista de productos</Link>
                     </div>
                 </div>
-                <Link to="/servicios" ><button className={`nav-btn ${isActiveLink("/servicios") ? 'active' : ''}`}>Servicios</button></Link>
+                <Link to="/users" ><button className={`nav-btn ${isActiveLink("/users") ? 'active' : ''}`}>Usuarios</button></Link> 
+                <Link to="/servicios" ><button className={`nav-btn ${isActiveLink("/servicios") ? 'active' : ''}`}>Servicios</button></Link>    
                 <Link to="/caja" ><button className={`nav-btn ${isActiveLink("/caja") ? 'active' : ''}`}>Caja</button></Link>
                 <Link to="/reportes" ><button className={`nav-btn ${isActiveLink("/reportes") ? 'active' : ''}`}>Reportes</button></Link>
             </div>
