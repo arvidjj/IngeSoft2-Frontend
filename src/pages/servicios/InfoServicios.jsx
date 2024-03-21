@@ -322,7 +322,7 @@ const InfoServicios = () => {
             <div className="card-body d-flex align-items-center ">
               <form className="d-flex flex-grow-1">
                 <input
-                  id="Btn-Buscar"
+                  id="input-search"
                   className="form-control mt-3 custom-input"
                   type="text"
                   placeholder="Search"
@@ -330,14 +330,14 @@ const InfoServicios = () => {
                   onChange={handleInputChange}
                 />
                 <ButtonBasic
-                  id="Btn-Buscar"
+                  id="btn-buscar"
                   text="Buscar"
                   onClick={handleSearchChange}
                 />{" "}
               </form>
               <div className="dropdown">
                 <button
-                  id="Btn-Filtrar"
+                  id="btn-filtrar"
                   type="button"
                   className="btn btn-secundary dropdown-toggle btn-filtrar"
                   data-bs-toggle="dropdown"
@@ -349,7 +349,7 @@ const InfoServicios = () => {
                   <li>
                     <button
                       className="dropdown-item"
-                      id="Btnpagado"
+                      id="btn-pagado"
                       onClick={() => handleFiltrar("pagado")}
                     >
                       Pagado
@@ -358,7 +358,7 @@ const InfoServicios = () => {
                   <li>
                     <button
                       className="dropdown-item"
-                      id="BtnPendiente"
+                      id="btn-pendiente"
                       onClick={() => handleFiltrar("pendiente")}
                     >
                       Pendiente
@@ -367,7 +367,7 @@ const InfoServicios = () => {
                   <li>
                     <button
                       className="dropdown-item"
-                      id="Btn-todos"
+                      id="btn-todos"
                       onClick={() => handleFiltrar("")}
                     >
                       Todos
@@ -376,7 +376,7 @@ const InfoServicios = () => {
                 </ul>
               </div>
               <ButtonCrear
-                id="Btn-Crear"
+                id="btn-Crear"
                 text="Nuevo Cliente"
                 onClick={() => setModalOpen(true)}
                 icon={<IoAdd />}
@@ -404,7 +404,7 @@ const InfoServicios = () => {
                 {suscripcionesFiltradas.map((suscripcion) => (
                   <tr key={suscripcion.id}>
                     <td>
-                      <Link to={`/clientesinfo/${suscripcion.clienteDto.id}`}>
+                      <Link   id={`infoActividad${suscripcion.clienteDto.id}`} to={`/clientesinfo/${suscripcion.clienteDto.id}`}>
                         {suscripcion.clienteDto.nombre}
                       </Link>
                     </td>
@@ -471,13 +471,13 @@ const InfoServicios = () => {
               <span className="required">*</span>
             </div>
             <select
-              id="selecModalidad"
+              id="modalidad"
               className="select"
               value={modalidad}
               onChange={(e) => setModalidad(e.target.value)}
             >
-              <option value="MENSUAL">Mensual</option>
-              <option value="SEMANAL">Semanal</option>
+              <option  id="mensual" value="MENSUAL">Mensual</option>
+              <option id="semanal" value="SEMANAL">Semanal</option>
             </select>
           </div>
           <div>
@@ -486,7 +486,7 @@ const InfoServicios = () => {
               <span className="required">*</span>
             </div>
             <input
-              id="Agregarfechainicio"
+              id="fecha"
               className="select-activity"
               type="date"
               value={fechaInicio}
@@ -509,12 +509,12 @@ const InfoServicios = () => {
       onChange={handleSearchCedulaChange}
     />
     {/* Botón para buscar clientes por cédula */}
-    <ButtonBasic id="Btn-BuscarCI"  text="Agregar" onClick={searchByCedula} style={{ width: '2cm',height:'0.87cm' }}/>
+    <ButtonBasic id="btn-buscarCI"  text="Agregar" onClick={searchByCedula} style={{ width: '2cm',height:'0.87cm' }}/>
   </div>
   <ul>
     {searchCedulaResults.map((cliente) => (
       <li key={cliente.id}>
-        <button onClick={() => handleSelectCliente(cliente)}>
+        <button  id={`btn-cliente-${cliente.id}`}onClick={() => handleSelectCliente(cliente)}>
           {cliente.nombre} - CI: {cliente.cedula}
         </button>
       </li>
@@ -535,7 +535,7 @@ const InfoServicios = () => {
           </div>
           <div className="d-flex justify-content-center align-items-center float-end">
             <ButtonBasic
-              id="Btn-guardar"
+              id="btn-guardar"
               text="Guardar"
               type="submit"
               onClick={handleSubmitSuscripcion}
@@ -565,7 +565,7 @@ const InfoServicios = () => {
               </div>
               <select
                 className="select"
-                id="selecModalidad"
+                id="modalidadEditar"
                 value={editingSubscription.suscripcionDto.modalidad}
                 onChange={(e) =>
                   setEditingSubscription({
@@ -577,8 +577,8 @@ const InfoServicios = () => {
                   })
                 }
               >
-                <option value="MENSUAL">Mensual</option>
-                <option value="SEMANAL">Semanal</option>
+                <option id="mensual" value="MENSUAL">Mensual</option>
+                <option id="semanal" value="SEMANAL">Semanal</option>
               </select>
             </div>
             <div>
@@ -587,7 +587,7 @@ const InfoServicios = () => {
                 <span className="required">*</span>
               </div>
               <input
-                id="fechaInicioEdit"
+                id="fecha-InicioEdit"
                 className="select-activity"
                 type="date"
                 value={editingSubscription.suscripcionDto.fechaInicio}
@@ -608,7 +608,7 @@ const InfoServicios = () => {
                 <span className="required">*</span>
               </div>
               <input
-                id="fechaFinEdit"
+                 id="fecha-InicioEdit"
                 className="select-activity"
                 type="date"
                 value={editingSubscription.suscripcionDto.fechaFin}
@@ -629,7 +629,7 @@ const InfoServicios = () => {
                 <span className="required">*</span>
               </div>
               <input
-                id="selecionIDactividad"
+                id="id-actividad"
                 className="select-activity"
                 type="text"
                 value={editingSubscription.clienteDto.nombre}
@@ -642,7 +642,7 @@ const InfoServicios = () => {
             </div>
             <div className="d-flex justify-content-center align-items-center float-end">
               <ButtonBasic
-                id="GuardarEdit"
+                id="btn-guardarEdit"
                 text="Guardar"
                 type="submit"
                 onClick={handleSubmitEditSubscription}
