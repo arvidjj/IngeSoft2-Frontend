@@ -19,7 +19,8 @@ import toast, { Toaster } from "react-hot-toast";
 import { Button } from "flowbite-react";
 import { IoAddOutline } from "react-icons/io5";
 import { IoCheckmark } from "react-icons/io5";
-
+import EstadoPago from "../../components/estado_pago/EstadoPago";
+import ButtonCrear from "../../components/bottons/ButtonCrear";
 const MainClients = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -41,6 +42,12 @@ const MainClients = () => {
   const [suscripcionSuccess, setSuscripcionSuccess] = useState(false);
   const [suscripcionError, setSuscripcionError] = useState(false);
   const [total, setTotal] = useState(0);
+  const [loadingActividades, setLoadingActividades] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+  const [actividadesPage, setActividadesPage] = useState(1);
+
+  //estado
+  const [filtroEstado, setFiltroEstado] = useState("");
 
   const [clienteData, setClienteData] = useState({
     nombre: "",
@@ -53,6 +60,7 @@ const MainClients = () => {
   const [clienteDataExtra, setClienteDataExtra] = useState({
     apellido: "",
   });
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4; // Define la cantidad de elementos por página
 
@@ -61,66 +69,60 @@ const MainClients = () => {
   }, [currentPage]);
 
   useEffect(() => {
-    fetchActividades();
-  }, []);
+    if (suscripcionModalOpen) {
+      fetchActividades();
+    }
+  }, [suscripcionModalOpen, actividadesPage]);
 
   useEffect(() => {
     // Concatenar el apellido al nombre al cargar el componente
   }, [clienteDataExtra.apellido]);
 
   useEffect(() => {
-  // Calcula el total cuando hay cambios en selectedActivities o modalidad
-  let newTotal = 0;
-  if (modalidad === "MENSUAL") {
-    newTotal = selectedActivities.reduce((acc, actividad) => {
-      acc += actividad.costoMensual || 0;
-      return acc;
-    }, 0);
-  } else if (modalidad === "SEMANAL") {
-    newTotal = selectedActivities.reduce((acc, actividad) => {
-      acc += actividad.costoSemanal || 0;
-      return acc;
-    }, 0);
-  }
-  setTotal(newTotal);
-}, [selectedActivities, modalidad]);
+    // Calcula el total cuando hay cambios en selectedActivities o modalidad
+    let newTotal = 0;
+    if (modalidad === "MENSUAL") {
+      newTotal = selectedActivities.reduce((acc, actividad) => {
+        acc += actividad.costoMensual || 0;
+        return acc;
+      }, 0);
+    } else if (modalidad === "SEMANAL") {
+      newTotal = selectedActivities.reduce((acc, actividad) => {
+        acc += actividad.costoSemanal || 0;
+        return acc;
+      }, 0);
+    }
+    setTotal(newTotal);
+  }, [selectedActivities, modalidad]);
 
   const fetchClientes = async () => {
     try {
       const response = await api.get(
-        `/clientes/page/${currentPage}?perPage=${itemsPerPage}`
+        `/clientes/lista/page/${currentPage}?perPage=${itemsPerPage}`
       );
       setClientes(response.data.items);
       setFilteredClientes(response.data.items);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error al obtener clientes:", error);
       toast.error("Error al actualizar cliente ");
     }
   };
-
-  const handleSearchChange = (event) => {
-    const term = event.target.value;
-    setSearchTerm(term);
-
-    if (term.length >= 4) {
-      searchClientes(term);
-    } else {
-      setFilteredClientes(clientes);
-      // Siempre vuelve a la primera página cuando se borra el término de búsqueda
-      setCurrentPage(1);
-    }
-  };
-
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+};
   const searchClientes = (term) => {
     const filtered = clientes.filter((cliente) => {
       const nombre = cliente.nombre.toLowerCase();
       const email = cliente.email.toLowerCase();
-      const telefono = cliente.telefono.toLowerCase();
+      const telefono = cliente.telefono;
+      const estado = cliente.estado;
 
       return (
-        nombre.includes(term.toLowerCase()) ||
-        email.includes(term.toLowerCase()) ||
-        telefono.includes(term.toLowerCase())
+        (nombre.includes(term.toLowerCase()) ||
+          email.includes(term.toLowerCase()) ||
+          telefono.includes(term.toLowerCase())) &&
+        (filtroEstado === "" || estado === filtroEstado)
       );
     });
     setFilteredClientes(filtered);
@@ -169,9 +171,28 @@ const MainClients = () => {
 
   // Funcion para cerrar el modal
   const handleCloseModal = () => {
+    
     setModalOpen(false);
   };
 
+
+
+  const handleCloseModalRegistre = () => {
+    {
+      // Restablecer los datos del cliente
+      setClienteDataExtra({ apellido: "" });
+      setClienteData({
+        nombre: "",
+        apellido: "",
+        ruc: "",
+        cedula: "",
+        telefono: "",
+        email: "",
+        direccion: "",
+      });
+    }
+    setShowModal(false);
+  };
   // Funcion para guardar los cambios realizados en el cliente
   const handleGuardarCambios = async () => {
     try {
@@ -188,25 +209,29 @@ const MainClients = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Verificar si algún campo esta vacio
-    for (const key in clienteData) {
-      if (clienteData[key] === "") {
-        toast.error(`El campo ${key} no puede estar vacío`);
+    // Verificar si algún campo esta vacios
+    const camposObligatorios = ["nombre", "apellido", "ruc"];
+    for (const campo of camposObligatorios) {
+      if (!clienteData[campo] && !clienteDataExtra.apellido) { // Verificar si el campo está vacío
+        toast.error(`El campo ${campo} es obligatorio`);
+        return;
+      }
+    }
+    // Verificar la validez del correo si se proporciona
+    if (clienteData.email && clienteData.email.trim() !== "") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(clienteData.email)) {
+        toast.error("Correo electrónico inválido");
         return;
       }
     }
 
-    // Verificar la validez del correo
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(clienteData.email)) {
-      toast.error("Correo electrónico inválido");
-      return;
-    }
-
-    // Verificar la longitud del numero de teléfono
-    if (clienteData.telefono.length < 8) {
-      toast.error("El número de teléfono debe tener al menos 8 dígitos");
-      return;
+    // Verificar la longitud del número de teléfono si se proporciona
+    if (clienteData.telefono && clienteData.telefono.trim() !== "") {
+      if (clienteData.telefono.length < 8) {
+        toast.error("El número de teléfono debe tener al menos 8 dígitos");
+        return;
+      }
     }
 
     setLoading(true);
@@ -223,6 +248,7 @@ const MainClients = () => {
       setClienteDataExtra({ apellido: "" });
       setClienteData({
         nombre: "",
+        apellido: "",
         ruc: "",
         cedula: "",
         telefono: "",
@@ -241,7 +267,7 @@ const MainClients = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     // Verificar si el campo es 'telefono' y si el valor contiene solo numeros
-    if (name === "telefono" && !/^\d+$/.test(value)) {
+    if (name === "telefono" && /[^0-9]/.test(value)) {
       return;
     }
 
@@ -257,7 +283,12 @@ const MainClients = () => {
         [name]: value,
         cedula: cedulaValue,
       });
-    } else {
+    } else if (name === "telefono" && value.trim() === "") { // Si el campo es el teléfono y se elimina todo el contenido
+      setClienteData({
+        ...clienteData,
+        [name]: "", // Vaciar el campo de teléfono
+      });
+    }else {
       // Si no es 'ruc', actualiza normalmente
       setClienteData({
         ...clienteData,
@@ -311,9 +342,7 @@ const MainClients = () => {
 
   const fetchActividades = async () => {
     try {
-      const response = await api.get(
-        "http://localhost:8080/actividades/page/1"
-      );
+      const response = await api.get(`actividades/page/${actividadesPage}`);
       const actividadesData = response.data.items.map((actividad) => ({
         id: actividad.id,
         nombre: actividad.nombre,
@@ -322,14 +351,17 @@ const MainClients = () => {
       }));
       setActividades(actividadesData);
     } catch (error) {
-      console.error("Error al obtener actividades:", error);
-      toast.error("Error al obtener actividades");
+      console.error("No hay actividades en la lista", error);
+      toast.error("No hay actividades en la lista");
     }
   };
 
   const handleSuscripcionModalOpen = (client) => {
     setSelectedClienteId(client);
     setSuscripcionModalOpen(true);
+
+    setLoadingActividades(true);
+    fetchActividades(); //actualizar actividades
   };
 
   const handleSuscripcionModalClose = () => {
@@ -379,7 +411,6 @@ const MainClients = () => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + daysToAdd);
 
-    
     try {
       const suscripcionesData = selectedActivities.map((activity) => ({
         clienteId: selectedClienteId.id,
@@ -430,119 +461,105 @@ const MainClients = () => {
     }
   };
 
+  //estado de filtro
+  const handleFiltrar = (filtro) => {
+    setFiltro(filtro);
+  };
+
+  const handleSearchChange = () => {
+    if (searchTerm.length >= 4) {
+      searchClientes(searchTerm); // Utiliza searchTerm en lugar de term
+    } else {
+      setFilteredClientes(clientes);
+      // Siempre vuelve a la primera página cuando se borra el término de búsqueda
+      setCurrentPage(1);
+    }
+  };
+
+  const handleInputChanges = (event) => {
+    const term = event.target.value;
+    setSearchTerm(term);
+    if (term === "") {
+      // Si el input está vacío, vuelve a la primera página
+      setCurrentPage(1);
+      setFilteredClientes(clientes);
+    }
+  };
+
   return (
     <div className="MaquetaCliente">
-      <div className="cuadro-central">
+      <div class="card">
+        <div class="container">
+        <div className="card-1">
         <h2>Clientes</h2>
-        <div className="header-cliente">
-          <div className="header-Principal">
+        <div className="card-body d-flex align-items-center ">
+        <form className="d-flex flex-grow-1">
             <input
+              id="Btn-Buscar"
+              className="form-control mt-3 custom-input"
               type="text"
               placeholder="Buscar..."
-              className="form-control me-2"
               value={searchTerm}
-              onChange={handleSearchChange}
+              onChange={handleInputChanges}
             />
-            <ButtonBasic text="Buscar" onClick={handleSearchChange} />
+            <ButtonBasic
+              id="Btn-Buscar"
+              text="Buscar"
+              onClick={handleSearchChange}
+            />
+             </form>
             <div className="dropdown">
               <button
+                id="Btn-Filtrar"
                 type="button"
                 className="btn btn-primary dropdown-toggle btn-filtrar"
                 data-bs-toggle="dropdown"
               >
-                <IoCheckmark />
-                Filtrar por...
+                Filtrar por
               </button>
               <ul className="dropdown-menu">
                 <li>
-                  <a className="dropdown-item" href="#">
+                <button
+                    className="dropdown-item"
+                    id="filtro-opcion-pagado"
+                    onClick={() => handleFiltrar("PAGADO")}
+                  >
                     Pagado
-                  </a>
+                    </button>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                <button
+                    className="dropdown-item"
+                    id="filtro-opcion-pendiente"
+                    onClick={() => handleFiltrar("PENDIENTE")}
+                  >
                     Pendiente
-                  </a>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    className="dropdown-item"
+                    id="filtro-todos"
+                    onClick={() => handleFiltrar("")}
+                  >
+                    Todos
+                  </button>
                 </li>
               </ul>
             </div>
-            <button className="button" onClick={() => setShowModal(true)}>
-              <IoAdd />
-              Nuevo Cliente
-            </button>
+            <ButtonCrear 
+            id="botton-crear"
+            text="Nuevo Proveedor"
+            onClick={() => setShowModal(true)}
+               icon={<IoAdd />}
+               color="secondary"
+            />
           </div>
         </div>
-        <hr />
-        <div className="tabla">
-          <table className="custom-table">
-            <thead>
-              <tr>
-                <th scope="col">Nombre</th>
-                <th scope="col">
-                  Estado <TbArrowDown />
-                </th>
-                <th scope="col">
-                  Plan <GoQuestion />
-                </th>
-                <th scope="col">Email</th>
-                <th scope="col">Numero de telefono</th>
-                <th scope="col"></th>
-              </tr>
-            </thead>
-            <tbody className="table tbody tr:nth-child(odd) ">
-              {filteredClientes.map((cliente) => (
-                <tr key={cliente.id}>
-                  <td>
-                    <Link to={`/clientesinfo/${cliente.id}`}>
-                      <PiUserCircleLight
-                        style={{
-                          padding: "0px",
-                          fontSize: "25px",
-                          background: "#eaecf000",
-                        }}
-                      />{" "}
-                      {cliente.nombre}
-                    </Link>
-                  </td>
-                  <td className=".custom-table2">
-                    {cliente.active ? "Activo" : "Inactivo"}
-                  </td>
-                  <td className=".custom-table2">Plan</td>
-                  <td className="custom-table2">{cliente.email}</td>
-                  <td className="custom-table2">{cliente.telefono}</td>
-                  <td className="custom-table2">
-                    <a href="#" onClick={() => handleShowAlert(cliente)}>
-                      <RiDeleteBinLine />
-                    </a>
-                    <a href="#" onClick={() => handleEditClientClick(cliente)}>
-                      <FiEdit2 />
-                    </a>
-                    <a
-                      href="#"
-                      onClick={() => handleSuscripcionModalOpen(cliente)}
-                    >
-                      <IoAdd />
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="d-flex justify-content-center mt-4">
-          <Pagination
-            count={Math.ceil(filteredClientes.length / itemsPerPage)}
-            page={currentPage <= 2 ? currentPage : 1}
-            onChange={(event, value) => setCurrentPage(value)}
-            shape="rounded"
-            color="secondary"
-          />
-        </div>
-      </div>
-      {/* Modal para registrar nuevo cliente */}
+          {/* Modal para registrar nuevo cliente */}
       <ModalBase
         open={showModal}
-        closeModal={() => setShowModal(false)}
+        closeModal={handleCloseModalRegistre}
         title="Registro de Cliente"
       >
         <div>
@@ -645,7 +662,11 @@ const MainClients = () => {
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Guardar" onClick={handleSubmit}>
+                <ButtonBasic
+                  id="guardarCliente"
+                  text="Guardar"
+                  onClick={handleSubmit}
+                >
                   {loading ? "Cargando..." : "Agregar Cliente"}
                 </ButtonBasic>
               </div>
@@ -732,7 +753,12 @@ const MainClients = () => {
                 />
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic text="Guardar" onClick={handleGuardarCambios}>
+                <ButtonBasic
+                  text="Guardar"
+                  ButtonBasic
+                  id="guardarClienteCambios"
+                  onClick={handleGuardarCambios}
+                >
                   {loading ? "Cargando..." : "Guardar Cambios"}
                 </ButtonBasic>
               </div>
@@ -762,6 +788,7 @@ const MainClients = () => {
             <select
               className="select"
               value={modalidad}
+              id="modalidad"
               onChange={(e) => setModalidad(e.target.value)}
             >
               <option value="MENSUAL">Mensual</option>
@@ -777,6 +804,7 @@ const MainClients = () => {
             <input
               className="select-activity"
               type="date"
+              id="fecha"
               value={fechaInicio}
               onChange={(e) => setFechaInicio(e.target.value)}
             />
@@ -789,6 +817,7 @@ const MainClients = () => {
             <select
               className="select"
               value=""
+              id="actividades"
               onChange={(e) => handleAddSelectedActivity(e.target.value)}
             >
               <option value="" disabled hidden>
@@ -806,6 +835,7 @@ const MainClients = () => {
                   {activity.nombre}{" "}
                   <button
                     className="button-activity"
+                    id="eliminarActividad"
                     onClick={() => handleRemoveSelectedActivity(activity)}
                   >
                     <IoClose />
@@ -815,12 +845,14 @@ const MainClients = () => {
               ))}
             </p>
           </div>
-          
-          <div className="d-flex">
-  <LabelBase label={`Costo: ${total}`} htmlFor="costo" />
-</div>
 
-   
+          <div className="d-flex">
+            {/*Para manejar el costo mostrar 50.000 o 390.000 */}
+            <LabelBase
+              label={`Costo: ${total.toLocaleString()} Gs`}
+              htmlFor="costo"
+            />
+          </div>
           <div className="campo-obligatorio">
             <span className="required">*</span>
             <span className="message">Campo obligatorio</span>
@@ -830,6 +862,7 @@ const MainClients = () => {
             <ButtonBasic
               text="Guardar"
               type="submit"
+              id="guardarSuscripcion"
               onClick={handleSubmitSuscripcion}
             >
               {loading ? "Cargando..." : "Guardar Cambios"}
@@ -847,6 +880,84 @@ const MainClients = () => {
           cancelAction={handleCancelDelete}
         />
       )}
+  
+        <div class="table-container">
+          <table className="custom-table">
+            <thead>
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">
+                  Estado <TbArrowDown />
+                </th>
+                <th scope="col">
+                  Plan <GoQuestion />
+                </th>
+                <th scope="col">Email</th>
+                <th scope="col">Numero de telefono</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredClientes.map((cliente) => (
+                <tr key={cliente.id}>
+                  <td style={{ textAlign: "left" }}>
+                    <Link to={`/clientesinfo/${cliente.id}`}>
+                      <PiUserCircleLight
+                        style={{
+                          marginLeft: "1rem",
+                          padding: "0px",
+                          id: "clienteinfo",
+                          fontSize: "25px",
+                          background: "#eaecf000",
+                        }}
+                      />{" "}
+                      {cliente.nombre}
+                    </Link>
+                  </td>
+                  <td>{cliente.active ? "Activo" : "Inactivo"}</td>
+                  <td>
+                    <EstadoPago estado={cliente.estado} />{" "}
+                  </td>
+                  <td>{cliente.email}</td>
+                  <td>{cliente.telefono}</td>
+                  <td className="custom-table2">
+                    <a
+                      href="#"
+                      onClick={() => handleShowAlert(cliente)}
+                      style={{ fontSize: "0.8rem" }}
+                    >
+                      <RiDeleteBinLine />
+                    </a>
+                    <a
+                      href="#"
+                      onClick={() => handleEditClientClick(cliente)}
+                      style={{ marginLeft: "1em", fontSize: "0.8rem" }}
+                    >
+                      <FiEdit2 />
+                    </a>
+                    <a
+                      href="#"
+                      onClick={() => handleSuscripcionModalOpen(cliente)}
+                      style={{ marginLeft: "1em", fontSize: "0.8rem" }}
+                    >
+                      <IoAdd />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        </div>
+        <div className="pagination-container">
+          <Pagination
+             id="selector-paginacion"
+             count={totalPages} // Número total de páginas
+             page={currentPage} // Página actual
+             onChange={handlePageChange}
+          />
+        </div>
+      </div>
       <Toaster
         position="top-right"
         reverseOrder={false}
@@ -865,10 +976,6 @@ const MainClients = () => {
           },
         }}
       />
-
-      <div className="d-flex justify-content-center mt-4">
-        <div className="pagination-container"></div>
-      </div>
     </div>
   );
 };
