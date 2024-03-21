@@ -592,8 +592,7 @@ const MainProductos = () => {
           <div class="table-container">
             {error && (
               <ErrorPagina
-                mensaje=" ¡Ups! Parece que hubo un problema al cargar los productos. Por favor,
-                          inténtalo de nuevo más tarde."
+                mensaje=  "No hay pruductos cargados aún "
               />
             )}
             {/* Muestra el componente de error si hay un error */}
