@@ -5,6 +5,7 @@ import { FiEdit2 } from "react-icons/fi";
 import { IoAdd } from "react-icons/io5";
 import { TbArrowDown } from "react-icons/tb";
 import { GoQuestion } from "react-icons/go";
+import ButtonCrear from "../../components/bottons/ButtonCrear";
 import Pagination from "@mui/material/Pagination";
 import ButtonBasic from "../../components/bottons/ButtonBasic";
 import ModalBase from "../../components/modals/ModalBase";
@@ -60,6 +61,11 @@ const MainServicios = () => {
       costoSemanal: "",
     });
     setShowModal(true);
+  };
+
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   const handleEditarServicio = (servicio) => {
@@ -203,16 +209,18 @@ const MainServicios = () => {
                   type="text"
                   placeholder="Buscar servicio por nombre"
                   value={searchTerm}
-                  id="searchInput"
+                  id="input-search"
                   onChange={handleSearchChange}
                 />
-                <ButtonBasic id="searchButton"text="Buscar" onClick={handleSearchChange}/>
+                <ButtonBasic id="searchButton" text="Buscar" onClick={handleSearchChange}/>
               </form>
-
-              <button id="nuevoServicioButton" className="button-t" onClick={handleNuevoServicio}>
-                <IoAdd />
-                Nuevo Servicio
-              </button>
+              <ButtonCrear
+                id="btn-crear"
+                text="Nuevo Servicio"
+                onClick={handleNuevoServicio}
+                icon={<IoAdd />}
+                color="secondary"
+              />
             </div>
           </div>
 
@@ -348,9 +356,8 @@ const MainServicios = () => {
           <div className="pagination-container">
             <Pagination
               count={totalPages}
-              shape="rounded"
-              color="secondary"
-              onChange={(event, page) => setCurrentPage(page)}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
             />
           </div>
         </div>

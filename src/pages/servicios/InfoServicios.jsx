@@ -25,8 +25,8 @@ const InfoServicios = () => {
   const [suscripciones, setSuscripciones] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [actividadNombre, setActividadNombre] = useState(""); 
-  const [filtro, setFiltro] = useState(""); 
+  const [actividadNombre, setActividadNombre] = useState("");
+  const [filtro, setFiltro] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalOpenEdit, setModalOpenEdit] = useState(false);
@@ -48,10 +48,8 @@ const InfoServicios = () => {
 
   useEffect(() => {
     if (modalOpen) {
-      fetchClientes();
     }
   }, [modalOpen]);
-  
 
   useEffect(() => {
     const fetchActividadNombre = async () => {
@@ -68,7 +66,9 @@ const InfoServicios = () => {
 
   const fetchSuscripciones = async (id, page) => {
     try {
-      const response = await api.get(`/actividades/${id}/suscripciones/page/${page}`);
+      const response = await api.get(
+        `/actividades/${id}/suscripciones/page/${page}`
+      );
       setSuscripciones(response.data.items);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -76,30 +76,20 @@ const InfoServicios = () => {
     }
   };
 
-  const fetchClientes = async (page = 1, allClientes = []) => {
-    try {
-      const response = await api.get(`/clientes/page/${page}`);
-      const clientesData = response.data.items;
-      const updatedClientes = [...allClientes, ...clientesData];
-      setClientes(updatedClientes);
-      if (response.data.hasNextPage) {
-        // Si existe mas paginas llama a las que faltan 
-        fetchClientes(page + 1, updatedClientes);
-      }
-    } catch (error) {
-      console.error("Error al obtener los clientes:", error);
-    }
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
-
   const handleFiltrar = (filtro) => {
     setFiltro(filtro);
   };
 
   const suscripcionesFiltradas = suscripciones.filter((suscripcion) => {
     if (filtro === "") {
-      return true; 
+      return true;
     } else {
-      return suscripcion.suscripcionDto.estado.toLowerCase() === filtro.toLowerCase();
+      return (
+        suscripcion.suscripcionDto.estado.toLowerCase() === filtro.toLowerCase()
+      );
     }
   });
 
@@ -111,8 +101,10 @@ const InfoServicios = () => {
         suscripcion.suscripcionDto.modalidad,
         suscripcion.clienteDto.email,
         suscripcion.clienteDto.telefono,
-      ].join(" ").toLowerCase();
-  
+      ]
+        .join(" ")
+        .toLowerCase();
+
       return suscripcionData.includes(term.toLowerCase());
     });
     setSuscripciones(filtered);
@@ -120,7 +112,7 @@ const InfoServicios = () => {
 
   const handleSubmitSuscripcion = async (event) => {
     event.preventDefault();
-  
+
     if (!fechaInicio) {
       toast.error("Falta llenar campos. Ingresa una fecha de inicio.");
       return;
@@ -148,20 +140,21 @@ const InfoServicios = () => {
       setFechaInicio("");
 
       fetchSuscripciones(id, currentPage);
-    }  catch (error) {
+    } catch (error) {
       if (error.response) {
         if (error.response.status === 500) {
           toast.error("El cliente ya posee esa actividad.");
-        } else if (error.response.status === 400 && error.response.data.code === "400 BAD_REQUEST") {
+        } else if (
+          error.response.status === 400 &&
+          error.response.data.code === "400 BAD_REQUEST"
+        ) {
           toast.error("El cliente ya posee una suscripcion");
         } else {
           console.error(
             "Error en la respuesta del servidor:",
             error.response.data
           );
-          toast.error(
-            "" + error.response.data.message
-          );
+          toast.error("" + error.response.data.message);
         }
       } else if (error.request) {
         console.error("No se recibió respuesta del servidor:", error.request);
@@ -173,7 +166,7 @@ const InfoServicios = () => {
         toast.error(
           "Error al configurar la solicitud. Consulta la consola para más detalles."
         );
-        }
+      }
     }
   };
 
@@ -185,14 +178,17 @@ const InfoServicios = () => {
   const handleSubmitEditSubscription = async (event) => {
     event.preventDefault();
     try {
-        console.log(editingSubscription.suscripcionDto.id)
+      console.log(editingSubscription.suscripcionDto.id);
       setLoading(true); // Establecer el estado de carga a true
-      console.log(editingSubscription)
-      await api.put(`/suscripciones/${editingSubscription.suscripcionDto.id}`, editingSubscription.suscripcionDto);
+      console.log(editingSubscription);
+      await api.put(
+        `/suscripciones/${editingSubscription.suscripcionDto.id}`,
+        editingSubscription.suscripcionDto
+      );
       toast.success("Suscripción actualizada exitosamente");
       setModalOpenEdit(false);
       setEditingSubscription(null);
-      fetchSuscripciones(id, currentPage); 
+      fetchSuscripciones(id, currentPage);
     } catch (error) {
       console.error("Error al actualizar la suscripción:", error);
       toast.error("Error al actualizar la suscripción");
@@ -204,7 +200,7 @@ const InfoServicios = () => {
   // eliminar una suscripcion
   const handleEliminarSuscripcion = async (suscripcionId) => {
     try {
-      await api.delete(`/suscripciones/con-detalles/${suscripcionId}`);
+      await api.delete(`/suscripciones/${suscripcionId}`);
       toast.success("Suscripción eliminada exitosamente");
       fetchSuscripciones(id, currentPage); // Actualiza la lista de suscripciones después de eliminar
     } catch (error) {
@@ -216,11 +212,11 @@ const InfoServicios = () => {
     setServicioToDelete(servicio);
     setShowAlert(true);
   };
-  
+
   const handleCancelDelete = () => {
     setShowAlert(false);
   };
-  
+
   const handleConfirmDelete = async () => {
     if (servicioToDelete) {
       try {
@@ -234,51 +230,67 @@ const InfoServicios = () => {
   };
 
   // manejar la cedula del cliente
-  const searchByCedula = () => {
-    const filtered = clientes.filter((cliente) =>
-      cliente.cedula.toLowerCase().includes(searchCedulaTerm.toLowerCase())
-    );
-    setSearchCedulaResults(filtered);
+  const searchByCedula = async () => {
+    try {
+      const response = await api.get(
+        `/clientes/searchByCi/${searchCedulaTerm}/page/1`
+      );
+      const cliente = response.data.items.find(
+        (cliente) => cliente.cedula === searchCedulaTerm
+      );
+      if (cliente) {
+        handleSelectCliente(cliente);
+      } else {
+        toast.error("La cédula ingresada no corresponde a ningún cliente.");
+      }
+    } catch (error) {
+      console.error("La cedula no corresponde a ningun cliente:", error);
+      toast.error("La cedula no corresponde a ningun cliente");
+    }
   };
+
   const handleSearchCedulaChange = (event) => {
     const term = event.target.value;
     setSearchCedulaTerm(term);
 
     // buscar si mayor o igual a 3 caracteres
     if (term.length >= 3) {
-      searchByCedula();
-    } else {
-      setSearchCedulaResults([]);
+      if (event.key === "Enter") {
+        searchByCedula();
+      } else {
+        setSearchCedulaResults([]);
+      }
     }
   };
 
-  const handleSelectCliente = (clientId) => {
-    setSelectedCliente(clientId);
-    setSearchCedulaTerm(""); 
+  const handleSelectCliente = (cliente) => {
+    setSelectedCliente(cliente);
+    setSearchCedulaTerm(""); // Limpiar el término de búsqueda
     setSearchCedulaResults([]); 
   };
-  //buscador mejorado 
+
+  //buscador mejorado
   const handleInputChange = (event) => {
     const term = event.target.value;
     setSearchTerm(term);
-  
+
     if (term === "") {
       // Si el input de búsqueda está vacío, vuelve a la primera página
       setCurrentPage(1);
       fetchSuscripciones(id, 1);
     }
   };
-  
+
   const handleSearchChange = () => {
     console.log(searchTerm);
     if (searchTerm.length >= 4) {
-      searchServicios(searchTerm); // Usa searchTerm en lugar de term
+      searchServicios(searchTerm); 
     } else {
-      fetchSuscripciones(id, currentPage); 
+      fetchSuscripciones(id, currentPage);
     }
   };
-  
-  return ( 
+
+  return (
     <div className="MaquetaCliente">
       <Toaster
         position="top-right"
@@ -309,7 +321,7 @@ const InfoServicios = () => {
             </div>
             <div className="card-body d-flex align-items-center ">
               <form className="d-flex flex-grow-1">
-              <input
+                <input
                   id="Btn-Buscar"
                   className="form-control mt-3 custom-input"
                   type="text"
@@ -317,15 +329,11 @@ const InfoServicios = () => {
                   value={searchTerm}
                   onChange={handleInputChange}
                 />
-             
-
-<ButtonBasic
-  id="Btn-Buscar"
-  text="Buscar"
-  onClick={handleSearchChange} // Mantén el onClick para llamar a la función handleSearchChange
-/>
-  
-  
+                <ButtonBasic
+                  id="Btn-Buscar"
+                  text="Buscar"
+                  onClick={handleSearchChange}
+                />{" "}
               </form>
               <div className="dropdown">
                 <button
@@ -339,17 +347,29 @@ const InfoServicios = () => {
                 </button>
                 <ul className="dropdown-menu">
                   <li>
-                    <button className="dropdown-item"  id="Btnpagado" onClick={() => handleFiltrar("pagado")}>
+                    <button
+                      className="dropdown-item"
+                      id="Btnpagado"
+                      onClick={() => handleFiltrar("pagado")}
+                    >
                       Pagado
                     </button>
                   </li>
                   <li>
-                    <button className="dropdown-item"  id="BtnPendiente" onClick={() => handleFiltrar("pendiente")}>
+                    <button
+                      className="dropdown-item"
+                      id="BtnPendiente"
+                      onClick={() => handleFiltrar("pendiente")}
+                    >
                       Pendiente
                     </button>
                   </li>
                   <li>
-                    <button className="dropdown-item"  id="Btn-todos" onClick={() => handleFiltrar("")}>
+                    <button
+                      className="dropdown-item"
+                      id="Btn-todos"
+                      onClick={() => handleFiltrar("")}
+                    >
                       Todos
                     </button>
                   </li>
@@ -369,8 +389,12 @@ const InfoServicios = () => {
               <thead>
                 <tr>
                   <th scope="col">Cliente</th>
-                  <th scope="col">Estado <TbArrowDown /></th>
-                  <th scope="col">Plan <GoQuestion /></th>
+                  <th scope="col">
+                    Estado <TbArrowDown />
+                  </th>
+                  <th scope="col">
+                    Plan <GoQuestion />
+                  </th>
                   <th scope="col">Email</th>
                   <th scope="col">Numero de telefono</th>
                   <th scope="col"></th>
@@ -384,15 +408,32 @@ const InfoServicios = () => {
                         {suscripcion.clienteDto.nombre}
                       </Link>
                     </td>
-                    <td><EstadoPago estado={suscripcion.suscripcionDto.estado} /></td>
+                    <td>
+                      <EstadoPago estado={suscripcion.suscripcionDto.estado} />
+                    </td>
                     <td>{suscripcion.suscripcionDto.modalidad}</td>
                     <td>{suscripcion.clienteDto.email}</td>
                     <td>{suscripcion.clienteDto.telefono}</td>
                     <td className="custom-table2">
-  <a href="#"  style={{ marginRight: "15%" }} id={`eliminar-${suscripcion.suscripcionDto.id}`}  onClick={() => handleEliminarSuscripcion(suscripcion.suscripcionDto.id)}>
-    <RiDeleteBinLine />
-  </a>
-                      <a href="#" id={`editar-${suscripcion.suscripcionDto.id}`} onClick={() => handleEditSubscription(suscripcion)}> {/* Agregar onClick para editar */}
+                      <a
+                        href="#"
+                        style={{ marginRight: "15%" }}
+                        id={`eliminar-${suscripcion.suscripcionDto.id}`}
+                        onClick={() =>
+                          handleEliminarSuscripcion(
+                            suscripcion.suscripcionDto.id
+                          )
+                        }
+                      >
+                        <RiDeleteBinLine />
+                      </a>
+                      <a
+                        href="#"
+                        id={`editar-${suscripcion.suscripcionDto.id}`}
+                        onClick={() => handleEditSubscription(suscripcion)}
+                      >
+                        {" "}
+                        {/* Agregar onClick para editar */}
                         <FiEdit2 />
                       </a>
                     </td>
@@ -403,26 +444,25 @@ const InfoServicios = () => {
           </div>
           <div className="pagination-container">
             <Pagination
-             id="paginacion"
+              id="paginacion"
               count={totalPages}
-              shape="rounded"
-              color="secondary"
-              onChange={(event, page) => setCurrentPage(page)}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
             />
           </div>
         </div>
       </div>
       <ModalBase
-      id="ModalAgregar"
-      title="Agrgar Cliente"
+        id="ModalAgregar"
+        title="Agrgar Cliente"
         open={modalOpen}
         closeModal={() => {
-          setModalOpen(false); 
-          // Limpiar los campos 
+          setModalOpen(false);
+          // Limpiar los campos
           setSelectedCliente("");
           setModalidad("MENSUAL");
           setFechaInicio("");
-        }}     
+        }}
       >
         <form onSubmit={handleSubmitSuscripcion}>
           <div>
@@ -431,7 +471,7 @@ const InfoServicios = () => {
               <span className="required">*</span>
             </div>
             <select
-             id="selecModalidad"
+              id="selecModalidad"
               className="select"
               value={modalidad}
               onChange={(e) => setModalidad(e.target.value)}
@@ -446,7 +486,7 @@ const InfoServicios = () => {
               <span className="required">*</span>
             </div>
             <input
-             id="Agregarfechainicio"
+              id="Agregarfechainicio"
               className="select-activity"
               type="date"
               value={fechaInicio}
@@ -454,39 +494,48 @@ const InfoServicios = () => {
             />
           </div>
 
-
           <div>
-            <div className="label-container">
-              <LabelBase label="Seleccione un cliente:" htmlFor="clientes" />
-              <span className="required">*</span>
-            </div>
-            <input
-            id="EscribirCedula"
-              type="text"
-              className="select"
-              placeholder="Ingrese la cedula del cliente"
-              value={searchCedulaTerm}
-              onChange={handleSearchCedulaChange}
-            />
-            {/* Buscar por CI  */}
-            <ul>
-              {searchCedulaResults.map((cliente) => (
-                <a id="listarInfo" className="select-activity" key={cliente.id} href="#" onClick={() => handleSelectCliente(cliente)}>
-                {cliente.nombre} CI: {cliente.cedula}
-              </a>
-              ))}
-            </ul>
-          </div>
+  <div className="label-container">
+    <LabelBase label="Cédula del cliente:" htmlFor="cedula" />
+    <span className="required">*</span>
+  </div>
+  <div className="input-container">
+    <input
+      id="cedula"
+      type="text"
+      className="select"
+      placeholder="Ingrese el Nº CI completo del cliente"
+      value={searchCedulaTerm}
+      onChange={handleSearchCedulaChange}
+    />
+    {/* Botón para buscar clientes por cédula */}
+    <ButtonBasic id="Btn-BuscarCI"  text="Agregar" onClick={searchByCedula} style={{ width: '2cm',height:'0.87cm' }}/>
+  </div>
+  <ul>
+    {searchCedulaResults.map((cliente) => (
+      <li key={cliente.id}>
+        <button onClick={() => handleSelectCliente(cliente)}>
+          {cliente.nombre} - CI: {cliente.cedula}
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
+
+          {/* Mostrar el cliente seleccionado */}
           {selectedCliente && (
-    <p>Seleccionado: {selectedCliente.nombre} CI: {selectedCliente.cedula}</p>
-  )}
+            <p>
+             <strong>Seleccionado:</strong> {selectedCliente.nombre} CI:{" "}
+              {selectedCliente.cedula}
+            </p>
+          )}
           <div className="campo-obligatorio">
             <span className="required">*</span>
             <span className="message">Campo obligatorio</span>
           </div>
           <div className="d-flex justify-content-center align-items-center float-end">
             <ButtonBasic
-             id="Btn-guardar"
+              id="Btn-guardar"
               text="Guardar"
               type="submit"
               onClick={handleSubmitSuscripcion}
@@ -499,8 +548,8 @@ const InfoServicios = () => {
 
       {/* Modal para editar suscripciones */}
       <ModalBase
-      id="ModalEditar"
-      title="Editar Cliente"
+        id="ModalEditar"
+        title="Editar Cliente"
         open={editingSubscription !== null}
         closeModal={() => setEditingSubscription(null)}
       >
@@ -508,7 +557,10 @@ const InfoServicios = () => {
           <form onSubmit={handleSubmitEditSubscription}>
             <div>
               <div className="label-container">
-                <LabelBase label="Modalidad de membresía:" htmlFor="modalidad" />
+                <LabelBase
+                  label="Modalidad de membresía:"
+                  htmlFor="modalidad"
+                />
                 <span className="required">*</span>
               </div>
               <select
@@ -535,7 +587,7 @@ const InfoServicios = () => {
                 <span className="required">*</span>
               </div>
               <input
-               id="fechaInicioEdit"
+                id="fechaInicioEdit"
                 className="select-activity"
                 type="date"
                 value={editingSubscription.suscripcionDto.fechaInicio}
@@ -556,7 +608,7 @@ const InfoServicios = () => {
                 <span className="required">*</span>
               </div>
               <input
-              id="fechaFinEdit"
+                id="fechaFinEdit"
                 className="select-activity"
                 type="date"
                 value={editingSubscription.suscripcionDto.fechaFin}
@@ -577,7 +629,7 @@ const InfoServicios = () => {
                 <span className="required">*</span>
               </div>
               <input
-              id="selecionIDactividad"
+                id="selecionIDactividad"
                 className="select-activity"
                 type="text"
                 value={editingSubscription.clienteDto.nombre}
@@ -590,7 +642,7 @@ const InfoServicios = () => {
             </div>
             <div className="d-flex justify-content-center align-items-center float-end">
               <ButtonBasic
-              id="GuardarEdit"
+                id="GuardarEdit"
                 text="Guardar"
                 type="submit"
                 onClick={handleSubmitEditSubscription}
@@ -603,16 +655,15 @@ const InfoServicios = () => {
       </ModalBase>
 
       {showAlert && servicioToDelete && (
-  <CustomAlert
-    message={`¿Estás seguro de eliminar el servicio ${servicioToDelete.actividad.nombre}?`}
-    confirmText="Aceptar"
-    cancelText="Cancelar"
-    id="confirmacion"
-    confirmAction={handleConfirmDelete}
-    cancelAction={handleCancelDelete}
-  />
-)}
-
+        <CustomAlert
+          message={`¿Estás seguro de eliminar el servicio ${servicioToDelete.actividad.nombre}?`}
+          confirmText="Aceptar"
+          cancelText="Cancelar"
+          id="confirmacion"
+          confirmAction={handleConfirmDelete}
+          cancelAction={handleCancelDelete}
+        />
+      )}
     </div>
   );
 };
