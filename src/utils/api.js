@@ -1,14 +1,21 @@
 import axios from "axios";
 
+
+
+const baseURL = import.meta.env.VITE_API; // Acceso a variables de entorno en Vite
+
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: baseURL,
 });
 
 api.interceptors.request.use(
   function (config) {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user && user.token) {
-      config.headers["token"] = user.token;
+    if (user && user.accessToken) {
+      // Ignorar el uso del token para las rutas /auth/register y /auth/login
+      if (config.url !== "/auth/register" && config.url !== "/auth/login") {
+        config.headers["Authorization"] = `Bearer ${user.accessToken}`;
+      }
     }
     return config;
   },
@@ -19,6 +26,7 @@ api.interceptors.request.use(
 
 export default api;
 
+
 /*
  * Ejemplo de utilizacion:
  * import api from "./services/api.js"
@@ -26,3 +34,5 @@ export default api;
  * api.post("/clientes", clientes);
  * api.get("/clientes");
  */
+
+

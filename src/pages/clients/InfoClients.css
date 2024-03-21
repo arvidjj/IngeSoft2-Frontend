@@ -1,0 +1,99 @@
+
+.MaquetaCliente {
+    padding: 3%;
+    padding-left: 18%;
+}
+
+.cuadro-central {
+    width: 100%;
+    padding: 20% 1%;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+}
+.cuadro-medio{
+    width: 80%;
+    margin-left: 10%;
+}
+.header-cliente {
+    margin-right: 20%;
+}
+
+/* Estilos base */
+.info-cliente {
+    display: flex;
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan en varias líneas */
+    margin-left: 10%;
+
+    align-items: center;
+}
+
+.info-cliente > div:nth-child(2) {
+    align-items: center;
+    margin-right: 20%; /* Reducir el margen derecho */
+
+}
+
+.info-cliente > div:last-child {
+
+    flex: 1; /* Permitir que este elemento ocupe todo el espacio disponible */
+}
+
+
+
+.datos-extras {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 3%;
+    padding-bottom: 5%; /* espacio en la linea divisoria*/
+}
+
+.datos-extras > div {
+    padding-left: 10%;
+    margin-right: 8%;
+
+}
+
+.datos-extras p {
+    margin: 0; /* Elimina el margen predeterminado del párrafo */
+}
+
+.circle {
+    width: 120%;
+    height: 180%;
+    margin-left:50%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #7F56D9;
+
+
+}
+
+.initials {
+    font-weight: bold;
+    background-color: #e9d4f7;
+    font-size: 5rem;
+    margin-left:50%;
+    background-color: #F9F5FF;
+}
+
+.custom-button {
+    font-size: 200%;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+}
+
+.ModalBase {
+    width: 30%;
+}
+.table td {
+    padding: 15px; /* Ajusta este valor según la altura que desees */
+  }
+  
+
+

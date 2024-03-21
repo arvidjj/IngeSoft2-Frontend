@@ -1,0 +1,178 @@
+.card {
+  width: 100%; 
+  height: 100%; 
+  max-width: 90rem; 
+  margin-left: -8%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+
+.custom-input {
+  margin-left: 3%;
+  width: 75%;
+  height: 40px;
+}
+
+.dropdown {
+  margin-right: 10%;
+  
+}
+
+.button-t {
+  margin-right: 5%;
+  border: 8px solid #6941c6;
+  border-radius: 8px;
+  background-color: #6941c6;
+  color: #fff;
+  text-align: center;
+  font-size: 13px;
+  cursor: pointer;
+}
+.btn-filtrar{
+  width: 130%;
+  color: #6941c6;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #6941c6;
+}
+.btn-filtrar:hover{
+  background-color: #6941c6;
+}
+.card-1{
+  border: none;
+}
+.card-2{
+  border: none;
+}
+.custom-table {
+  width: 100%; 
+  text-align: center; 
+}
+.custom-table td {
+  padding: 1%; 
+  margin: auto;
+  padding: auto;
+}
+
+.custom-table th {
+  background-color: #f2f2f2; 
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  bottom: 2em; 
+ 
+}
+.custom-table-icons{
+  margin: 2%;
+}
+
+/* Media Queries para pantallas más pequeñas */
+
+@media screen and (max-width: 600px) {
+.card {
+  margin-left: 0;
+  
+  max-width: 100%;
+}
+
+.custom-input {
+  width: 60%;
+}
+
+.dropdown {
+  margin-right: 5%;
+}
+
+.button-t {
+  margin-right: 3%;
+  font-size: 11px;
+}
+
+.btn-filtrar {
+  width: 110%;
+}
+
+.custom-table{
+  width: 50%;
+  font-size: 5px;
+}
+
+.pagination-container {
+  margin-top: 50rem;
+  bottom: 1rem; 
+}
+}
+.container {
+
+display: flex;
+flex-direction: column; 
+
+}
+
+.table-container {
+flex: 1; 
+overflow: auto; 
+}
+
+.custom-table {
+width: 98%; 
+}
+
+
+.mb-2.block {
+display: flex;
+flex-direction: column; 
+}
+
+.label-container {
+display: flex;
+align-items: center;
+}
+
+.required {
+color: red;
+margin-left: 0.5rem;
+font-size: 0.8rem; 
+}
+
+.campo-obligatorio {
+display: flex;
+align-items: center;
+color: red;
+font-size: 0.8rem;
+}
+
+
+
+.required-info {
+color: red; 
+text-align: center; 
+}
+
+.title-container {
+display: flex;
+align-items: center;
+}
+
+.back-link {
+margin-right: 10px; 
+}
+
+.title {
+margin: 0; 
+}
+
+.custom-table tbody tr {
+height: 50px; 
+}
+
+.custom-table2{
+padding: 8px;
+color: #667085;
+font-size: 14px;
+text-align: center;
+align-items: center;
+margin-left: 5px;
+}
