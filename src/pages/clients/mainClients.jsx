@@ -549,7 +549,7 @@ const MainClients = () => {
             </div>
             <ButtonCrear 
             id="btn-crear"
-            text="Nuevo Proveedor"
+            text="Nuevo Cliente"
             onClick={() => setShowModal(true)}
                icon={<IoAdd />}
                color="secondary"
