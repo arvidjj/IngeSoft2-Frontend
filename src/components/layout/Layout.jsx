@@ -7,8 +7,8 @@ const Layout = ({ children }) => {
     <>
       <NavBar />
     {/* todas las pantallas estaran rodeadas de este fondo, gris al fondo
-        para utilizar la carta blanca del medio, ver componente MainSquare */}
-      <div className='FondoApp'>
+        - Para utilizar la carta blanca del medio, ver componente MainSquare */}
+      <div className='FondoApp pt-5'>
         {children}
       </div>
     </>
