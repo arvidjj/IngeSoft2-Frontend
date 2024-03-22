@@ -1,0 +1,12 @@
+/*utilizar estas variables para mantener constancia,
+importar este modulo @import 'global.css';*/
+
+:root {
+    --background-maincolor: #F4F6F6;
+
+    --primary: #6941C6;
+    --secondary: #E5D0FF;
+
+    --text-color:#667085;
+  }
+  

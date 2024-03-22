@@ -1,3 +1,17 @@
+/*cambios de andy*/
+@import './global.css';
+
+body {
+  background-color: var(--background-maincolor);
+}
+
+#root {
+  height: 100vh;
+}
+/**/
+
+
+
 .login-container {
   padding: 20px;
   display: flex;
@@ -7,8 +21,6 @@
   width: 100vw;
   background-color: #F4F4F4;
 }
-
-
 
 
 .login-card {
@@ -110,13 +122,3 @@
 }
 
 
-/*cambios de andy*/
-body {
-  background-color: rgba(159, 176, 176, 0.107);
-}
-
-#root {
-
-  height: 100vh;
-}
-/**/
