@@ -80,7 +80,7 @@
 }
 
 .focused .placehold,
-.form-control:not(:placeholder-shown) + .placehold {
+.form-control:not(:placeholder-shown)+.placehold {
   top: -15px;
   font-size: 15px;
   color: black;
@@ -99,12 +99,24 @@
 }
 
 .error-title {
-  font-size: 14px; 
+  font-size: 14px;
   color: red;
 }
 
 
-.logo-navbar{
+.logo-navbar {
   width: 20%;
   height: 20%;
 }
+
+
+/*cambios de andy*/
+body {
+  background-color: rgba(159, 176, 176, 0.107);
+}
+
+#root {
+
+  height: 100vh;
+}
+/**/
