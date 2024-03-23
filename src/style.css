@@ -1,13 +1,5 @@
 /*cambios de andy*/
 @import './global.css';
-
-body {
-  background-color: var(--background-maincolor);
-}
-
-#root {
-  height: 100vh;
-}
 /**/
 
 
