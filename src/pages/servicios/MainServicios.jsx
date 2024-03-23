@@ -220,7 +220,7 @@ const MainServicios = () => {
             <div className="card-body d-flex align-items-center justify-content-between">
               <form className="d-flex flex-grow-1">
                   <input
-                  id="Btn-Buscar"
+                   id="input-search"
                   className="form-control mt-3 custom-input"
                   type="text"
                   placeholder="Buscar actividad..."
@@ -230,13 +230,13 @@ const MainServicios = () => {
              
 
 <ButtonBasic
-  id="Btn-Buscar"
+  id="btn-buscar"
   text="Buscar"
   onClick={handleSearchChange} // Mantén el onClick para llamar a la función handleSearchChange
 />
   </form>
 
-              <button id="nuevoServicioButton" className="button-t" onClick={handleNuevoServicio}>
+              <button id="btn-crear" className="button-t" onClick={handleNuevoServicio}>
                 <IoAdd />
                 Nuevo Servicio
               </button>
@@ -261,7 +261,7 @@ const MainServicios = () => {
                 </div>
                 <input
                   type="text"
-                  id="Inputnombre"
+                  id="nombre"
                   name="nombre"
                   className="form-control"
                   value={servicioData.nombre}
@@ -321,7 +321,7 @@ const MainServicios = () => {
                 <span className="message">Campo obligatorio</span>
               </div>
               <div className="d-flex justify-content-center align-items-center float-end">
-                <ButtonBasic id="BtnGuardar" text="Guardar" onClick={handleAceptar}  />
+                <ButtonBasic id="btn-guardar" text="Guardar" onClick={handleAceptar}  />
               </div>
             </form>
           </ModalBase>
@@ -358,11 +358,13 @@ const MainServicios = () => {
                     <td>{servicio.actividad.costoMensual.toLocaleString()}</td>
                     <td>{servicio.actividad.costoSemanal.toLocaleString()}</td>
                     <td class="text-center">
-                      <a id="eliminar" href="#" onClick={() => handleShowAlert(servicio)}>
+                      <a 
+                       id={`btn-eliminar-actividad-${servicio.id}`}
+                      href="#" onClick={() => handleShowAlert(servicio)}>
                         <RiDeleteBinLine />
                       </a>
                       <a
-                      id="editar"
+                         id={`btn-editar-actividad-${servicio.id}`}
                         href="#"
                         onClick={() => handleEditarServicio(servicio)}
                         style={{ marginLeft: "1.5em" }}
