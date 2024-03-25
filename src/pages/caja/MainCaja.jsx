@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useForm } from "react-hook-form"
 import BotonCrear from "../../components/bottons/ButtonCrear";
-import MainSquare from "../../components/mainSquare/MainSquare";
+import CartaPrincipal from "../../components/cartaPrincipal/CartaPrincipal";
 import './MainCaja.css'
+import FlechaAtras from "../../components/flechaAtras/FlechaAtras";
 
 const MainCaja = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
@@ -11,7 +12,8 @@ const MainCaja = () => {
 
     return (
         <>
-            <MainSquare>
+            <CartaPrincipal>
+                <FlechaAtras />
                 <h1>Registrar Nueva Caja</h1>
                 <form>
                     <label for="nombre">Nombre de la Caja</label>
@@ -23,7 +25,7 @@ const MainCaja = () => {
                         text={"Registrar Caja"}
                     />
                 </form>
-            </MainSquare>
+            </CartaPrincipal>
         </>
     )
 }
