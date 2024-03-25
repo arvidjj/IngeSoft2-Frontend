@@ -12,6 +12,7 @@ import Servicios from './pages/servicios/MainServicios';
 import InfoServicios from "./pages/servicios/InfoServicios";
 import MainProveedores from './pages/proveedores/MainProveedores';
 import MainCaja from './pages/caja/MainCaja';
+import ComprasCaja from "./pages/compras_caja/ComprasCaja";
 
 createRoot(document.getElementById("root")).render(
     <React.StrictMode>
@@ -27,7 +28,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/proveedores" element={<Layout><MainProveedores /></Layout>} />
 
           <Route path="/caja" element={<Layout><MainCaja /></Layout>} />
-
+          <Route path="/comprasCaja" element={<Layout><ComprasCaja/></Layout>}/>
           <Route path="*" element={<Layout><PageNotFound /></Layout>} />
         </Routes>
       </Router>
