@@ -4,6 +4,8 @@ import { Btn } from "../../../components/bottons/Button";
 import CartaPrincipal from "../../../components/cartaPrincipal/CartaPrincipal";
 import { useNavigate } from "react-router-dom";
 
+import './AdministrarCaja.css'
+
 
 import toast, { Toaster } from "react-hot-toast";
 
@@ -39,8 +41,38 @@ const AdministrarCaja = () => {
             />
 
             <CartaPrincipal>
-                <div className="d-flex align-items-center">
-                    <h1>Caja #0001</h1>
+                <h1>Caja #0001</h1>
+
+                <div className="d-flex gap-5">
+                    <div className="card cajaCard">
+                        <p>Ventas</p>
+
+                        <Btn type="primary">
+                            Nueva Venta
+                        </Btn>
+
+                        <Btn outline>
+                            Listar Ventas
+                        </Btn>
+                    </div>
+                    <div className="card cajaCard">
+                        <p>Compras</p>
+
+                        <Btn type="primary">
+                            Nueva Compra
+                        </Btn>
+
+                        <Btn outline>
+                            Listar Compras
+                        </Btn>
+                    </div>
+                    <div className="card cajaCard">
+                        <p>Cobros Pendientes</p>
+
+                        <Btn outline>
+                            Listar Cobros Pendientes
+                        </Btn>
+                    </div>
                 </div>
 
             </CartaPrincipal>

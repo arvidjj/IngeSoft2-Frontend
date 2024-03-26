@@ -135,7 +135,8 @@ const MainCaja = () => {
                                         )
                                     )}
 
-                                    <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={(cargandoSesion || cargandoCajas)}>
+                                    <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={(cargandoSesion || cargandoCajas)}
+                                     onClick={() => handleAbrirCaja(values)}>
                                         Abrir Caja
                                     </Btn>
 
