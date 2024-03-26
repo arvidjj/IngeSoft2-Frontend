@@ -2,7 +2,7 @@ import { ButtonBase } from "../../../bottons/styles/ButtonBase";
 
 export const NavButtonBase = {
   ...ButtonBase,
-  color: "inherit",
+  color: "gray",
   border: "none",
   padding: "2em 1.5em",
   borderRadius: "0",
