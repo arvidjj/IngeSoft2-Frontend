@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import api from '../utils/api'
 
-const useCaja = () => {
+const useSesionCaja = () => {
 
-    const CAJA_URL = '/cajas' //URL del endpoint
+    const CAJA_URL = '/cajas/sesiones-caja' //URL del endpoint
 
     const [data, setData] = useState([]); //datos traidos del back
     const [error, setError] = useState(null) //guarda error
@@ -22,15 +22,11 @@ const useCaja = () => {
     }
 
     //Funciones del endpoint
-    const createCaja = async params => {
+    const createSesionCaja = async params => {
         return handleRequest(() => api.post(CAJA_URL, params ))
     }
 
-    const getAllCajas = async (page = 1, params) => {
-        return handleRequest(() => api.get(`${CAJA_URL}/page/${page}`, params ))
-    }
-
-    return { createCaja, getAllCajas, data, error, isLoading }
+    return { createSesionCaja, data, error, isLoading }
 }
 
-export default useCaja
+export default useSesionCaja

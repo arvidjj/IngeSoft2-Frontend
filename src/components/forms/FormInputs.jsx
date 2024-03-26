@@ -12,7 +12,7 @@ export const FormTextInput = ({ label, required = false, ...props }) => {
     return (
         <>
             <label htmlFor={props.id || props.name}>
-                {label} {required && (<span style={{color:'red'}}>*</span>)}
+                {label} {required && (<span style={{ color: 'red' }}>*</span>)}
             </label>
             <input className="text-input form-control" {...field} {...props} />
             {meta.touched && meta.error ? (
@@ -31,6 +31,7 @@ export const FormCheckbox = ({ children, ...props }) => {
     return (
         <div>
             <label className="checkbox-input">
+                {required && (<span style={{ color: 'red' }}>*</span>)}
                 <input type="checkbox" {...field} {...props} />
                 {children}
             </label>
@@ -41,12 +42,14 @@ export const FormCheckbox = ({ children, ...props }) => {
     );
 };
 
-export const FormSelect = ({ label, ...props }) => {
+export const FormSelect = ({ label, required = false, ...props }) => {
     const [field, meta] = useField(props);
     return (
         <div>
-            <label htmlFor={props.id || props.name}>{label}</label>
-            <select {...field} {...props} />
+            <label htmlFor={props.id || props.name}>
+                {label} {required && (<span style={{ color: 'red' }}>*</span>)}
+            </label>
+            <select {...field} {...props} className='form-control form-select' />
             {meta.touched && meta.error ? (
                 <div className="error">{meta.error}</div>
             ) : null}

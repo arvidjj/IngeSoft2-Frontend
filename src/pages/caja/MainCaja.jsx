@@ -6,22 +6,51 @@ import './MainCaja.css'
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { FormSelect, FormTextInput } from "../../components/forms/FormInputs";
+import { useNavigate } from "react-router-dom";
 
 import useCaja from "../../hooks/useCaja";
+import useSesionCaja from "../../hooks/useSesionCaja";
 
 const MainCaja = () => {
 
-    const { getAllCajas, data: cajas, isLoading, error } = useCaja();
+    const { getAllCajas, data: cajas, isLoading: cargandoCajas, error: errorCajas } = useCaja();
+    const { createSesionCaja, isLoading: cargandoSesion, error: errorSesion } = useSesionCaja();
+    const [userData, setUserData] = useState({});
+
+    const navigate = useNavigate();
 
     useEffect(() => {
-        getAllCajas(1);
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            setUserData(user);
+            getAllCajas(1);
+        }
     }, [localStorage.getItem("user")])
 
-    const handleAbrirCaja = (values) => {
-        console.log(values)
-        setTimeout(() => {
-            alert(JSON.stringify(values));
-        }, 400);
+    const handleAbrirCaja = async (values) => {
+
+        if (cargandoSesion || cargandoCajas) return;
+
+        //anho-mes-fecha
+        const fecha = new Date().toISOString().slice(0, 10);
+        //hora-min-seg
+        const hora = new Date().toISOString().slice(11, 19);
+
+        const postData = {
+            idCaja: values['id_caja'],
+            idUsuario: 1,
+            montoInicial: values['montoInicial'],
+            montoFinal: null,
+            fecha: fecha,
+            horaApertura: hora,
+            horaCierre: null
+        }
+
+        const success = await createSesionCaja(postData);
+        
+        if (!errorSesion) {
+            navigate("/caja-administracion");
+        }
     }
 
     return (
@@ -33,36 +62,49 @@ const MainCaja = () => {
                         <Formik
                             initialValues={{
                                 id_caja: '',
+                                montoInicial: ''
                             }}
                             validationSchema={Yup.object({
                                 id_caja: Yup.string()
+                                    .required('Requerido'),
+                                montoInicial: Yup.string()
+                                    .required('Requerido'),
                             })}
                             onSubmit={async (values) => {
-                                await sleep(500);
-                                alert(JSON.stringify(values, null, 2));
+                                handleAbrirCaja(values)
                             }}
                         >
                             <Form>
                                 <div className="d-flex flex-column gap-2">
-                                    {isLoading ? (
+                                    {cargandoCajas ? (
                                         <p>Cargando...</p>
                                     ) : (
                                         cajas.items ? (
-                                            <FormSelect
-                                                label="Caja"
-                                                name="id_caja"
-                                                required={true}
-                                            >
-                                                {cajas.items.map(caja => (
-                                                    <option key={caja.id} value={caja.id}>{caja.nombre}</option>
-                                                ))}
-                                            </FormSelect>
+                                            <>
+                                                <FormSelect
+                                                    label="Caja"
+                                                    name="id_caja"
+                                                    required={true}
+                                                >
+                                                    <option value="">Selecciona una Caja</option>
+                                                    {cajas.items.map(caja => (
+                                                        <option key={caja.id} value={caja.id}>{caja.nombre}</option>
+                                                    ))}
+                                                </FormSelect>
+                                                <FormTextInput
+                                                    label="Monto Inicial"
+                                                    name="montoInicial"
+                                                    type="number"
+                                                    placeholder="2000000"
+                                                    required={true}
+                                                />
+                                            </>
                                         ) : (
                                             <p>No hay cajas</p>
                                         )
                                     )}
 
-                                    <Btn type="primary" className='mt-3 align-self-end'>
+                                    <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={cargandoSesion}>
                                         Abrir Caja
                                     </Btn>
 
@@ -84,6 +126,7 @@ export default MainCaja
 
 
 /*
+codigo para registrar una caja:
 <Formik
                             initialValues={{
                                 nombre: '',
