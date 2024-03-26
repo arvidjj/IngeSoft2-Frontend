@@ -8,6 +8,9 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Logo from "../../../assets/logo.png";
 import { NavBtn } from "./NavBtn";
+import { NavDropdown } from "./DropDown/NavDropdown";
+import { NavDropDownItem } from "./DropDown/NavDropDownItem";
+
 
 const NavbarStyled = styled(AppBar)(AppBarStyle);
 
@@ -28,9 +31,17 @@ export const NewNavbar = () => {
             >
               <MenuIcon />
             </IconButton>
-            <NavBtn type="nav"><img src={Logo} alt="Logo de la aplicación" className="logo-img" /></NavBtn>
-            <NavBtn type="nav">asdfasfd</NavBtn>
-            <NavBtn type="nav">asdfasfd</NavBtn>
+            <NavBtn type="base"><img src={Logo} alt="Logo de la aplicación" className="logo-img" /></NavBtn>
+            <NavBtn href="/clientes">Clientes</NavBtn>
+            <NavBtn href="/users">Usuarios</NavBtn>
+            <NavBtn href="/servicios">Servicios</NavBtn>
+            <NavBtn href="/caja">Caja</NavBtn>
+            <NavBtn href="/reportes">Reportes</NavBtn>
+            <NavDropdown title="pepe">
+              <NavDropDownItem href="/pepe">Lista de Proveedores</NavDropDownItem>
+              <NavDropDownItem href="/pepe">Lista de Productos</NavDropDownItem>
+
+            </NavDropdown>
           </div>
           <Btn color="inherit">Login</Btn>
         </ToolbarStyled>
