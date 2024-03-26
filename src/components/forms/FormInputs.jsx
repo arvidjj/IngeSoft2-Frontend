@@ -16,7 +16,7 @@ export const FormTextInput = ({ label, required = false, ...props }) => {
             </label>
             <input className="text-input form-control" {...field} {...props} />
             {meta.touched && meta.error ? (
-                <div className="error">{meta.error}</div>
+                <div className="error" style={{ color: 'red' }}>{meta.error}</div>
             ) : null}
         </>
     );
@@ -36,7 +36,7 @@ export const FormCheckbox = ({ children, ...props }) => {
                 {children}
             </label>
             {meta.touched && meta.error ? (
-                <div className="error">{meta.error}</div>
+                <div className="error" style={{ color: 'red' }}>{meta.error}</div>
             ) : null}
         </div>
     );
@@ -51,7 +51,7 @@ export const FormSelect = ({ label, required = false, ...props }) => {
             </label>
             <select {...field} {...props} className='form-control form-select' />
             {meta.touched && meta.error ? (
-                <div className="error">{meta.error}</div>
+                <div className="error" style={{ color: 'red' }}>{meta.error}</div>
             ) : null}
         </div>
     );

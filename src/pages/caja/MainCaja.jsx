@@ -11,10 +11,14 @@ import { useNavigate } from "react-router-dom";
 import useCaja from "../../hooks/useCaja";
 import useSesionCaja from "../../hooks/useSesionCaja";
 
+import toast, { Toaster } from "react-hot-toast";
+
+import CircularProgress from "@mui/material/CircularProgress";
+
 const MainCaja = () => {
 
-    const { getAllCajas, data: cajas, isLoading: cargandoCajas, error: errorCajas } = useCaja();
-    const { createSesionCaja, isLoading: cargandoSesion, error: errorSesion } = useSesionCaja();
+    const { getAllCajas, data: req_cajas, isLoading: cargandoCajas, error: errorCajas } = useCaja();
+    const { createSesionCaja, data: req_sesion, isLoading: cargandoSesion, error: errorSesion } = useSesionCaja();
     const [userData, setUserData] = useState({});
 
     const navigate = useNavigate();
@@ -47,17 +51,38 @@ const MainCaja = () => {
         }
 
         const success = await createSesionCaja(postData);
-        
+
         if (!errorSesion) {
-            navigate("/caja-administracion");
+            navigate(`/caja-administracion/${req_sesion['id']}`);
+        } else {
+            toast.error("Error al abrir caja. Revise la conexión.");
         }
     }
 
     return (
         <>
+            <Toaster
+                position="top-right"
+                reverseOrder={false}
+                toastOptions={{
+                    success: {
+                        style: {
+                            background: "#75B798",
+                            color: "#0A3622",
+                        },
+                    },
+                    error: {
+                        style: {
+                            background: "#FFDBD9",
+                            color: "#D92D20",
+                        },
+                    },
+                }}
+            />
+
             <CartaPrincipal>
                 <div className="d-flex align-items-center justify-content-center my-auto">
-                    <div className="d-flex flex-column p-4 py-5 card" style={{ "width": "25rem", marginLeft: 0 }}>
+                    <div className="d-flex flex-column p-4 py-5 card" style={{ "width": "30rem", marginLeft: 0 }}>
                         <h1>Abrir caja</h1>
                         <Formik
                             initialValues={{
@@ -67,8 +92,11 @@ const MainCaja = () => {
                             validationSchema={Yup.object({
                                 id_caja: Yup.string()
                                     .required('Requerido'),
-                                montoInicial: Yup.string()
-                                    .required('Requerido'),
+                                montoInicial: Yup.number()
+                                    .typeError('El monto debe ser un numero')
+                                    .required('Requerido')
+                                    .positive('Debe ser un número positivo')
+                                    ,
                             })}
                             onSubmit={async (values) => {
                                 handleAbrirCaja(values)
@@ -77,9 +105,12 @@ const MainCaja = () => {
                             <Form>
                                 <div className="d-flex flex-column gap-2">
                                     {cargandoCajas ? (
-                                        <p>Cargando...</p>
+                                        <div className="d-flex flex-column align-items-center justify-content-center mt-2">
+                                            <CircularProgress />
+                                            <p className="pt-2">Cargando cajas...</p>
+                                        </div>
                                     ) : (
-                                        cajas.items ? (
+                                        req_cajas.items ? (
                                             <>
                                                 <FormSelect
                                                     label="Caja"
@@ -87,12 +118,12 @@ const MainCaja = () => {
                                                     required={true}
                                                 >
                                                     <option value="">Selecciona una Caja</option>
-                                                    {cajas.items.map(caja => (
+                                                    {req_cajas.items.map(caja => (
                                                         <option key={caja.id} value={caja.id}>{caja.nombre}</option>
                                                     ))}
                                                 </FormSelect>
                                                 <FormTextInput
-                                                    label="Monto Inicial"
+                                                    label="Monto Inicial en Efectivo"
                                                     name="montoInicial"
                                                     type="number"
                                                     placeholder="2000000"
@@ -100,13 +131,17 @@ const MainCaja = () => {
                                                 />
                                             </>
                                         ) : (
-                                            <p>No hay cajas</p>
+                                            <p className="pt-2">No se encontraron cajas, registra una nueva caja.</p>
                                         )
                                     )}
 
-                                    <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={cargandoSesion}>
+                                    <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={(cargandoSesion || cargandoCajas)}>
                                         Abrir Caja
                                     </Btn>
+
+                                    {/*<nav>
+                                        {errorSesion && <p className="text-danger">Error al abrir caja. Revise la conexión.</p>}
+                                    </nav>*/}
 
                                     <button type="submit">Submit</button>
 
