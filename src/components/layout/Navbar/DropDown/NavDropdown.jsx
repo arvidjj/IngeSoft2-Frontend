@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavBtn } from "../NavBtn";
 
-export const NavDropdown = ({ title, children }) => {
+export const NavDropdown = ({ title, children, showArrow, className,...props }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -9,11 +9,15 @@ export const NavDropdown = ({ title, children }) => {
       className="d-inline-block"
       onMouseOver={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
+      style={{ minWidth: "fit-content"}}
     >
       <div className="dropdown">
         <NavBtn
-          style={open ? { boxShadow: "0 5px 0 -1px #7749F8" } : {}}
-          className="dropdown-toggle"
+          style={
+            open ? { color: "#7749F8", boxShadow: "0 5px 0 -1px #7749F8" } : {}
+          }
+          className={`${className} ${showArrow ? "dropdown-toggle" : ""}`}
+          {...props}
         >
           {title}
         </NavBtn>

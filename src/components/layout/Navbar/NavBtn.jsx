@@ -3,6 +3,8 @@ import { styled } from "@mui/material";
 import { NavButton } from "./styles/NavButton";
 import { NavButtonBase } from "./styles/NavButtonBase";
 import { NavBtnDropdownStyle } from "./styles/NavBtnDropdownStyle";
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const BtnNavbar = styled(Button)(() => NavButton);
 const BtnNavbarBase = styled(Button)(() => NavButtonBase);
@@ -18,6 +20,15 @@ const BtnContent = ({ icon, children }) => {
 };
 
 export const NavBtn = ({ children, icon, type, href, className, ...props }) => {
+
+  const [selected, setSelected] = useState(false);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    setSelected(location.pathname === href);
+  }, [location]);
+
   switch (type) {
     case "base":
       return (
@@ -27,13 +38,13 @@ export const NavBtn = ({ children, icon, type, href, className, ...props }) => {
       );
     case "dropdownItem":
       return (
-          <BtnNavbarDropdown href={href ?? "#"} className="dropdown-item" {...props}>
+          <BtnNavbarDropdown href={href ?? "#"} className={`${selected&&"selected"} ${className}`} {...props}>
             <BtnContent icon={icon}>{children}</BtnContent>
           </BtnNavbarDropdown>
       );
     default:
       return (
-          <BtnNavbar  href={href ?? "#"}  className={className} {...props}>
+          <BtnNavbar  href={href ?? "#"} className={`${selected&&"selected"} ${className}`} {...props}>
             <BtnContent icon={icon}>{children}</BtnContent>
           </BtnNavbar>
       );

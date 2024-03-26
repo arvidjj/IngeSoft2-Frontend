@@ -31,3 +31,12 @@ Ejemplo:
       </NavBtn>
     </NavDropdown>
 ```
+
+### UserDropDown
+
+Es el dropdown con las opciones del usuario.
+
+Las opciones Configurar Cuenta (sin funcionamiento todavía) y Cerrar Sesión están ahí
+
+### ProveedoresDropDown
+Aquí están Ver Proveedores y Ver Productos

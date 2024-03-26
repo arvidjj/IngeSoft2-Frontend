@@ -12,5 +12,10 @@ export const NavBtnDropdownStyle = {
     ...NavButtonBase["&:hover"],
     background: "#f4ebff",
   },
+
+  "&.selected": {
+    background: "#f4ebff",
+    color: "#7749F8",
+  },
  
 };
