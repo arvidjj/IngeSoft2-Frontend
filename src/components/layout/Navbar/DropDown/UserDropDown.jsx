@@ -11,7 +11,7 @@ const UserDropDownTitle = ({ nombre }) => {
         style={{
           borderRadius: "100%",
           background: "#f4ebff",
-          marginLeft: "0.5rem",
+          margin: "0.5rem",
         }}
       >
         <FaUser
@@ -45,7 +45,7 @@ export const UserDropDown = () => {
 
   return (
     <>
-      <NavDropdown title={<UserDropDownTitle nombre={userData?.nombre} style={{minWidth:"max-content"}} />}>
+      <NavDropdown left title={<UserDropDownTitle nombre={userData?.nombre} style={{minWidth:"max-content"}}/>}>
         <NavBtn type="dropdownItem" href="#">
           Configurar Cuenta
         </NavBtn>
