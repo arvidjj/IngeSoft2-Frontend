@@ -61,10 +61,13 @@ const AdministrarCaja = () => {
         const putData = {
             horaCierre: hora
         }
-        await cerrarCajaById(CajaStorage.getSesionCajaId(), putData);
+        
+        setSesionCaja(await cerrarCajaById(CajaStorage.getSesionCajaId(), putData));
 
         CajaStorage.cerrarCaja();
-        navigate("/caja");
+        setTimeout(() => {
+            navigate("/caja");
+        }, 1000);
     }
 
     return (
@@ -95,9 +98,12 @@ const AdministrarCaja = () => {
                         :
                         (<h1>caja.nombre</h1>)}
 
-                    <Btn outline onClick={cerrarCajaActual}>
-                        Cerrar Caja
-                    </Btn>
+                    <div className="d-flex align-items-center justify-content-center gap-3">
+                        {sesionCaja.horaCierre ? <p className="p-0 m-0">Caja cerrada a las {sesionCaja.horaCierre}</p> : <p className="p-0 m-0">Caja en curso</p>}
+                        <Btn outline onClick={cerrarCajaActual}>
+                            Cerrar Caja
+                        </Btn>
+                    </div>
                 </div>
 
                 <div className="d-flex gap-5 justify-content-center my-auto flex-md-row flex-sm-column">

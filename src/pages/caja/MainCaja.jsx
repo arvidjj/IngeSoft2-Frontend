@@ -145,15 +145,13 @@ const MainCaja = () => {
                                     )}
 
                                     <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={(cargandoSesion || cargandoCajas)}
-                                        onClick={() => handleAbrirCaja(values)}>
+                                        submit >
                                         Abrir Caja
                                     </Btn>
 
                                     {/*<nav>
                                         {errorSesion && <p className="text-danger">Error al abrir caja. Revise la conexión.</p>}
                                     </nav>*/}
-
-                                    <button type="submit">Submit</button>
 
                                 </div>
                             </Form>
