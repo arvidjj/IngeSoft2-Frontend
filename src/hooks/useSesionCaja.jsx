@@ -13,10 +13,10 @@ const useSesionCaja = () => {
         setIsLoading(true)
         try {
             const res = await FuncionBackend() // que funcion se ejecutara en el back
-            await setData(res.data) //guarda los datos traidos del back
+            setData(res.data) //guarda los datos traidos del back
             return res.data;
         } catch (error) {
-            setError(error)
+            return setError(error)
         } finally {
             setIsLoading(false)
         }

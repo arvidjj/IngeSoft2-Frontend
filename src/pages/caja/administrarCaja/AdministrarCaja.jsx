@@ -27,10 +27,12 @@ const AdministrarCaja = () => {
 
     useEffect(() => {
         if (CajaStorage.getCajaId() && CajaStorage.getSesionCajaId()) {
-            setCaja(getCajaById(CajaStorage.getCajaId()));
-            setSesionCaja(getSesionCajaById(CajaStorage.getSesionCajaId()));
-        }
-    }, [localStorage.getItem("user")])
+            getCajaById(CajaStorage.getCajaId());
+            setCaja(req_caja);
+            getSesionCajaById(CajaStorage.getSesionCajaId());
+            setSesionCaja(req_sesion);
+        } 
+    }, [caja])
 
 
     const goToNuevaCompra = () => {
@@ -80,7 +82,7 @@ const AdministrarCaja = () => {
         toast.success(`Caja cerrada con éxito a las ${hora}. Redirigiendo a la página principal..`);
         setTimeout(() => {
             navigate("/caja");
-        }, 2000);
+        }, 2500);
     }
 
     return (
@@ -109,7 +111,7 @@ const AdministrarCaja = () => {
                     {(cargandoCaja && cargandoSesion && caja) ?
                         (<CircularProgress />)
                         :
-                        (<h1>caja.nombre</h1>)}
+                        (<h1>{caja.nombre}</h1>)}
 
                     <div className="d-flex align-items-center justify-content-center gap-3">
                         {sesionCaja.horaCierre ? <p className="p-0 m-0">Caja cerrada a las {sesionCaja.horaCierre}</p> : <p className="p-0 m-0">Caja en curso</p>}

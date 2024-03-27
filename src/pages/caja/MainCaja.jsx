@@ -15,6 +15,9 @@ import toast, { Toaster } from "react-hot-toast";
 
 import CircularProgress from "@mui/material/CircularProgress";
 import CajaStorage from "../../utils/CajaStorage";
+import { IoAdd } from "react-icons/io5";
+import ModalBase from "../../components/modals/ModalBase";
+import ModalRegistrarCaja from "./ModalRegistrarCaja";
 
 const MainCaja = () => {
 
@@ -22,6 +25,7 @@ const MainCaja = () => {
     const { createSesionCaja, data: req_sesion, isLoading: cargandoSesion, error: errorSesion } = useSesionCaja();
 
     const [abrirDisabled, setAbrirDisabled] = useState(true);
+    const [openRegistrarModal, setOpenRegistrarModal] = useState(false);
 
     const navigate = useNavigate();
 
@@ -74,6 +78,16 @@ const MainCaja = () => {
         }
     }
 
+    // por el momento utilizo esto para evitar cargar contenido en la pagina si una caja esta abierta
+    // si existe una mejor solucion, avisar a andy
+    // de todas formas en el useEffect se redirecciona a administracion-caja si hay una caja abierta
+    if (CajaStorage.getCajaId() && CajaStorage.getSesionCajaId()) {
+        return (
+            <>
+            </>
+        )
+    }
+
     return (
         <>
             <Toaster
@@ -95,7 +109,13 @@ const MainCaja = () => {
                 }}
             />
 
+            <ModalRegistrarCaja open={openRegistrarModal} closeModal={() => {setOpenRegistrarModal(false)}} toast={toast}/>
+
             <CartaPrincipal>
+                <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={((cargandoSesion || abrirDisabled))} icon={<IoAdd />}
+                onClick={() => {setOpenRegistrarModal(true)}}>
+                    Registrar Nueva Caja
+                </Btn>
                 <div className="d-flex align-items-center justify-content-center my-auto">
                     <div className="d-flex flex-column p-4 py-5 card" style={{ "width": "30rem", marginLeft: 0 }}>
                         <h1>Abrir caja</h1>
@@ -172,52 +192,3 @@ const MainCaja = () => {
 
 
 export default MainCaja
-
-
-/*
-codigo para registrar una caja:
-<Formik
-                            initialValues={{
-                                nombre: '',
-                                monto: '',
-                            }}
-                            validationSchema={Yup.object({
-                                nombre: Yup.string()
-                                    .max(15, 'Debe tener 15 caracteres o menos')
-                                    .required('Requerido'),
-                                monto: Yup.string()
-                                    .max(20, 'Debe tener 20 caracteres o menos')
-                                    .required('Requerido'),
-                            })}
-                            onSubmit={(values, { setSubmitting }) => {
-                                setTimeout(() => {
-                                    alert(JSON.stringify(values, null, 2));
-                                    setSubmitting(false);
-                                }, 400);
-                            }}
-                        >
-                            <Form>
-                                <div className="d-flex flex-column gap-2">
-                                    <FormTextInput
-                                        label="Nombre"
-                                        name="nombre"
-                                        type="text"
-                                        placeholder="Caja 1"
-                                        required={true}
-                                    />
-                                    <FormTextInput
-                                        label="Monto"
-                                        name="monto"
-                                        type="text"
-                                        placeholder="2000000"
-                                        required={true}
-                                    />
-                                    <Btn type="submit" className='mt-3 align-self-end'>
-                                        Abrir Caja
-                                    </Btn>
-                    
-                                </div>
-                            </Form>
-                        </Formik>
-
-                        */
