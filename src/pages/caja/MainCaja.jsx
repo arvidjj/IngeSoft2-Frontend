@@ -14,21 +14,27 @@ import useSesionCaja from "../../hooks/useSesionCaja";
 import toast, { Toaster } from "react-hot-toast";
 
 import CircularProgress from "@mui/material/CircularProgress";
+import CajaStorage from "../../utils/CajaStorage";
 
 const MainCaja = () => {
 
     const { getAllCajas, data: req_cajas, isLoading: cargandoCajas, error: errorCajas } = useCaja();
     const { createSesionCaja, data: req_sesion, isLoading: cargandoSesion, error: errorSesion } = useSesionCaja();
-    const [userData, setUserData] = useState({});
 
     const navigate = useNavigate();
 
     useEffect(() => {
+
         const user = JSON.parse(localStorage.getItem('user'));
         if (user) {
-            setUserData(user);
             getAllCajas(1);
         }
+
+        //si ya se abrio una caja, ir a administración
+        if (CajaStorage.getCajaId() && CajaStorage.getSesionCajaId()) {
+            navigate(`/caja-administracion/${CajaStorage.getSesionCajaId()}`);
+        }
+
     }, [localStorage.getItem("user")])
 
     const handleAbrirCaja = async (values) => {
@@ -52,7 +58,11 @@ const MainCaja = () => {
 
         const success = await createSesionCaja(postData);
 
-        if (!errorSesion) {
+        if (!errorSesion && req_sesion) {
+
+            CajaStorage.setCajaId(req_sesion['idCaja']);
+            CajaStorage.setSesionCajaId(req_sesion['id']);
+
             navigate(`/caja-administracion/${req_sesion['id']}`);
         } else {
             toast.error("Error al abrir caja. Revise la conexión.");
@@ -96,7 +106,7 @@ const MainCaja = () => {
                                     .typeError('El monto debe ser un numero')
                                     .required('Requerido')
                                     .positive('Debe ser un número positivo')
-                                    ,
+                                ,
                             })}
                             onSubmit={async (values) => {
                                 handleAbrirCaja(values)
@@ -136,7 +146,7 @@ const MainCaja = () => {
                                     )}
 
                                     <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={(cargandoSesion || cargandoCajas)}
-                                     onClick={() => handleAbrirCaja(values)}>
+                                        onClick={() => handleAbrirCaja(values)}>
                                         Abrir Caja
                                     </Btn>
 

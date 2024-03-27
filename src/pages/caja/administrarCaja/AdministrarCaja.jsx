@@ -8,16 +8,46 @@ import './AdministrarCaja.css'
 
 
 import toast, { Toaster } from "react-hot-toast";
-
+import useSesionCaja from "../../../hooks/useSesionCaja";
+import CajaStorage from "../../../utils/CajaStorage";
 
 const AdministrarCaja = () => {
 
     const navigate = useNavigate();
+    const { getSesionCajaById, createSesionCaja, data: req_sesion, isLoading: cargandoSesion, error: errorSesion } = useSesionCaja();
+
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
+
+        const sesionCaja = getSesionCajaById(1);
     }, [localStorage.getItem("user")])
 
+
+    const goToNuevaCompra = () => {
+        navigate("/caja-ventas");
+    }
+
+    const goToListarCompras = () => {
+        navigate("/lista-compras");
+    }
+
+    const goToNuevaVenta = () => { 
+        navigate("/caja-ventas");
+    }
+
+    const goToListarVentas = () => {
+        navigate("/lista-ventas");
+    }
+
+    const goToListarCobros = () => {
+        navigate("/lista-cobros");
+    }
+
+    const cerrarCajaActual = () => {
+        CajaStorage.cerrarCaja();
+        navigate("/caja");
+    }
 
     return (
         <>
@@ -41,35 +71,40 @@ const AdministrarCaja = () => {
             />
 
             <CartaPrincipal>
-                <h1>Caja #0001</h1>
+                <div className="d-flex align-items-center justify-content-between">
+                    <h1>Caja #0001</h1>
+                    <Btn outline onClick={cerrarCajaActual}>
+                        Cerrar Caja
+                    </Btn>
+                </div>
 
-                <div className="d-flex gap-5">
+                <div className="d-flex gap-5 justify-content-center my-auto flex-md-row flex-sm-column">
                     <div className="card cajaCard">
                         <p>Ventas</p>
 
-                        <Btn type="primary">
+                        <Btn type="primary" onClick={goToNuevaVenta}>
                             Nueva Venta
                         </Btn>
 
-                        <Btn outline>
+                        <Btn outline onClick={goToListarVentas}>
                             Listar Ventas
                         </Btn>
                     </div>
                     <div className="card cajaCard">
                         <p>Compras</p>
 
-                        <Btn type="primary">
+                        <Btn type="primary" onClick={goToNuevaCompra}>
                             Nueva Compra
                         </Btn>
 
-                        <Btn outline>
+                        <Btn outline onClick={goToListarCompras}>
                             Listar Compras
                         </Btn>
                     </div>
                     <div className="card cajaCard">
                         <p>Cobros Pendientes</p>
 
-                        <Btn outline>
+                        <Btn outline onClick={goToListarCobros}>
                             Listar Cobros Pendientes
                         </Btn>
                     </div>

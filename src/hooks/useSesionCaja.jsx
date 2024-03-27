@@ -22,11 +22,15 @@ const useSesionCaja = () => {
     }
 
     //Funciones del endpoint
-    const createSesionCaja = async params => {
-        return handleRequest(() => api.post(CAJA_URL, params ))
+    const getSesionCajaById = async (id, params) => {
+        return handleRequest(() => api.get(`${CAJA_URL}/${id}`, params ))
     }
 
-    return { createSesionCaja, data, error, isLoading }
+    const createSesionCaja = async params => {
+        return handleRequest(() => api.post(CAJA_URL, params))
+    }
+
+    return { getSesionCajaById, createSesionCaja, data, error, isLoading }
 }
 
 export default useSesionCaja
