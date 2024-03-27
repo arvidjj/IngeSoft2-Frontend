@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Btn } from "../../components/bottons/Button";
 import CartaPrincipal from "../../components/cartaPrincipal/CartaPrincipal";
@@ -24,15 +24,14 @@ const MainCaja = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-            getAllCajas(1);
-        }
-
         //si ya se abrio una caja, ir a administración
         if (CajaStorage.getCajaId() && CajaStorage.getSesionCajaId()) {
-            navigate(`/caja-administracion/${CajaStorage.getSesionCajaId()}`);
+            navigate(`/caja-administracion`);
+        } else {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                getAllCajas(1);
+            }
         }
 
     }, [localStorage.getItem("user")])
@@ -58,12 +57,12 @@ const MainCaja = () => {
 
         const success = await createSesionCaja(postData);
 
-        if (!errorSesion && req_sesion) {
+        if (!errorSesion && success) {
 
-            CajaStorage.setCajaId(req_sesion['idCaja']);
-            CajaStorage.setSesionCajaId(req_sesion['id']);
+            CajaStorage.setCajaId(success['idCaja']);
+            CajaStorage.setSesionCajaId(success['id']);
 
-            navigate(`/caja-administracion/${req_sesion['id']}`);
+            navigate(`/caja-administracion`);
         } else {
             toast.error("Error al abrir caja. Revise la conexión.");
         }

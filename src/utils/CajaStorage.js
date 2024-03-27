@@ -2,23 +2,6 @@ class CajaStorage {
     static setCajaId(id) {
         localStorage.setItem('cajaId', id);
     }
-
-    static getSesionCajaId() {
-        return localStorage.getItem('sesionCajaId');
-    }
-
-    static setCajaId(id) {
-        localStorage.setItem('cajaId', id);
-    }
-
-    static getCajaId() {
-        return localStorage.getItem('cajaId');
-    }
-
-    static removeCajaId() {
-        localStorage.removeItem('cajaId');
-    }
-
     static setSesionCajaId(id) {
         localStorage.setItem('sesionCajaId', id);
     }
@@ -26,7 +9,13 @@ class CajaStorage {
     static getSesionCajaId() {
         return localStorage.getItem('sesionCajaId');
     }
+    static getCajaId() {
+        return localStorage.getItem('cajaId');
+    }
 
+    static removeCajaId() {
+        localStorage.removeItem('cajaId');
+    }
     static removeSesionCajaId() {
         localStorage.removeItem('sesionCajaId');
     }

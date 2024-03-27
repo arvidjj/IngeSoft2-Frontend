@@ -29,7 +29,7 @@ createRoot(document.getElementById("root")).render(
 
           {/*seccion de caja, agregar sus flujos de compra, venta, etc.*/}
           <Route path="/caja" element={<Layout><MainCaja /></Layout>} />
-          <Route path="/caja-administracion/:id" element={<Layout><AdministrarCaja /></Layout>} />
+          <Route path="/caja-administracion" element={<Layout><AdministrarCaja /></Layout>} />
 
 
           <Route path="*" element={<Layout><PageNotFound /></Layout>} />

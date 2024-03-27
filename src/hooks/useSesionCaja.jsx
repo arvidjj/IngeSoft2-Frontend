@@ -13,7 +13,8 @@ const useSesionCaja = () => {
         setIsLoading(true)
         try {
             const res = await FuncionBackend() // que funcion se ejecutara en el back
-            setData(res.data) //guarda los datos traidos del back
+            await setData(res.data) //guarda los datos traidos del back
+            return res.data;
         } catch (error) {
             setError(error)
         } finally {
@@ -30,7 +31,11 @@ const useSesionCaja = () => {
         return handleRequest(() => api.post(CAJA_URL, params))
     }
 
-    return { getSesionCajaById, createSesionCaja, data, error, isLoading }
+    const cerrarCajaById = async (id, params) => {
+        return handleRequest(() => api.put(`${CAJA_URL}/${id}`, params))
+    }
+
+    return { getSesionCajaById, createSesionCaja, cerrarCajaById, data, error, isLoading }
 }
 
 export default useSesionCaja

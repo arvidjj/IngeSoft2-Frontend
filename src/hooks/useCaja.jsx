@@ -13,7 +13,8 @@ const useCaja = () => {
         setIsLoading(true)
         try {
             const res = await FuncionBackend() // que funcion se ejecutara en el back
-            setData(res.data) //guarda los datos traidos del back
+            await setData(res.data) //guarda los datos traidos del back
+            return res.data;
         } catch (error) {
             setError(error)
         } finally {
@@ -26,11 +27,15 @@ const useCaja = () => {
         return handleRequest(() => api.post(CAJA_URL, params ))
     }
 
+    const getCajaById = async (id, params) => {
+        return handleRequest(() => api.get(`${CAJA_URL}/${id}`, params ))
+    }
+
     const getAllCajas = async (page = 1, params) => {
         return handleRequest(() => api.get(`${CAJA_URL}/page/${page}`, params ))
     }
 
-    return { createCaja, getAllCajas, data, error, isLoading }
+    return { createCaja, getCajaById, getAllCajas, data, error, isLoading }
 }
 
 export default useCaja

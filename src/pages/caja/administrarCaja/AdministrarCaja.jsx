@@ -8,19 +8,28 @@ import './AdministrarCaja.css'
 
 
 import toast, { Toaster } from "react-hot-toast";
+
 import useSesionCaja from "../../../hooks/useSesionCaja";
+import useCaja from "../../../hooks/useCaja";
+
 import CajaStorage from "../../../utils/CajaStorage";
+import { CircularProgress } from "@mui/material";
 
 const AdministrarCaja = () => {
 
     const navigate = useNavigate();
-    const { getSesionCajaById, createSesionCaja, data: req_sesion, isLoading: cargandoSesion, error: errorSesion } = useSesionCaja();
+    const { getCajaById, data: req_caja, isLoading: cargandoCaja, error: errorCajas } = useCaja();
+    const { getSesionCajaById, cerrarCajaById, data: req_sesion, isLoading: cargandoSesion, error: errorSesion } = useSesionCaja();
+    const [sesionCaja, setSesionCaja] = useState({});
+    const [caja, setCaja] = useState({});
 
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user'));
-
-        const sesionCaja = getSesionCajaById(1);
+        if (CajaStorage.getCajaId() && CajaStorage.getSesionCajaId()) {
+            setCaja(getCajaById(CajaStorage.getCajaId()));
+            setSesionCaja(getSesionCajaById(CajaStorage.getSesionCajaId()));
+        }
+        console.log(caja)
     }, [localStorage.getItem("user")])
 
 
@@ -32,7 +41,7 @@ const AdministrarCaja = () => {
         navigate("/lista-compras");
     }
 
-    const goToNuevaVenta = () => { 
+    const goToNuevaVenta = () => {
         navigate("/caja-ventas");
     }
 
@@ -44,7 +53,16 @@ const AdministrarCaja = () => {
         navigate("/lista-cobros");
     }
 
-    const cerrarCajaActual = () => {
+    //AUN NO SE ACTUALIZA EL MONTO FINAL!!!! URGENTE
+    const cerrarCajaActual = async () => {
+        //hora-min-seg
+        const hora = new Date().toISOString().slice(11, 19);
+
+        const putData = {
+            horaCierre: hora
+        }
+        await cerrarCajaById(CajaStorage.getSesionCajaId(), putData);
+
         CajaStorage.cerrarCaja();
         navigate("/caja");
     }
@@ -72,7 +90,11 @@ const AdministrarCaja = () => {
 
             <CartaPrincipal>
                 <div className="d-flex align-items-center justify-content-between">
-                    <h1>Caja #0001</h1>
+                    {(cargandoCaja && cargandoSesion && caja) ?
+                        (<CircularProgress />)
+                        :
+                        (<h1>caja.nombre</h1>)}
+
                     <Btn outline onClick={cerrarCajaActual}>
                         Cerrar Caja
                     </Btn>
