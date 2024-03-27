@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import "./NavBar.css";
 import Logo from "../../assets/logo.png";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { RiArrowDropDownFill } from "react-icons/ri";

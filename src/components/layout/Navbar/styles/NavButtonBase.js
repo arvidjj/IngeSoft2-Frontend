@@ -10,4 +10,5 @@ export const NavButtonBase = {
     backgroundColor: "white",
     color: "#7749F8",
   },
+
 };

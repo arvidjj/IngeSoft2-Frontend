@@ -45,7 +45,7 @@ export const UserDropDown = () => {
 
   return (
     <>
-      <NavDropdown left title={<UserDropDownTitle nombre={userData?.nombre} style={{minWidth:"max-content"}}/>}>
+      <NavDropdown title={<UserDropDownTitle nombre={userData?.nombre} style={{minWidth:"max-content"}}/>} left>
         <NavBtn type="dropdownItem" href="#">
           Configurar Cuenta
         </NavBtn>

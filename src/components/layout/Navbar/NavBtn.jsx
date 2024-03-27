@@ -44,7 +44,7 @@ export const NavBtn = ({ children, icon, type, href, className, ...props }) => {
       );
     default:
       return (
-          <BtnNavbar  href={href ?? "#"} className={`${selected&&"selected"} ${className}`} {...props}>
+          <BtnNavbar  href={href ?? "#"} className={`d-block  d-lg-inline-flex ${selected&&"selected"} ${className}`} {...props}>
             <BtnContent icon={icon}>{children}</BtnContent>
           </BtnNavbar>
       );

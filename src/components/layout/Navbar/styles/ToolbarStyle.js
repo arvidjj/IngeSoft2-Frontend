@@ -6,4 +6,5 @@ margin: "0",
 color: "#667085",
 fontWeight: "bold",
 textTransform: "none",
-minHeight: "fit-content !important",}
+minHeight: "fit-content !important",
+}
