@@ -1,5 +1,12 @@
 ## Navbar
 
+## Lo que se hizo
+- Botones en navbar
+- Botones dropdowns
+- Navbar desde 0 usando MUI + Bootstrap
+- Navbar responsive
+- Logo nuevo
+
 ### NavBtn
 
 Se tienen los tipos (usar type="_el tipo que eligas_")
@@ -40,3 +47,4 @@ Las opciones Configurar Cuenta (sin funcionamiento todavía) y Cerrar Sesión es
 
 ### ProveedoresDropDown
 Aquí están Ver Proveedores y Ver Productos
+
