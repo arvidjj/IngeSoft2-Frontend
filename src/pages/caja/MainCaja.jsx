@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Btn } from "../../components/bottons/Button";
 import CartaPrincipal from "../../components/cartaPrincipal/CartaPrincipal";
@@ -21,6 +21,8 @@ const MainCaja = () => {
     const { getAllCajas, data: req_cajas, isLoading: cargandoCajas, error: errorCajas } = useCaja();
     const { createSesionCaja, data: req_sesion, isLoading: cargandoSesion, error: errorSesion } = useSesionCaja();
 
+    const [abrirDisabled, setAbrirDisabled] = useState(true);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,9 +33,13 @@ const MainCaja = () => {
             const user = JSON.parse(localStorage.getItem('user'));
             if (user) {
                 getAllCajas(1);
+                setAbrirDisabled(false)
+                if (errorCajas) {
+                    setAbrirDisabled(true);
+                    toast.error("Error al cargar cajas. Revise la conexión.");
+                }
             }
         }
-
     }, [localStorage.getItem("user")])
 
     const handleAbrirCaja = async (values) => {
@@ -144,7 +150,7 @@ const MainCaja = () => {
                                         )
                                     )}
 
-                                    <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={(cargandoSesion || cargandoCajas)}
+                                    <Btn type="primary" className='mt-3 align-self-end' loading={cargandoSesion} disabled={((cargandoSesion || cargandoCajas || abrirDisabled))}
                                         submit >
                                         Abrir Caja
                                     </Btn>

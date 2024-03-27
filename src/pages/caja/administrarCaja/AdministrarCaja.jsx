@@ -23,51 +23,64 @@ const AdministrarCaja = () => {
     const [sesionCaja, setSesionCaja] = useState({});
     const [caja, setCaja] = useState({});
 
+    const [disabledCerrarCaja, setDisabledCerrarCaja] = useState(false);
 
     useEffect(() => {
         if (CajaStorage.getCajaId() && CajaStorage.getSesionCajaId()) {
             setCaja(getCajaById(CajaStorage.getCajaId()));
             setSesionCaja(getSesionCajaById(CajaStorage.getSesionCajaId()));
         }
-        console.log(caja)
     }, [localStorage.getItem("user")])
 
 
     const goToNuevaCompra = () => {
+        if (disabledCerrarCaja) return;
         navigate("/caja-ventas");
     }
 
     const goToListarCompras = () => {
+        if (disabledCerrarCaja) return;
         navigate("/lista-compras");
     }
 
     const goToNuevaVenta = () => {
+        if (disabledCerrarCaja) return;
         navigate("/caja-ventas");
     }
 
     const goToListarVentas = () => {
+        if (disabledCerrarCaja) return;
         navigate("/lista-ventas");
     }
 
     const goToListarCobros = () => {
+        if (disabledCerrarCaja) return;
         navigate("/lista-cobros");
     }
 
     //AUN NO SE ACTUALIZA EL MONTO FINAL!!!! URGENTE
     const cerrarCajaActual = async () => {
+        setDisabledCerrarCaja(true);
         //hora-min-seg
         const hora = new Date().toISOString().slice(11, 19);
 
         const putData = {
             horaCierre: hora
         }
-        
+
         setSesionCaja(await cerrarCajaById(CajaStorage.getSesionCajaId(), putData));
 
+        if (errorSesion) {
+            toast.error("Error al cerrar caja. Revise la conexión.");
+            setDisabledCerrarCaja(false);
+            return;
+        }
+
         CajaStorage.cerrarCaja();
+        toast.success(`Caja cerrada con éxito a las ${hora}. Redirigiendo a la página principal..`);
         setTimeout(() => {
             navigate("/caja");
-        }, 1000);
+        }, 2000);
     }
 
     return (
@@ -100,7 +113,7 @@ const AdministrarCaja = () => {
 
                     <div className="d-flex align-items-center justify-content-center gap-3">
                         {sesionCaja.horaCierre ? <p className="p-0 m-0">Caja cerrada a las {sesionCaja.horaCierre}</p> : <p className="p-0 m-0">Caja en curso</p>}
-                        <Btn outline onClick={cerrarCajaActual}>
+                        <Btn outline onClick={cerrarCajaActual} disabled={disabledCerrarCaja}>
                             Cerrar Caja
                         </Btn>
                     </div>
@@ -110,29 +123,29 @@ const AdministrarCaja = () => {
                     <div className="card cajaCard">
                         <p>Ventas</p>
 
-                        <Btn type="primary" onClick={goToNuevaVenta}>
+                        <Btn type="primary" onClick={goToNuevaVenta} disabled={disabledCerrarCaja}>
                             Nueva Venta
                         </Btn>
 
-                        <Btn outline onClick={goToListarVentas}>
+                        <Btn outline onClick={goToListarVentas} disabled={disabledCerrarCaja}>
                             Listar Ventas
                         </Btn>
                     </div>
                     <div className="card cajaCard">
                         <p>Compras</p>
 
-                        <Btn type="primary" onClick={goToNuevaCompra}>
+                        <Btn type="primary" onClick={goToNuevaCompra} disabled={disabledCerrarCaja}>
                             Nueva Compra
                         </Btn>
 
-                        <Btn outline onClick={goToListarCompras}>
+                        <Btn outline onClick={goToListarCompras} disabled={disabledCerrarCaja}>
                             Listar Compras
                         </Btn>
                     </div>
                     <div className="card cajaCard">
                         <p>Cobros Pendientes</p>
 
-                        <Btn outline onClick={goToListarCobros}>
+                        <Btn outline onClick={goToListarCobros} disabled={disabledCerrarCaja}>
                             Listar Cobros Pendientes
                         </Btn>
                     </div>
